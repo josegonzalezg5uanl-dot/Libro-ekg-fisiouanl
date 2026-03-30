@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cap. 4 – Metodología de Interpretación | Guía ECG</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-left">
+      <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+      <a href="index.html" class="site-logo"><i class="fas fa-heartbeat"></i><span>Guía de ECG</span></a>
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Buscar en el libro..."/>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-send-session" id="btnSendSession" onclick="openSendModal()" title="Enviar registro de sesión al profesor">
+        <i class="fas fa-paper-plane"></i><span class="btn-send-label">Enviar</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+      <a href="https://github.com/dmccreary/i-book-v1" target="_blank" class="gh-link"><i class="fab fa-github"></i></a>
+    </div>
+  </header>
+  <div class="overlay" id="overlay"></div>
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        <div class="sidebar-title">Contenido</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Inicio</a></li>
+          <li class="nav-section">Capítulos</li>
+          <li class="nav-item"><a href="chapter-1.html" class="nav-link"><span class="ch-num">1</span> Fundamentos Fisiológicos y Técnicos</a></li>
+          <li class="nav-item"><a href="chapter-2.html" class="nav-link"><span class="ch-num">2</span> Anatomía de las Derivaciones</a></li>
+          <li class="nav-item"><a href="chapter-3.html" class="nav-link"><span class="ch-num">3</span> Componentes del Trazado Normal</a></li>
+          <li class="nav-item"><a href="chapter-4.html" class="nav-link active"><span class="ch-num">4</span> Metodología de Interpretación</a></li>
+          <li class="nav-item"><a href="chapter-5.html" class="nav-link"><span class="ch-num">5</span> Patologías Básicas y Patrones</a></li>
+          <li class="nav-item"><a href="chapter-6.html" class="nav-link"><span class="ch-num">6</span> Talleres de Práctica</a></li>
+          <li class="nav-section">Aprendizaje</li>
+          <li class="nav-item">
+            <a href="autopercepcion.html" class="nav-link">
+              <i class="fas fa-brain" style="color:#a78bfa"></i> Autopercepción
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="chapter-layout">
+          <article class="chapter-content">
+            <h1>Metodología de Interpretación (Sistemática)</h1>
+            <div class="chapter-meta">
+              <span class="chapter-badge"><i class="fas fa-clipboard-list"></i> Capítulo 4</span>
+              <span class="chapter-read-time"><i class="fas fa-clock"></i> ~25 min de lectura</span>
+            </div>
+
+            <p>Interpretar un ECG sin un método sistemático es una de las principales fuentes de error en la práctica clínica. Un orden estructurado garantiza que <strong>no se omita ningún hallazgo importante</strong>, especialmente en situaciones de urgencia donde el tiempo es crítico.</p>
+
+            <div class="info-box note">
+              <i class="fas fa-info-circle"></i>
+              <p><strong>Regla de oro:</strong> Siempre sigue el mismo orden. Nunca te saltes un paso, aunque la primera impresión del trazo te parezca obvio.</p>
+            </div>
+
+            <h2 id="orden-sistematico">El Orden Sistemático de los 5 Pasos</h2>
+            <ol class="steps">
+              <li>Frecuencia cardíaca</li>
+              <li>Ritmo</li>
+              <li>Eje eléctrico</li>
+              <li>Análisis de la morfología (P, PR, QRS, ST, T, QT)</li>
+              <li>Conclusión e interpretación</li>
+            </ol>
+
+            <h2 id="frecuencia">1. Frecuencia Cardíaca</h2>
+            <p>La frecuencia cardíaca normal es de <strong>60–100 lpm</strong>. Existen tres métodos principales para calcularla:</p>
+
+            <h3 id="regla-300">Método de los 300 (Ritmo Regular)</h3>
+            <p>Divide 300 entre el número de cuadros grandes entre dos ondas R consecutivas:</p>
+            <div style="background:var(--code-bg);border-radius:8px;padding:.9rem 1.2rem;margin:1rem 0;font-family:'Roboto Mono',monospace;font-size:.95rem;">
+              FC = 300 / n° cuadros grandes entre R–R
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Cuadros grandes entre R–R</th><th>Frecuencia aproximada</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>300 lpm</td></tr>
+                <tr><td>2</td><td>150 lpm</td></tr>
+                <tr><td>3</td><td>100 lpm</td></tr>
+                <tr><td>4</td><td>75 lpm</td></tr>
+                <tr><td>5</td><td>60 lpm</td></tr>
+                <tr><td>6</td><td>50 lpm</td></tr>
+              </tbody>
+            </table>
+            <div class="info-box tip">
+              <i class="fas fa-lightbulb"></i>
+              <p><strong>Regla nemotécnica:</strong> 300 – 150 – 100 – 75 – 60 – 50. ¡Memoriza esta secuencia y úsala en urgencias!</p>
+            </div>
+
+            <h3 id="regla-1500">Método de los 1500 (Precisión)</h3>
+            <p>Divide 1500 entre el número de cuadros pequeños entre dos ondas R:</p>
+            <div style="background:var(--code-bg);border-radius:8px;padding:.9rem 1.2rem;margin:1rem 0;font-family:'Roboto Mono',monospace;font-size:.95rem;">
+              FC = 1500 / n° cuadros pequeños entre R–R
+            </div>
+            <p>Más preciso para frecuencias que no coinciden exactamente con valores de la regla de los 300.</p>
+
+            <h3 id="ritmo-irregular">Ritmos Irregulares</h3>
+            <p>Cuando el ritmo es irregular (por ejemplo, fibrilación auricular), los métodos anteriores no son válidos. En su lugar:</p>
+            <ul>
+              <li>Cuenta el número de complejos QRS en una tira de ritmo de <strong>10 segundos</strong> y multiplica por 6.</li>
+              <li>O cuenta los QRS en 6 segundos y multiplica por 10.</li>
+            </ul>
+
+            <h2 id="ritmo">2. Ritmo</h2>
+            <p>La identificación del ritmo es el paso más importante. Se deben responder cuatro preguntas:</p>
+            <ol class="steps">
+              <li><strong>¿Hay ondas P?</strong> Si no hay ondas P, descartar fibrilación auricular o ritmo ventricular.</li>
+              <li><strong>¿Las ondas P son sinusales?</strong> Deben ser positivas en II y negativas en aVR.</li>
+              <li><strong>¿Cada P precede a un QRS?</strong> Relación P:QRS debe ser 1:1 en ritmo sinusal normal.</li>
+              <li><strong>¿El intervalo R–R es regular?</strong> Variación &gt; 0,12 s indica irregularidad.</li>
+            </ol>
+
+            <table class="data-table">
+              <thead><tr><th>Hallazgo</th><th>Diagnóstico probable</th></tr></thead>
+              <tbody>
+                <tr><td>P sinusal + R–R regular</td><td>Ritmo sinusal normal</td></tr>
+                <tr><td>Ausencia de ondas P + R–R irregular</td><td>Fibrilación auricular</td></tr>
+                <tr><td>Ondas P en "sierra" + R–R regular</td><td>Flutter auricular</td></tr>
+                <tr><td>P antes del QRS pero no sinusal</td><td>Ritmo ectópico auricular</td></tr>
+                <tr><td>Sin P visible + QRS ancho</td><td>Ritmo ventricular / TV</td></tr>
+              </tbody>
+            </table>
+
+            <h2 id="eje-electrico">3. Eje Eléctrico del QRS</h2>
+            <p>El eje eléctrico representa la dirección general de la despolarización ventricular en el plano frontal. Se calcula observando las derivaciones del sistema hexaxial.</p>
+
+            <h3 id="metodo-rapido">Método Rápido (Derivaciones I y aVF)</h3>
+            <table class="data-table">
+              <thead><tr><th>Derivación I</th><th>Derivación aVF</th><th>Eje</th><th>Rango</th></tr></thead>
+              <tbody>
+                <tr><td>Positiva (+)</td><td>Positiva (+)</td><td>Normal</td><td>0° a +90°</td></tr>
+                <tr><td>Positiva (+)</td><td>Negativa (−)</td><td>Desviación izquierda (DAHI)</td><td>0° a −90°</td></tr>
+                <tr><td>Negativa (−)</td><td>Positiva (+)</td><td>Desviación derecha (DAHD)</td><td>+90° a +180°</td></tr>
+                <tr><td>Negativa (−)</td><td>Negativa (−)</td><td>Eje indeterminado</td><td>−90° a ±180°</td></tr>
+              </tbody>
+            </table>
+
+            <div class="info-box warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p><strong>Causas de desviación del eje:</strong> DAHI → Hemibloqueo anterior izquierdo, HVI. DAHD → HVD, EPOC, Tromboembolismo pulmonar, Hemibloqueo posterior izquierdo.</p>
+            </div>
+
+            <h2 id="morfologia">4. Análisis de la Morfología</h2>
+            <p>Evalúa de forma secuencial cada componente del ECG. Sigue siempre el mismo orden:</p>
+
+            <h3 id="analisis-p">Onda P</h3>
+            <ul>
+              <li>Duración ≤ 0,12 s</li>
+              <li>Amplitud ≤ 2,5 mm</li>
+              <li>Morfología: uniforme, redondeada</li>
+              <li>¿P bimodal en II? → Crecimiento de aurícula izquierda</li>
+              <li>¿P picuda en II? → Crecimiento de aurícula derecha</li>
+            </ul>
+
+            <h3 id="analisis-pr">Intervalo PR</h3>
+            <ul>
+              <li>Normal: 0,12–0,20 s</li>
+              <li>¿PR largo constante? → BAV 1er grado</li>
+              <li>¿PR que se alarga progresivamente? → BAV 2do grado Mobitz I (Wenckebach)</li>
+              <li>¿PR corto con onda delta? → Síndrome de WPW</li>
+            </ul>
+
+            <h3 id="analisis-qrs">Complejo QRS</h3>
+            <ul>
+              <li>Duración: 0,06–0,10 s</li>
+              <li>¿QRS ancho (&gt; 0,12 s)? → Bloqueo de rama o conducción aberrante</li>
+              <li>¿Ondas Q? → Evaluar profundidad y derivaciones afectadas</li>
+              <li>Voltaje: ¿Bajo voltaje? ¿Criterios de HVI o HVD?</li>
+            </ul>
+
+            <h3 id="analisis-st">Segmento ST y Onda T</h3>
+            <ul>
+              <li>¿ST elevado? → Infarto agudo (IAMCEST), pericarditis, patrón de repolarización precoz</li>
+              <li>¿ST deprimido? → Isquemia, efecto digitálico</li>
+              <li>¿Onda T invertida? → Isquemia, HVI con patrón de sobrecarga, TEP</li>
+              <li>¿Onda T alta y picuda? → Hiperpotasemia, isquemia hiperaguda</li>
+            </ul>
+
+            <h3 id="analisis-qt">Intervalo QT</h3>
+            <ul>
+              <li>Calcular QTc con fórmula de Bazett</li>
+              <li>Normal: &lt; 440 ms (♂) / &lt; 460 ms (♀)</li>
+              <li>QTc &gt; 500 ms: riesgo de arritmias malignas</li>
+            </ul>
+
+            <h2 id="resumen">Resumen: Checklist de Interpretación</h2>
+            <table class="data-table">
+              <thead><tr><th>#</th><th>Paso</th><th>Lo que debes preguntarte</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>Frecuencia</td><td>¿Cuántos lpm? ¿Bradi/Taqui/Normal?</td></tr>
+                <tr><td>2</td><td>Ritmo</td><td>¿Sinusal? ¿Regular? ¿P antes de cada QRS?</td></tr>
+                <tr><td>3</td><td>Eje</td><td>¿Normal? ¿DAHI? ¿DAHD?</td></tr>
+                <tr><td>4a</td><td>Onda P</td><td>¿Normal en morfología y duración?</td></tr>
+                <tr><td>4b</td><td>Intervalo PR</td><td>¿0,12–0,20 s? ¿Constante?</td></tr>
+                <tr><td>4c</td><td>Complejo QRS</td><td>¿Estrecho? ¿Ondas Q? ¿Voltaje?</td></tr>
+                <tr><td>4d</td><td>ST y T</td><td>¿Isoeléctrico? ¿Elevación/depresión?</td></tr>
+                <tr><td>4e</td><td>QT/QTc</td><td>¿Dentro de límites normales?</td></tr>
+                <tr><td>5</td><td>Conclusión</td><td>¿Cuál es el diagnóstico ECG?</td></tr>
+              </tbody>
+            </table>
+
+            <div class="chapter-nav">
+              <a href="chapter-3.html" class="ch-nav-btn">
+                <i class="fas fa-chevron-left"></i>
+                <div><span class="nav-label">Anterior</span><span class="nav-title">Componentes del Trazado Normal</span></div>
+              </a>
+              <a href="chapter-5.html" class="ch-nav-btn">
+                <div><span class="nav-label">Siguiente</span><span class="nav-title">Patologías Básicas y Patrones</span></div>
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            </div>
+          </article>
+
+          <aside class="toc">
+            <div class="toc-title">En este capítulo</div>
+            <ul class="toc-list">
+              <li><a href="#orden-sistematico">Los 5 Pasos</a></li>
+              <li><a href="#frecuencia">1. Frecuencia Cardíaca</a></li>
+              <li><a href="#regla-300">— Regla de los 300</a></li>
+              <li><a href="#regla-1500">— Regla de los 1500</a></li>
+              <li><a href="#ritmo-irregular">— Ritmos Irregulares</a></li>
+              <li><a href="#ritmo">2. Ritmo</a></li>
+              <li><a href="#eje-electrico">3. Eje Eléctrico</a></li>
+              <li><a href="#morfologia">4. Morfología</a></li>
+              <li><a href="#analisis-p">— Onda P</a></li>
+              <li><a href="#analisis-pr">— Intervalo PR</a></li>
+              <li><a href="#analisis-qrs">— Complejo QRS</a></li>
+              <li><a href="#analisis-st">— ST y T</a></li>
+              <li><a href="#analisis-qt">— QT/QTc</a></li>
+              <li><a href="#resumen">Checklist</a></li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+      <footer class="site-footer-bottom">
+        <p>Guía de Electrocardiografía &mdash; Libro Digital &copy; 2025</p>
+      </footer>
+    </main>
+  </div>
+  <script src="js/session.js"></script>
+<script src="js/main.js"></script>
+<script src="js/likert.js"></script>
+</body>
+</html>

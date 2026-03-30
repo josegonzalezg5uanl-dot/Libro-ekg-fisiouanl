@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Descargar Libro ECG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0e1a;
+      color: #e0e6f0;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .header .icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #00ff88;
+      margin-bottom: 8px;
+    }
+    .header p {
+      color: #8899aa;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* ── Instrucciones ── */
+    .steps {
+      background: #111827;
+      border: 1px solid #1e3a5f;
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 36px;
+    }
+    .steps h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #60c8ff;
+      margin-bottom: 16px;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+    }
+    .step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .step-num {
+      background: #00ff88;
+      color: #0a0e1a;
+      font-weight: 700;
+      font-size: 0.8rem;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-text { font-size: 0.9rem; line-height: 1.6; color: #c8d8e8; }
+    .step-text code {
+      background: #1e3a5f;
+      color: #60c8ff;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+    .step-text a {
+      color: #00ff88;
+      text-decoration: none;
+    }
+    .step-text a:hover { text-decoration: underline; }
+
+    /* ── Sección de archivos ── */
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #8899aa;
+      margin-bottom: 12px;
+      padding-left: 4px;
+    }
+
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .file-card {
+      background: #111827;
+      border: 1px solid #1e2d40;
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: border-color .2s, background .2s;
+    }
+    .file-card:hover { border-color: #00ff88; background: #131e2e; }
+
+    .file-icon {
+      font-size: 1.5rem;
+      width: 36px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .file-info { flex: 1; min-width: 0; }
+    .file-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #e0e6f0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .file-desc {
+      font-size: 0.75rem;
+      color: #607080;
+      margin-top: 2px;
+    }
+
+    .btn-dl {
+      background: transparent;
+      border: 1px solid #00ff88;
+      color: #00ff88;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-family: inherit;
+      font-weight: 600;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background .2s, color .2s;
+    }
+    .btn-dl:hover { background: #00ff88; color: #0a0e1a; }
+
+    /* ── ZIP / Descarga masiva ── */
+    .zip-section {
+      background: linear-gradient(135deg, #0d2137 0%, #0a1628 100%);
+      border: 1px solid #00ff8840;
+      border-radius: 12px;
+      padding: 28px;
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .zip-section h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #00ff88;
+      margin-bottom: 8px;
+    }
+    .zip-section p {
+      color: #8899aa;
+      font-size: 0.88rem;
+      margin-bottom: 20px;
+    }
+    .btn-zip {
+      background: #00ff88;
+      color: #0a0e1a;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .btn-zip:hover { transform: translateY(-2px); box-shadow: 0 8px 24px #00ff8840; }
+
+    .progress-bar-wrap {
+      background: #1a2a3a;
+      border-radius: 8px;
+      height: 8px;
+      margin-top: 16px;
+      overflow: hidden;
+      display: none;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #00ff88, #00ccff);
+      width: 0%;
+      border-radius: 8px;
+      transition: width .3s ease;
+    }
+    .progress-label {
+      font-size: 0.8rem;
+      color: #607080;
+      margin-top: 8px;
+      display: none;
+    }
+
+    /* ── Netlify tip ── */
+    .tip-box {
+      background: #0d1f35;
+      border-left: 4px solid #60c8ff;
+      border-radius: 0 10px 10px 0;
+      padding: 16px 20px;
+      margin-bottom: 30px;
+    }
+    .tip-box h4 { color: #60c8ff; font-size: 0.9rem; margin-bottom: 6px; }
+    .tip-box p  { color: #8899aa; font-size: 0.85rem; line-height: 1.6; }
+    .tip-box a  { color: #00ff88; }
+
+    .back-link {
+      text-align: center;
+      margin-top: 24px;
+    }
+    .back-link a {
+      color: #607080;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back-link a:hover { color: #00ff88; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ── Header ── -->
+  <div class="header">
+    <div class="icon">📦</div>
+    <h1>Descargar Archivos del Libro</h1>
+    <p>Descarga cada archivo individualmente o todos juntos como ZIP.<br/>
+       Luego súbelos a GitHub o arrástralos a Netlify.</p>
+  </div>
+
+  <!-- ── Instrucciones ── -->
+  <div class="steps">
+    <h2><i class="fas fa-map-signs"></i> &nbsp;¿Cómo publicar en Netlify?</h2>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">Haz clic en <strong>"Descargar todo (ZIP)"</strong> y guarda el archivo en tu computadora.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">Descomprime el ZIP → obtendrás una carpeta con todos los archivos del libro.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">Ve a <a href="https://app.netlify.com/drop" target="_blank">app.netlify.com/drop</a> y arrastra la carpeta completa ahí.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-text">En ~30 segundos tendrás una URL pública como <code>tu-libro-ecg.netlify.app</code> 🎉</div>
+    </div>
+  </div>
+
+  <!-- ── Descarga masiva ZIP ── -->
+  <div class="zip-section">
+    <h3><i class="fas fa-file-archive"></i> &nbsp;Descargar todo el libro (ZIP)</h3>
+    <p>Incluye todos los HTML, CSS, JS e imágenes listos para Netlify.</p>
+    <button class="btn-zip" id="btnZip" onclick="downloadAllAsZip()">
+      <i class="fas fa-download"></i> Descargar todo (ZIP)
+    </button>
+    <div class="progress-bar-wrap" id="progressWrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">Preparando archivos…</div>
+  </div>
+
+  <!-- ── Archivos HTML ── -->
+  <div class="section-title"><i class="fas fa-file-code"></i> &nbsp;Páginas HTML</div>
+  <div class="file-grid">
+    <div class="file-card">
+      <div class="file-icon">🏠</div>
+      <div class="file-info">
+        <div class="file-name">index.html</div>
+        <div class="file-desc">Portada con animación ECG</div>
+      </div>
+      <a class="btn-dl" href="index.html" download="index.html"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">📗</div>
+      <div class="file-info">
+        <div class="file-name">chapter-1.html</div>
+        <div class="file-desc">Fundamentos Fisiológicos</div>
+      </div>
+      <a class="btn-dl" href="chapter-1.html" download="chapter-1.html"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">📗</div>
+      <div class="file-info">
+        <div class="file-name">chapter-2.html</div>
+        <div class="file-desc">Anatomía de las Derivaciones</div>
+      </div>
+      <a class="btn-dl" href="chapter-2.html" download="chapter-2.html"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">📗</div>
+      <div class="file-info">
+        <div class="file-name">chapter-3.html</div>
+        <div class="file-desc">Componentes del Trazado</div>
+      </div>
+      <a class="btn-dl" href="chapter-3.html" download="chapter-3.html"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">📗</div>
+      <div class="file-info">
+        <div class="file-name">chapter-4.html</div>
+        <div class="file-desc">Metodología de Interpretación</div>
+      </div>
+      <a class="btn-dl" href="chapter-4.html" download="chapter-4.html"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">📗</div>
+      <div class="file-info">
+        <div class="file-name">chapter-5.html</div>
+        <div class="file-desc">Patologías Básicas</div>
+      </div>
+      <a class="btn-dl" href="chapter-5.html" download="chapter-5.html"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">📗</div>
+      <div class="file-info">
+        <div class="file-name">chapter-6.html</div>
+        <div class="file-desc">Talleres de Práctica</div>
+      </div>
+      <a class="btn-dl" href="chapter-6.html" download="chapter-6.html"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">💓</div>
+      <div class="file-info">
+        <div class="file-name">ecg-monitor.html</div>
+        <div class="file-desc">Monitor ECG Interactivo</div>
+      </div>
+      <a class="btn-dl" href="ecg-monitor.html" download="ecg-monitor.html"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+  </div>
+
+  <!-- ── CSS y JS ── -->
+  <div class="section-title"><i class="fas fa-paint-brush"></i> &nbsp;CSS y JavaScript</div>
+  <div class="file-grid">
+    <div class="file-card">
+      <div class="file-icon">🎨</div>
+      <div class="file-info">
+        <div class="file-name">css/style.css</div>
+        <div class="file-desc">Estilos globales (modo oscuro/claro)</div>
+      </div>
+      <a class="btn-dl" href="css/style.css" download="style.css"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">⚙️</div>
+      <div class="file-info">
+        <div class="file-name">js/main.js</div>
+        <div class="file-desc">Navegación, búsqueda, progreso</div>
+      </div>
+      <a class="btn-dl" href="js/main.js" download="main.js"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">📈</div>
+      <div class="file-info">
+        <div class="file-name">js/ecg-monitor.js</div>
+        <div class="file-desc">Motor del monitor ECG animado</div>
+      </div>
+      <a class="btn-dl" href="js/ecg-monitor.js" download="ecg-monitor.js"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+  </div>
+
+  <!-- ── Imágenes ── -->
+  <div class="section-title"><i class="fas fa-image"></i> &nbsp;Imágenes</div>
+  <div class="file-grid">
+    <div class="file-card">
+      <div class="file-icon">🖼️</div>
+      <div class="file-info">
+        <div class="file-name">potencial-accion-ecg.png</div>
+        <div class="file-desc">Cap. 1 – Potencial de acción</div>
+      </div>
+      <a class="btn-dl" href="images/potencial-accion-ecg.png" download="potencial-accion-ecg.png"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">🖼️</div>
+      <div class="file-info">
+        <div class="file-name">regiones-cardiacas-ecg.png</div>
+        <div class="file-desc">Cap. 1 – Regiones cardíacas</div>
+      </div>
+      <a class="btn-dl" href="images/regiones-cardiacas-ecg.png" download="regiones-cardiacas-ecg.png"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">🖼️</div>
+      <div class="file-info">
+        <div class="file-name">derivaciones-frontales.png</div>
+        <div class="file-desc">Cap. 2 – Derivaciones frontales</div>
+      </div>
+      <a class="btn-dl" href="images/derivaciones-frontales.png" download="derivaciones-frontales.png"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">🖼️</div>
+      <div class="file-info">
+        <div class="file-name">electrodos-precordiales2.png</div>
+        <div class="file-desc">Cap. 2 – Electrodos precordiales</div>
+      </div>
+      <a class="btn-dl" href="images/electrodos-precordiales2.png" download="electrodos-precordiales2.png"><i class="fas fa-download"></i> Bajar</a>
+    </div>
+  </div>
+
+  <!-- ── Consejo Netlify ── -->
+  <div class="tip-box">
+    <h4><i class="fas fa-lightbulb"></i> &nbsp;Consejo para Netlify</h4>
+    <p>
+      Descarga el ZIP → descomprímelo → arrastra la carpeta a
+      <a href="https://app.netlify.com/drop" target="_blank">app.netlify.com/drop</a>.
+      ¡Listo en 30 segundos! Si ya tienes un sitio en Netlify, ve a
+      <strong>Deploys → "Drag and drop your site folder here"</strong>
+      para actualizar.
+    </p>
+  </div>
+
+  <div class="back-link">
+    <a href="index.html"><i class="fas fa-arrow-left"></i> &nbsp;Volver a la portada</a>
+  </div>
+
+</div>
+
+<!-- JSZip para crear el ZIP en el navegador -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+
+<script>
+  // Lista de todos los archivos del libro con su ruta destino dentro del ZIP
+  const FILES = [
+    // HTML
+    { url: 'index.html',          path: 'libro-ecg/index.html' },
+    { url: 'chapter-1.html',      path: 'libro-ecg/chapter-1.html' },
+    { url: 'chapter-2.html',      path: 'libro-ecg/chapter-2.html' },
+    { url: 'chapter-3.html',      path: 'libro-ecg/chapter-3.html' },
+    { url: 'chapter-4.html',      path: 'libro-ecg/chapter-4.html' },
+    { url: 'chapter-5.html',      path: 'libro-ecg/chapter-5.html' },
+    { url: 'chapter-6.html',      path: 'libro-ecg/chapter-6.html' },
+    { url: 'ecg-monitor.html',    path: 'libro-ecg/ecg-monitor.html' },
+    // CSS
+    { url: 'css/style.css',       path: 'libro-ecg/css/style.css' },
+    // JS
+    { url: 'js/main.js',          path: 'libro-ecg/js/main.js' },
+    { url: 'js/ecg-monitor.js',   path: 'libro-ecg/js/ecg-monitor.js' },
+    // Imágenes
+    { url: 'images/potencial-accion-ecg.png',      path: 'libro-ecg/images/potencial-accion-ecg.png' },
+    { url: 'images/regiones-cardiacas-ecg.png',    path: 'libro-ecg/images/regiones-cardiacas-ecg.png' },
+    { url: 'images/derivaciones-frontales.png',    path: 'libro-ecg/images/derivaciones-frontales.png' },
+    { url: 'images/electrodos-precordiales2.png',  path: 'libro-ecg/images/electrodos-precordiales2.png' },
+  ];
+
+  async function downloadAllAsZip() {
+    const btn   = document.getElementById('btnZip');
+    const wrap  = document.getElementById('progressWrap');
+    const bar   = document.getElementById('progressBar');
+    const label = document.getElementById('progressLabel');
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando…';
+    wrap.style.display  = 'block';
+    label.style.display = 'block';
+
+    const zip = new JSZip();
+    let done  = 0;
+
+    for (const file of FILES) {
+      try {
+        label.textContent = `Empaquetando: ${file.url}`;
+        const response = await fetch(file.url);
+        const blob     = await response.blob();
+        zip.file(file.path, blob);
+      } catch (e) {
+        console.warn('No se pudo incluir:', file.url, e);
+      }
+      done++;
+      bar.style.width = Math.round((done / FILES.length) * 100) + '%';
+    }
+
+    label.textContent = 'Generando ZIP…';
+    const content = await zip.generateAsync({
+      type: 'blob',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 }
+    }, (meta) => {
+      bar.style.width = Math.round(meta.percent) + '%';
+    });
+
+    saveAs(content, 'libro-ecg.zip');
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check"></i> ¡ZIP descargado!';
+    label.textContent = '✅ Listo. Ahora arrastra la carpeta libro-ecg/ a Netlify.';
+    bar.style.width = '100%';
+  }
+</script>
+</body>
+</html>

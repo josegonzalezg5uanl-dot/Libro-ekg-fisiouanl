@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cap. 6 – Talleres de Práctica | Guía ECG</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <style>
+    /* Quiz estilos */
+    .quiz-card {
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.4rem 1.5rem; margin: 1.5rem 0;
+    }
+    .quiz-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text); }
+    .quiz-card h4 span { color: var(--primary); }
+    .quiz-options { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+    .quiz-options li button {
+      width: 100%; text-align: left; background: var(--bg);
+      border: 1.5px solid var(--border); border-radius: 6px;
+      padding: .6rem 1rem; cursor: pointer; font-size: .9rem; color: var(--text);
+      transition: all .2s; font-family: 'Inter', sans-serif;
+    }
+    .quiz-options li button:hover { border-color: var(--primary); background: var(--primary-light); }
+    .quiz-options li button.correct { background: #e8f5e9; border-color: #43a047; color: #1b5e20; font-weight: 600; }
+    .quiz-options li button.wrong   { background: #fce4ec; border-color: #e53935; color: #b71c1c; }
+    .quiz-feedback {
+      display: none; margin-top: .8rem; padding: .7rem 1rem;
+      border-radius: 6px; font-size: .88rem; font-weight: 500;
+    }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok  { background: #e8f5e9; color: #1b5e20; border-left: 4px solid #43a047; }
+    .quiz-feedback.err { background: #fce4ec; color: #b71c1c; border-left: 4px solid #e53935; }
+
+    /* Algoritmo de decisión */
+    .algo-box {
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.4rem;
+      margin: 1.5rem 0;
+    }
+    .algo-step {
+      display: flex; align-items: flex-start; gap: .8rem;
+      padding: .7rem 0; border-bottom: 1px dashed var(--border);
+    }
+    .algo-step:last-child { border-bottom: none; }
+    .algo-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      font-size: .8rem; font-weight: 700; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .algo-step .algo-text { font-size: .9rem; }
+    .algo-step .algo-text strong { color: var(--primary); }
+    .algo-yes-no {
+      display: flex; gap: 1rem; margin-top: .5rem; flex-wrap: wrap;
+    }
+    .tag-yes { background: #e8f5e9; color: #2e7d32; padding: .2rem .6rem; border-radius: 4px; font-size: .78rem; font-weight: 600; }
+    .tag-no  { background: #fce4ec; color: #b71c1c; padding: .2rem .6rem; border-radius: 4px; font-size: .78rem; font-weight: 600; }
+
+    /* Score marcador */
+    .score-bar {
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem; flex-wrap: wrap; gap: .8rem;
+    }
+    .score-label { font-size: .9rem; color: var(--text-muted); }
+    .score-value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+    .reset-btn {
+      background: none; border: 1.5px solid var(--border); border-radius: 6px;
+      padding: .4rem 1rem; font-size: .85rem; cursor: pointer; color: var(--text);
+      transition: all .2s; font-family: 'Inter', sans-serif;
+    }
+    .reset-btn:hover { border-color: var(--primary); color: var(--primary); }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-left">
+      <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+      <a href="index.html" class="site-logo"><i class="fas fa-heartbeat"></i><span>Guía de ECG</span></a>
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Buscar en el libro..."/>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-send-session" id="btnSendSession" onclick="openSendModal()" title="Enviar registro de sesión al profesor">
+        <i class="fas fa-paper-plane"></i><span class="btn-send-label">Enviar</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+      <a href="https://github.com/dmccreary/i-book-v1" target="_blank" class="gh-link"><i class="fab fa-github"></i></a>
+    </div>
+  </header>
+  <div class="overlay" id="overlay"></div>
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        <div class="sidebar-title">Contenido</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Inicio</a></li>
+          <li class="nav-section">Capítulos</li>
+          <li class="nav-item"><a href="chapter-1.html" class="nav-link"><span class="ch-num">1</span> Fundamentos Fisiológicos y Técnicos</a></li>
+          <li class="nav-item"><a href="chapter-2.html" class="nav-link"><span class="ch-num">2</span> Anatomía de las Derivaciones</a></li>
+          <li class="nav-item"><a href="chapter-3.html" class="nav-link"><span class="ch-num">3</span> Componentes del Trazado Normal</a></li>
+          <li class="nav-item"><a href="chapter-4.html" class="nav-link"><span class="ch-num">4</span> Metodología de Interpretación</a></li>
+          <li class="nav-item"><a href="chapter-5.html" class="nav-link"><span class="ch-num">5</span> Patologías Básicas y Patrones</a></li>
+          <li class="nav-item"><a href="chapter-6.html" class="nav-link active"><span class="ch-num">6</span> Talleres de Práctica</a></li>
+          <li class="nav-section">Aprendizaje</li>
+          <li class="nav-item">
+            <a href="autopercepcion.html" class="nav-link">
+              <i class="fas fa-brain" style="color:#a78bfa"></i> Autopercepción
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="chapter-layout">
+          <article class="chapter-content">
+            <h1>Talleres de Práctica e Integración</h1>
+            <div class="chapter-meta">
+              <span class="chapter-badge"><i class="fas fa-flask"></i> Capítulo 6</span>
+              <span class="chapter-read-time"><i class="fas fa-clock"></i> ~45 min de práctica</span>
+            </div>
+
+            <p>Este capítulo es diferente: en lugar de leer, vas a <strong>practicar</strong>. Usa los conocimientos de los capítulos anteriores para responder los casos clínicos y aplicar el algoritmo de urgencias.</p>
+
+            <div class="info-box tip">
+              <i class="fas fa-lightbulb"></i>
+              <p>Lee cada descripción del trazo ECG, piensa tu respuesta antes de hacer clic en cualquier opción, y usa el sistema de los 5 pasos del Capítulo 4.</p>
+            </div>
+
+            <!-- SCORE -->
+            <div class="score-bar">
+              <div>
+                <div class="score-label">Tu puntuación</div>
+                <div class="score-value" id="scoreDisplay">0 / 0</div>
+              </div>
+              <button class="reset-btn" onclick="resetQuiz()"><i class="fas fa-redo"></i> Reiniciar</button>
+            </div>
+
+            <!-- QUIZ SECTION -->
+            <h2 id="casos-clinicos">1. Casos Clínicos — Identificación de Trazos</h2>
+
+            <!-- CASO 1 -->
+            <div class="quiz-card" data-qid="1">
+              <h4><span>Caso 1:</span> Paciente de 68 años con disnea de esfuerzo y antecedente de EPOC. Se observa: ritmo sinusal, FC 88 lpm, eje a +110°, onda P picuda en II de 3 mm. ¿Cuál es el hallazgo más relevante?</h4>
+              <ul class="quiz-options">
+                <li><button onclick="checkAnswer(this, false, 1)">A. Bloqueo de rama izquierda</button></li>
+                <li><button onclick="checkAnswer(this, false, 1)">B. Fibrilación auricular</button></li>
+                <li><button onclick="checkAnswer(this, true, 1)">C. Crecimiento de aurícula derecha (P pulmonale) con desviación del eje a la derecha</button></li>
+                <li><button onclick="checkAnswer(this, false, 1)">D. Infarto inferior antiguo</button></li>
+              </ul>
+              <div class="quiz-feedback" id="feedback-1"></div>
+            </div>
+
+            <!-- CASO 2 -->
+            <div class="quiz-card" data-qid="2">
+              <h4><span>Caso 2:</span> Varón de 55 años, hipertenso, asintomático. ECG: ritmo sinusal, FC 72 lpm, eje normal. S en V1 = 14 mm, R en V5 = 24 mm. Intervalo PR normal. QRS 0,09 s. ¿Qué patrón describe el ECG?</h4>
+              <ul class="quiz-options">
+                <li><button onclick="checkAnswer(this, false, 2)">A. Bloqueo de rama derecha incompleto</button></li>
+                <li><button onclick="checkAnswer(this, true, 2)">B. Hipertrofia ventricular izquierda (criterio de Sokolow-Lyon positivo)</button></li>
+                <li><button onclick="checkAnswer(this, false, 2)">C. Hipertrofia ventricular derecha</button></li>
+                <li><button onclick="checkAnswer(this, false, 2)">D. ECG normal</button></li>
+              </ul>
+              <div class="quiz-feedback" id="feedback-2"></div>
+            </div>
+
+            <!-- CASO 3 -->
+            <div class="quiz-card" data-qid="3">
+              <h4><span>Caso 3:</span> Mujer de 74 años con palpitaciones irregulares. ECG: ausencia de ondas P bien definidas, ondulaciones basales irregulares de pequeña amplitud, intervalos R–R completamente irregulares, QRS estrecho (0,08 s). ¿Cuál es el ritmo?</h4>
+              <ul class="quiz-options">
+                <li><button onclick="checkAnswer(this, false, 3)">A. Flutter auricular con bloqueo variable</button></li>
+                <li><button onclick="checkAnswer(this, false, 3)">B. Taquicardia ventricular</button></li>
+                <li><button onclick="checkAnswer(this, true, 3)">C. Fibrilación auricular con respuesta ventricular controlada</button></li>
+                <li><button onclick="checkAnswer(this, false, 3)">D. Taquicardia auricular multifocal</button></li>
+              </ul>
+              <div class="quiz-feedback" id="feedback-3"></div>
+            </div>
+
+            <!-- CASO 4 -->
+            <div class="quiz-card" data-qid="4">
+              <h4><span>Caso 4:</span> Hombre de 60 años con dolor torácico de 2 horas de evolución. ECG urgente muestra: elevación del ST de 3 mm en II, III y aVF, con imagen en espejo (depresión) en I y aVL. ¿Cuál es el diagnóstico y la arteria responsable probable?</h4>
+              <ul class="quiz-options">
+                <li><button onclick="checkAnswer(this, false, 4)">A. IAMCEST anterior — arteria descendente anterior</button></li>
+                <li><button onclick="checkAnswer(this, false, 4)">B. Pericarditis aguda — elevación difusa del ST</button></li>
+                <li><button onclick="checkAnswer(this, true, 4)">C. IAMCEST inferior — coronaria derecha (CD)</button></li>
+                <li><button onclick="checkAnswer(this, false, 4)">D. Bloqueo de rama izquierda nuevo</button></li>
+              </ul>
+              <div class="quiz-feedback" id="feedback-4"></div>
+            </div>
+
+            <!-- CASO 5 -->
+            <div class="quiz-card" data-qid="5">
+              <h4><span>Caso 5:</span> Paciente con insuficiencia renal crónica. K⁺ sérico = 6,8 mEq/L. El ECG muestra: ondas T altas, picudas y simétricas en múltiples derivaciones, QRS de 0,14 s y PR de 0,22 s. ¿Qué trastorno electrolítico explica estos hallazgos?</h4>
+              <ul class="quiz-options">
+                <li><button onclick="checkAnswer(this, false, 5)">A. Hipopotasemia grave</button></li>
+                <li><button onclick="checkAnswer(this, false, 5)">B. Hipocalcemia</button></li>
+                <li><button onclick="checkAnswer(this, false, 5)">C. Hipercalcemia</button></li>
+                <li><button onclick="checkAnswer(this, true, 5)">D. Hiperpotasemia moderada-grave</button></li>
+              </ul>
+              <div class="quiz-feedback" id="feedback-5"></div>
+            </div>
+
+            <!-- CASO 6 -->
+            <div class="quiz-card" data-qid="6">
+              <h4><span>Caso 6:</span> ECG con QRS ancho (0,13 s), morfología RSR' en V1 con S empastada en I y V6. ST y T normales. El paciente es un deportista de 25 años asintomático. ¿Cuál es la interpretación más probable?</h4>
+              <ul class="quiz-options">
+                <li><button onclick="checkAnswer(this, true, 6)">A. Bloqueo de rama derecha completo, probablemente aislado y sin significado patológico</button></li>
+                <li><button onclick="checkAnswer(this, false, 6)">B. Bloqueo de rama izquierda completo</button></li>
+                <li><button onclick="checkAnswer(this, false, 6)">C. IAMCEST anterior</button></li>
+                <li><button onclick="checkAnswer(this, false, 6)">D. Síndrome de preexcitación (WPW)</button></li>
+              </ul>
+              <div class="quiz-feedback" id="feedback-6"></div>
+            </div>
+
+            <!-- ALGORITMO IAMCEST -->
+            <h2 id="algoritmo-iamcest">2. Algoritmo de Decisión Rápida: IAMCEST en Urgencias</h2>
+            <p>Ante un paciente con <strong>dolor torácico</strong>, este es el algoritmo sistemático para detectar un IAMCEST en menos de 10 minutos:</p>
+
+            <div class="algo-box">
+              <div class="algo-step">
+                <div class="algo-num">1</div>
+                <div class="algo-text">
+                  <strong>Realiza ECG de 12 derivaciones en ≤ 10 minutos</strong> desde la llegada al servicio de urgencias.
+                  <div class="algo-yes-no">
+                    <span class="tag-yes">✓ Objetivo: diagnóstico en &lt; 10 min</span>
+                  </div>
+                </div>
+              </div>
+              <div class="algo-step">
+                <div class="algo-num">2</div>
+                <div class="algo-text">
+                  <strong>¿Hay elevación del ST ≥ 1 mm en ≥ 2 derivaciones contiguas?</strong> (o ≥ 2 mm en precordiales, o BRI nuevo)
+                  <div class="algo-yes-no">
+                    <span class="tag-yes">SÍ → Paso 3 (activar código infarto)</span>
+                    <span class="tag-no">NO → Buscar IAMSEST, otra causa</span>
+                  </div>
+                </div>
+              </div>
+              <div class="algo-step">
+                <div class="algo-num">3</div>
+                <div class="algo-text">
+                  <strong>Localiza el territorio afectado</strong> por las derivaciones con elevación del ST.
+                  <div class="algo-yes-no">
+                    <span class="tag-yes">II, III, aVF → Inferior (CD)</span>
+                    <span class="tag-yes">V2–V4 → Anterior (DA)</span>
+                    <span class="tag-yes">I, aVL, V5–V6 → Lateral (CX)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="algo-step">
+                <div class="algo-num">4</div>
+                <div class="algo-text">
+                  <strong>Medidas inmediatas (MONA modificada):</strong>
+                  <ul style="margin-top:.5rem;margin-left:1rem;font-size:.88rem;">
+                    <li>Morfina (si dolor refractario)</li>
+                    <li>Oxígeno (si SpO₂ &lt; 90%)</li>
+                    <li>Nitratos (si no hay hipotensión)</li>
+                    <li>Aspirina 300 mg + inhibidor P2Y12 (ticagrelor/clopidogrel)</li>
+                    <li>Anticoagulación (heparina no fraccionada o enoxaparina)</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="algo-step">
+                <div class="algo-num">5</div>
+                <div class="algo-text">
+                  <strong>Estrategia de reperfusión:</strong>
+                  <div class="algo-yes-no">
+                    <span class="tag-yes">ICP disponible en &lt; 120 min → Angioplastia primaria (de elección)</span>
+                    <span class="tag-no">ICP no disponible → Fibrinólisis si &lt; 12 h de inicio y sin contraindicaciones</span>
+                  </div>
+                </div>
+              </div>
+              <div class="algo-step">
+                <div class="algo-num">6</div>
+                <div class="algo-text">
+                  <strong>Monitorización continua</strong> y manejo en unidad coronaria.
+                </div>
+              </div>
+            </div>
+
+            <!-- CHECKLIST FINAL -->
+            <h2 id="checklist-final">3. Checklist Final de Revisión</h2>
+            <p>Antes de dar por terminado cualquier ECG, verifica esta lista:</p>
+            <ul>
+              <li>☐ Velocidad y calibración del papel son estándar (25 mm/s, 10 mm/mV)</li>
+              <li>☐ Frecuencia cardíaca calculada</li>
+              <li>☐ Ritmo identificado (¿sinusal? ¿regular?)</li>
+              <li>☐ Eje eléctrico del QRS determinado</li>
+              <li>☐ Onda P analizada (duración, morfología, eje)</li>
+              <li>☐ Intervalo PR medido</li>
+              <li>☐ Complejo QRS analizado (duración, morfología, voltaje, ondas Q)</li>
+              <li>☐ Segmento ST evaluado en todas las derivaciones</li>
+              <li>☐ Onda T analizada (polaridad, morfología)</li>
+              <li>☐ QTc calculado</li>
+              <li>☐ Conclusión clínica formulada con contexto del paciente</li>
+            </ul>
+
+            <div class="info-box tip">
+              <i class="fas fa-lightbulb"></i>
+              <p><strong>¡Felicitaciones!</strong> Has completado los 6 capítulos de la Guía de Electrocardiografía. La clave del dominio del ECG es la <strong>práctica constante</strong>: cuantos más trazos leas, más rápido y preciso serás. ¡Sigue practicando!</p>
+            </div>
+
+            <div class="chapter-nav">
+              <a href="chapter-5.html" class="ch-nav-btn">
+                <i class="fas fa-chevron-left"></i>
+                <div><span class="nav-label">Anterior</span><span class="nav-title">Patologías Básicas y Patrones</span></div>
+              </a>
+              <a href="index.html" class="ch-nav-btn">
+                <div><span class="nav-label">Volver al</span><span class="nav-title">Inicio</span></div>
+                <i class="fas fa-home"></i>
+              </a>
+            </div>
+          </article>
+
+          <aside class="toc">
+            <div class="toc-title">En este capítulo</div>
+            <ul class="toc-list">
+              <li><a href="#casos-clinicos">1. Casos Clínicos</a></li>
+              <li><a href="#algoritmo-iamcest">2. Algoritmo IAMCEST</a></li>
+              <li><a href="#checklist-final">3. Checklist Final</a></li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+      <footer class="site-footer-bottom">
+        <p>Guía de Electrocardiografía &mdash; Libro Digital &copy; 2025</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="js/session.js"></script>
+<script src="js/main.js"></script>
+  <script>
+    // ---- QUIZ LOGIC ----
+    let correct = 0;
+    let answered = 0;
+    const totalQ = 6;
+    const feedbacks = {
+      1: { ok: '¡Correcto! La onda P ≥ 2,5 mm en II es diagnóstico de crecimiento de aurícula derecha (P pulmonale). El eje a +110° indica desviación derecha, compatible con EPOC e hipertensión pulmonar.', err: 'Incorrecto. Analiza la onda P: es picuda y alta en II (≥ 2,5 mm), lo que indica crecimiento de aurícula derecha. El eje a +110° es una desviación a la derecha.' },
+      2: { ok: '¡Correcto! S(V1) + R(V5) = 14 + 24 = 38 mm > 35 mm. Criterio de Sokolow-Lyon positivo para HVI.', err: 'Incorrecto. Suma S en V1 + R en V5: 14 + 24 = 38 mm. El criterio de Sokolow-Lyon establece que ≥ 35 mm es diagnóstico de HVI.' },
+      3: { ok: '¡Correcto! La tríada clásica de la FA: ausencia de P, ondulaciones basales irregulares, R–R completamente irregular con QRS estrecho.', err: 'Incorrecto. Las claves son: sin ondas P, R–R completamente irregular y QRS estrecho. Eso define la fibrilación auricular.' },
+      4: { ok: '¡Correcto! Elevación del ST en cara inferior (II, III, aVF) con imagen en espejo en I y aVL = IAMCEST inferior. La arteria responsable más frecuente es la coronaria derecha (CD).', err: 'Incorrecto. La elevación del ST en II, III y aVF indica afectación de la cara inferior. La arteria responsable más frecuente es la coronaria derecha.' },
+      5: { ok: '¡Correcto! La hiperpotasemia produce ondas T altas y picudas, seguidas de QRS ancho y PR prolongado a medida que el K⁺ aumenta. Con K⁺ 6,8 mEq/L esto es una emergencia.', err: 'Incorrecto. Ondas T picudas + QRS ancho + PR prolongado con K⁺ elevado = hiperpotasemia. El tratamiento es urgente (calcio, insulina+glucosa, bicarbonato, diálisis).' },
+      6: { ok: '¡Correcto! RSR\' en V1 + S ancha en I y V6 + QRS ≥ 0,12 s = BRD completo. En un deportista joven asintomático, puede ser un hallazgo aislado sin significado patológico.', err: 'Incorrecto. El patrón RSR\' en V1 con S empastada en I y V6 es la firma del BRD. En jóvenes asintomáticos puede ser benigno.' },
+    };
+
+    function checkAnswer(btn, isCorrect, qid) {
+      const card = document.querySelector(`[data-qid="${qid}"]`);
+      const buttons = card.querySelectorAll('button');
+      if (card.dataset.answered) return; // ya respondido
+
+      card.dataset.answered = 'true';
+      answered++;
+
+      buttons.forEach(b => { b.disabled = true; });
+
+      if (isCorrect) {
+        btn.classList.add('correct');
+        correct++;
+        showFeedback(qid, true);
+      } else {
+        btn.classList.add('wrong');
+        // marcar la correcta
+        buttons.forEach(b => { if (b.onclick.toString().includes('true')) b.classList.add('correct'); });
+        showFeedback(qid, false);
+      }
+      updateScore();
+    }
+
+    function showFeedback(qid, ok) {
+      const fb = document.getElementById(`feedback-${qid}`);
+      fb.textContent = ok ? feedbacks[qid].ok : feedbacks[qid].err;
+      fb.className = `quiz-feedback show ${ok ? 'ok' : 'err'}`;
+    }
+
+    function updateScore() {
+      document.getElementById('scoreDisplay').textContent = `${correct} / ${answered}`;
+    }
+
+    function resetQuiz() {
+      correct = 0; answered = 0;
+      document.querySelectorAll('.quiz-card').forEach(card => {
+        delete card.dataset.answered;
+        card.querySelectorAll('button').forEach(b => {
+          b.disabled = false;
+          b.classList.remove('correct', 'wrong');
+        });
+        card.querySelectorAll('.quiz-feedback').forEach(f => {
+          f.className = 'quiz-feedback';
+          f.textContent = '';
+        });
+      });
+      updateScore();
+    }
+  </script>
+  <script src="js/likert.js"></script>
+</body>
+</html>

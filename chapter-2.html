@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cap. 2 – Anatomía de las Derivaciones | Guía ECG</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-left">
+      <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+      <a href="index.html" class="site-logo"><i class="fas fa-heartbeat"></i><span>Guía de ECG</span></a>
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Buscar en el libro..."/>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-send-session" id="btnSendSession" onclick="openSendModal()" title="Enviar registro de sesión al profesor">
+        <i class="fas fa-paper-plane"></i><span class="btn-send-label">Enviar</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+      <a href="https://github.com/dmccreary/i-book-v1" target="_blank" class="gh-link"><i class="fab fa-github"></i></a>
+    </div>
+  </header>
+  <div class="overlay" id="overlay"></div>
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        <div class="sidebar-title">Contenido</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Inicio</a></li>
+          <li class="nav-section">Capítulos</li>
+          <li class="nav-item"><a href="chapter-1.html" class="nav-link"><span class="ch-num">1</span> Fundamentos Fisiológicos y Técnicos</a></li>
+          <li class="nav-item"><a href="chapter-2.html" class="nav-link active"><span class="ch-num">2</span> Anatomía de las Derivaciones</a></li>
+          <li class="nav-item"><a href="chapter-3.html" class="nav-link"><span class="ch-num">3</span> Componentes del Trazado Normal</a></li>
+          <li class="nav-item"><a href="chapter-4.html" class="nav-link"><span class="ch-num">4</span> Metodología de Interpretación</a></li>
+          <li class="nav-item"><a href="chapter-5.html" class="nav-link"><span class="ch-num">5</span> Patologías Básicas y Patrones</a></li>
+          <li class="nav-item"><a href="chapter-6.html" class="nav-link"><span class="ch-num">6</span> Talleres de Práctica</a></li>
+          <li class="nav-section">Aprendizaje</li>
+          <li class="nav-item">
+            <a href="autopercepcion.html" class="nav-link">
+              <i class="fas fa-brain" style="color:#a78bfa"></i> Autopercepción
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="chapter-layout">
+          <article class="chapter-content">
+            <h1>Anatomía de las Derivaciones</h1>
+            <div class="chapter-meta">
+              <span class="chapter-badge"><i class="fas fa-broadcast-tower"></i> Capítulo 2</span>
+              <span class="chapter-read-time"><i class="fas fa-clock"></i> ~25 min de lectura</span>
+            </div>
+
+            <p>El ECG estándar de 12 derivaciones puede entenderse como <strong>12 "fotografías"</strong> del corazón tomadas desde ángulos diferentes. Cada derivación registra la actividad eléctrica desde una perspectiva distinta, lo que permite localizar con precisión los eventos cardíacos.</p>
+
+            <div class="info-box note">
+              <i class="fas fa-info-circle"></i>
+              <p><strong>Objetivo del capítulo:</strong> Identificar cada una de las 12 derivaciones, su ubicación anatómica, su plano de visión y la colocación correcta de los electrodos.</p>
+            </div>
+
+            <h2 id="plano-frontal">1. Derivaciones del Plano Frontal (Miembros)</h2>
+            <p>Las derivaciones de miembros "ven" el corazón en el <strong>plano frontal</strong> (adelante–atrás, arriba–abajo). Se obtienen con cuatro electrodos colocados en las extremidades.</p>
+
+            <h3 id="bipolares">Derivaciones Bipolares: I, II, III</h3>
+            <p>Propuestas por <strong>Einthoven</strong>, registran la diferencia de potencial entre dos electrodos:</p>
+
+            <table class="data-table">
+              <thead><tr><th>Derivación</th><th>Electrodo positivo</th><th>Electrodo negativo</th><th>Visión del corazón</th></tr></thead>
+              <tbody>
+                <tr><td><strong>I</strong></td><td>Brazo izquierdo (LA)</td><td>Brazo derecho (RA)</td><td>Lateral izquierdo</td></tr>
+                <tr><td><strong>II</strong></td><td>Pierna izquierda (LL)</td><td>Brazo derecho (RA)</td><td>Inferior (más usada)</td></tr>
+                <tr><td><strong>III</strong></td><td>Pierna izquierda (LL)</td><td>Brazo izquierdo (LA)</td><td>Inferior izquierdo</td></tr>
+              </tbody>
+            </table>
+
+            <div class="info-box tip">
+              <i class="fas fa-lightbulb"></i>
+              <p><strong>Ley de Einthoven:</strong> La suma algebraica de las deflexiones en I, II y III siempre cumple que <code>I + III = II</code>. Esto sirve para verificar la correcta colocación de electrodos.</p>
+            </div>
+
+            <h3 id="unipolares">Derivaciones Unipolares Aumentadas: aVR, aVL, aVF</h3>
+            <p>Desarrolladas por <strong>Goldberger</strong>, registran el potencial de un punto respecto a un terminal central de referencia (cero). La "a" significa <em>augmented</em> (aumentada), ya que la señal se amplifica un 50% para hacerla comparable a las bipolares.</p>
+
+            <table class="data-table">
+              <thead><tr><th>Derivación</th><th>Electrodo explorador</th><th>Visión del corazón</th><th>Normalidad</th></tr></thead>
+              <tbody>
+                <tr><td><strong>aVR</strong></td><td>Brazo derecho (RA)</td><td>Cavidades derechas / desde arriba-derecha</td><td>Generalmente negativa</td></tr>
+                <tr><td><strong>aVL</strong></td><td>Brazo izquierdo (LA)</td><td>Lateral alto izquierdo</td><td>Variable</td></tr>
+                <tr><td><strong>aVF</strong></td><td>Pierna izquierda (LL)</td><td>Inferior (desde abajo)</td><td>Positiva en sinusal</td></tr>
+              </tbody>
+            </table>
+
+            <!-- IMAGEN: Derivaciones del Plano Frontal -->
+            <figure class="chapter-figure">
+              <img
+                src="images/derivaciones-frontales.png"
+                alt="Derivaciones del plano frontal: bipolares I, II, III y unipolares aumentadas aVR, aVL, aVF"
+                class="chapter-img"
+              />
+              <figcaption>
+                <strong>Figura 2.1</strong> — Derivaciones del Plano Frontal. Las seis derivaciones de miembros: bipolares (I, II, III) y unipolares aumentadas (aVR, aVL, aVF) con sus orientaciones en el plano frontal.
+              </figcaption>
+            </figure>
+
+            <h2 id="plano-horizontal">2. Derivaciones del Plano Horizontal (Precordiales)</h2>
+            <p>Las derivaciones precordiales V1 a V6 exploran el corazón en el <strong>plano horizontal</strong> (izquierda–derecha, anterior–posterior). Son unipolar y su colocación exacta es crítica para evitar errores diagnósticos.</p>
+
+            <h3 id="ubicacion-electrodos">Ubicación Correcta de los Electrodos</h3>
+
+            <table class="data-table">
+              <thead><tr><th>Derivación</th><th>Ubicación anatómica</th><th>Zona cardíaca que explora</th></tr></thead>
+              <tbody>
+                <tr><td><strong>V1</strong></td><td>4° espacio intercostal, borde esternal derecho</td><td>Ventrículo derecho / Septo</td></tr>
+                <tr><td><strong>V2</strong></td><td>4° espacio intercostal, borde esternal izquierdo</td><td>Septo / pared anterior</td></tr>
+                <tr><td><strong>V3</strong></td><td>Entre V2 y V4</td><td>Pared anterior</td></tr>
+                <tr><td><strong>V4</strong></td><td>5° espacio intercostal, línea medioclavicular</td><td>Ápex (punta)</td></tr>
+                <tr><td><strong>V5</strong></td><td>Línea axilar anterior, mismo nivel que V4</td><td>Lateral bajo</td></tr>
+                <tr><td><strong>V6</strong></td><td>Línea axilar media, mismo nivel que V4</td><td>Lateral bajo / posterior</td></tr>
+              </tbody>
+            </table>
+
+            <!-- IMAGEN: Colocación de electrodos precordiales -->
+            <figure class="chapter-figure">
+              <img
+                src="images/electrodos-precordiales2.png"
+                alt="Colocación correcta de los electrodos precordiales V1 a V6 en el tórax"
+                class="chapter-img"
+              />
+              <figcaption>
+                <strong>Figura 2.2</strong> — Colocación de los electrodos precordiales. V1 y V2 en el 4° espacio intercostal paraesternal, V3 entre V2 y V4, V4 en el 5° espacio intercostal en la línea medioclavicular, V5 en la línea axilar anterior y V6 en la línea axilar media.
+              </figcaption>
+            </figure>
+
+            <div class="info-box warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p><strong>Error frecuente:</strong> Colocar V1/V2 en espacios intercostales incorrectos (a veces se colocan demasiado altos, en el 2° o 3° espacio). Esto puede generar patrones falsos de bloqueo de rama derecha o de ondas Q patológicas anteriores.</p>
+            </div>
+
+            <h3 id="progresion-r">Progresión Normal de la Onda R en Precordiales</h3>
+            <p>En condiciones normales, la amplitud de la onda R aumenta progresivamente de V1 a V5, y luego se estabiliza o disminuye levemente en V6. Esto se conoce como <strong>progresión normal de la onda R</strong>.</p>
+            <ul>
+              <li><strong>V1–V2:</strong> Predominio de onda negativa (S) → exploración del VD</li>
+              <li><strong>V3–V4:</strong> Zona de transición (R ≈ S)</li>
+              <li><strong>V5–V6:</strong> Predominio de onda positiva (R) → exploración del VI</li>
+            </ul>
+
+            <h2 id="triangulo-einthoven">3. El Triángulo de Einthoven</h2>
+            <p>El triángulo de Einthoven es un modelo geométrico que representa las tres derivaciones bipolares (I, II, III) como los lados de un triángulo equilátero, con el corazón en el centro.</p>
+            <p>Cada lado del triángulo indica la dirección desde la que esa derivación "mira" al corazón:</p>
+            <ul>
+              <li><strong>Derivación I:</strong> Eje horizontal (0°)</li>
+              <li><strong>Derivación II:</strong> Eje a +60°</li>
+              <li><strong>Derivación III:</strong> Eje a +120°</li>
+            </ul>
+
+            <div class="info-box note">
+              <i class="fas fa-info-circle"></i>
+              <p>El triángulo de Einthoven es la base para calcular el <strong>eje eléctrico del QRS</strong>, tema que se desarrolla en el Capítulo 4.</p>
+            </div>
+
+            <h2 id="sistema-hexaxial">4. Sistema Hexaxial de Bailey</h2>
+            <p>Al combinar las 6 derivaciones de miembros (I, II, III, aVR, aVL, aVF) y trasladar sus ejes al centro del triángulo, se obtiene el <strong>sistema hexaxial de referencia</strong>, que divide el plano frontal en 12 sectores de 30° cada uno.</p>
+            <p>Los ángulos de cada derivación en el sistema hexaxial son:</p>
+            <table class="data-table">
+              <thead><tr><th>Derivación</th><th>Ángulo positivo</th></tr></thead>
+              <tbody>
+                <tr><td>I</td><td>0°</td></tr>
+                <tr><td>II</td><td>+60°</td></tr>
+                <tr><td>aVF</td><td>+90°</td></tr>
+                <tr><td>III</td><td>+120°</td></tr>
+                <tr><td>aVL</td><td>−30°</td></tr>
+                <tr><td>aVR</td><td>−150°</td></tr>
+              </tbody>
+            </table>
+
+            <h2 id="resumen">Resumen del Capítulo</h2>
+            <ul>
+              <li>Las 12 derivaciones ofrecen 12 perspectivas distintas del corazón.</li>
+              <li>Las derivaciones de miembros (I, II, III, aVR, aVL, aVF) exploran el plano frontal.</li>
+              <li>Las precordiales (V1–V6) exploran el plano horizontal.</li>
+              <li>La colocación correcta de electrodos es esencial para evitar errores diagnósticos.</li>
+              <li>El sistema hexaxial de Bailey permite calcular el eje eléctrico del corazón.</li>
+            </ul>
+
+            <div class="chapter-nav">
+              <a href="chapter-1.html" class="ch-nav-btn">
+                <i class="fas fa-chevron-left"></i>
+                <div><span class="nav-label">Anterior</span><span class="nav-title">Fundamentos Fisiológicos</span></div>
+              </a>
+              <a href="chapter-3.html" class="ch-nav-btn">
+                <div><span class="nav-label">Siguiente</span><span class="nav-title">Componentes del Trazado Normal</span></div>
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            </div>
+          </article>
+
+          <aside class="toc">
+            <div class="toc-title">En este capítulo</div>
+            <ul class="toc-list">
+              <li><a href="#plano-frontal">1. Plano Frontal</a></li>
+              <li><a href="#bipolares">— Bipolares I, II, III</a></li>
+              <li><a href="#unipolares">— Aumentadas aVR, aVL, aVF</a></li>
+              <li><a href="#plano-horizontal">2. Plano Horizontal</a></li>
+              <li><a href="#ubicacion-electrodos">— Ubicación de electrodos</a></li>
+              <li><a href="#progresion-r">— Progresión onda R</a></li>
+              <li><a href="#triangulo-einthoven">3. Triángulo de Einthoven</a></li>
+              <li><a href="#sistema-hexaxial">4. Sistema Hexaxial</a></li>
+              <li><a href="#resumen">Resumen</a></li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+      <footer class="site-footer-bottom">
+        <p>Guía de Electrocardiografía &mdash; Libro Digital &copy; 2025</p>
+      </footer>
+    </main>
+  </div>
+  <script src="js/session.js"></script>
+<script src="js/main.js"></script>
+<script src="js/likert.js"></script>
+</body>
+</html>

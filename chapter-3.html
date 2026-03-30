@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cap. 3 – Componentes del Trazado Normal | Guía ECG</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-left">
+      <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+      <a href="index.html" class="site-logo"><i class="fas fa-heartbeat"></i><span>Guía de ECG</span></a>
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Buscar en el libro..."/>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-send-session" id="btnSendSession" onclick="openSendModal()" title="Enviar registro de sesión al profesor">
+        <i class="fas fa-paper-plane"></i><span class="btn-send-label">Enviar</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+      <a href="https://github.com/dmccreary/i-book-v1" target="_blank" class="gh-link"><i class="fab fa-github"></i></a>
+    </div>
+  </header>
+  <div class="overlay" id="overlay"></div>
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        <div class="sidebar-title">Contenido</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Inicio</a></li>
+          <li class="nav-section">Capítulos</li>
+          <li class="nav-item"><a href="chapter-1.html" class="nav-link"><span class="ch-num">1</span> Fundamentos Fisiológicos y Técnicos</a></li>
+          <li class="nav-item"><a href="chapter-2.html" class="nav-link"><span class="ch-num">2</span> Anatomía de las Derivaciones</a></li>
+          <li class="nav-item"><a href="chapter-3.html" class="nav-link active"><span class="ch-num">3</span> Componentes del Trazado Normal</a></li>
+          <li class="nav-item"><a href="chapter-4.html" class="nav-link"><span class="ch-num">4</span> Metodología de Interpretación</a></li>
+          <li class="nav-item"><a href="chapter-5.html" class="nav-link"><span class="ch-num">5</span> Patologías Básicas y Patrones</a></li>
+          <li class="nav-item"><a href="chapter-6.html" class="nav-link"><span class="ch-num">6</span> Talleres de Práctica</a></li>
+          <li class="nav-section">Aprendizaje</li>
+          <li class="nav-item">
+            <a href="autopercepcion.html" class="nav-link">
+              <i class="fas fa-brain" style="color:#a78bfa"></i> Autopercepción
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="chapter-layout">
+          <article class="chapter-content">
+            <h1>Componentes del Trazado Normal</h1>
+            <div class="chapter-meta">
+              <span class="chapter-badge"><i class="fas fa-wave-square"></i> Capítulo 3</span>
+              <span class="chapter-read-time"><i class="fas fa-clock"></i> ~30 min de lectura</span>
+            </div>
+
+            <p>Un ECG normal está formado por una secuencia de <strong>ondas, intervalos y segmentos</strong> que se repiten con cada latido. Aprender a identificar y medir cada componente es la habilidad fundamental del electrocardiografista.</p>
+
+            <div class="info-box note">
+              <i class="fas fa-info-circle"></i>
+              <p><strong>Objetivo:</strong> Identificar, describir y medir correctamente la onda P, el complejo QRS, la onda T, los intervalos PR y QT, y los segmentos ST y PR dentro de los límites normales.</p>
+            </div>
+
+            <h2 id="ondas">1. Las Ondas</h2>
+
+            <h3 id="onda-p">Onda P — Despolarización Auricular</h3>
+            <p>La onda P representa la <strong>despolarización de ambas aurículas</strong>. La primera mitad corresponde a la aurícula derecha y la segunda a la izquierda.</p>
+            <table class="data-table">
+              <thead><tr><th>Parámetro</th><th>Valor normal</th></tr></thead>
+              <tbody>
+                <tr><td>Duración</td><td>≤ 0,12 s (3 cuadros pequeños)</td></tr>
+                <tr><td>Amplitud</td><td>≤ 2,5 mm en derivaciones de miembros</td></tr>
+                <tr><td>Morfología</td><td>Redondeada, positiva en II, negativa en aVR</td></tr>
+                <tr><td>Eje</td><td>0° a +75° (positiva en I, II, aVF)</td></tr>
+              </tbody>
+            </table>
+            <div class="info-box tip">
+              <i class="fas fa-lightbulb"></i>
+              <p>Si la onda P es positiva en II y negativa en aVR, confirma origen sinusal del latido. ¡Esta es la primera pregunta al analizar el ritmo!</p>
+            </div>
+
+            <h3 id="complejo-qrs">Complejo QRS — Despolarización Ventricular</h3>
+            <p>Es la deflexión más prominente del ECG y representa la <strong>despolarización simultánea de ambos ventrículos</strong>. Se compone de tres deflexiones posibles:</p>
+            <ul>
+              <li><strong>Onda Q:</strong> Primera deflexión negativa, antes de cualquier positiva. Representa la despolarización septal de izquierda a derecha.</li>
+              <li><strong>Onda R:</strong> Primera (o única) deflexión positiva.</li>
+              <li><strong>Onda S:</strong> Deflexión negativa que sigue a una R.</li>
+            </ul>
+            <div class="info-box warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p><strong>Nomenclatura:</strong> Se usan letras mayúsculas (Q, R, S) para ondas de gran amplitud y minúsculas (q, r, s) para ondas pequeñas. Un complejo completamente negativo se llama <strong>QS</strong>.</p>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Parámetro</th><th>Valor normal</th></tr></thead>
+              <tbody>
+                <tr><td>Duración</td><td>0,06 – 0,10 s (1,5 a 2,5 cuadros pequeños)</td></tr>
+                <tr><td>Amplitud (R en V5–V6)</td><td>≤ 25 mm</td></tr>
+                <tr><td>Onda Q normal</td><td>&lt; 1 mm de ancho y &lt; 25% de la R siguiente</td></tr>
+              </tbody>
+            </table>
+
+            <h3 id="onda-t">Onda T — Repolarización Ventricular</h3>
+            <p>Representa la <strong>repolarización ventricular</strong>. A diferencia de la despolarización, ocurre en dirección opuesta (de epicardio a endocardio), lo que hace que la onda T sea positiva en la mayoría de derivaciones donde el QRS también es positivo.</p>
+            <table class="data-table">
+              <thead><tr><th>Parámetro</th><th>Valor normal</th></tr></thead>
+              <tbody>
+                <tr><td>Morfología</td><td>Asimétrica: sube lento, baja rápido</td></tr>
+                <tr><td>Polaridad normal</td><td>Positiva en I, II, V3–V6. Negativa en aVR. Variable en III, aVL, V1–V2</td></tr>
+                <tr><td>Amplitud</td><td>≤ 6 mm en miembros, ≤ 10 mm en precordiales</td></tr>
+              </tbody>
+            </table>
+
+            <h2 id="intervalos">2. Los Intervalos</h2>
+
+            <h3 id="intervalo-pr">Intervalo PR — Conducción Auriculoventricular</h3>
+            <p>Se mide desde el <strong>inicio de la onda P hasta el inicio del complejo QRS</strong>. Representa el tiempo que tarda el impulso en viajar desde el nodo SA hasta el inicio de la despolarización ventricular, incluyendo el retardo fisiológico en el nodo AV.</p>
+            <table class="data-table">
+              <thead><tr><th>Parámetro</th><th>Valor</th><th>Significado clínico</th></tr></thead>
+              <tbody>
+                <tr><td>Normal</td><td>0,12 – 0,20 s (3–5 cuadros pequeños)</td><td>Conducción AV normal</td></tr>
+                <tr><td>PR largo (&gt; 0,20 s)</td><td>Bloqueo AV de 1er grado</td><td>Retraso en nodo AV</td></tr>
+                <tr><td>PR corto (&lt; 0,12 s)</td><td>Preexcitación (WPW) o ritmo de unión</td><td>Vía accesoria o marcapasos ectópico</td></tr>
+              </tbody>
+            </table>
+
+            <h3 id="intervalo-qt">Intervalo QT — Sístole Eléctrica</h3>
+            <p>Se mide desde el <strong>inicio del QRS hasta el final de la onda T</strong>. Representa toda la actividad eléctrica ventricular (despolarización + repolarización). Su duración depende de la frecuencia cardíaca: a mayor frecuencia, menor QT.</p>
+            <p>Por eso se utiliza el <strong>QTc (QT corregido)</strong>, calculado con la fórmula de Bazett:</p>
+            <div style="background:var(--code-bg);border-radius:8px;padding:1rem;margin:1rem 0;font-family:'Roboto Mono',monospace;font-size:.95rem;text-align:center;">
+              QTc = QT / √RR
+            </div>
+            <table class="data-table">
+              <thead><tr><th>QTc</th><th>Interpretación</th></tr></thead>
+              <tbody>
+                <tr><td>&lt; 440 ms (♂) / &lt; 460 ms (♀)</td><td>Normal</td></tr>
+                <tr><td>440–500 ms</td><td>Borderline / monitorizar</td></tr>
+                <tr><td>&gt; 500 ms</td><td>QT largo: riesgo de Torsades de Pointes</td></tr>
+              </tbody>
+            </table>
+            <div class="info-box danger">
+              <i class="fas fa-exclamation-circle"></i>
+              <p><strong>Alerta clínica:</strong> Un QTc &gt; 500 ms es un marcador de riesgo de arritmias ventriculares malignas. Siempre revisar medicamentos que prolongan el QT (antiarrítmicos, antibióticos, antipsicóticos).</p>
+            </div>
+
+            <h2 id="segmentos">3. Los Segmentos</h2>
+
+            <h3 id="segmento-st">Segmento ST — Repolarización Temprana</h3>
+            <p>Es la línea que une el final del complejo QRS (punto J) con el inicio de la onda T. Representa el período entre la despolarización completa y el inicio de la repolarización ventricular.</p>
+            <ul>
+              <li><strong>Normal:</strong> Isoeléctrico (en la línea de base), con variaciones de ±1 mm en miembros y ±2 mm en precordiales.</li>
+              <li><strong>Elevación del ST:</strong> Sugiere lesión miocárdica (infarto agudo, pericarditis).</li>
+              <li><strong>Depresión del ST:</strong> Sugiere isquemia subendocárdica o efecto de digoxina.</li>
+            </ul>
+
+            <h3 id="segmento-pr">Segmento PR — Línea Isoeléctrica</h3>
+            <p>Se extiende desde el final de la onda P hasta el inicio del QRS. Representa el período en que el impulso está siendo retrasado en el nodo AV (nodo AV en reposo eléctrico desde la superficie). Sirve como <strong>línea de referencia isoeléctrica</strong> para medir desplazamientos del segmento ST.</p>
+
+            <h2 id="resumen">Resumen del Capítulo</h2>
+            <table class="data-table">
+              <thead><tr><th>Componente</th><th>Origen</th><th>Duración normal</th><th>Amplitud normal</th></tr></thead>
+              <tbody>
+                <tr><td>Onda P</td><td>Despolarización auricular</td><td>≤ 0,12 s</td><td>≤ 2,5 mm</td></tr>
+                <tr><td>Intervalo PR</td><td>Conducción SA→AV→His</td><td>0,12–0,20 s</td><td>—</td></tr>
+                <tr><td>Complejo QRS</td><td>Despolarización ventricular</td><td>0,06–0,10 s</td><td>Variable</td></tr>
+                <tr><td>Segmento ST</td><td>Repolarización temprana</td><td>Variable</td><td>±1–2 mm de la isoeléctrica</td></tr>
+                <tr><td>Onda T</td><td>Repolarización ventricular</td><td>Variable</td><td>≤ 6–10 mm</td></tr>
+                <tr><td>Intervalo QT</td><td>Sístole eléctrica completa</td><td>QTc &lt;440–460 ms</td><td>—</td></tr>
+              </tbody>
+            </table>
+
+            <div class="chapter-nav">
+              <a href="chapter-2.html" class="ch-nav-btn">
+                <i class="fas fa-chevron-left"></i>
+                <div><span class="nav-label">Anterior</span><span class="nav-title">Anatomía de las Derivaciones</span></div>
+              </a>
+              <a href="chapter-4.html" class="ch-nav-btn">
+                <div><span class="nav-label">Siguiente</span><span class="nav-title">Metodología de Interpretación</span></div>
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            </div>
+          </article>
+
+          <aside class="toc">
+            <div class="toc-title">En este capítulo</div>
+            <ul class="toc-list">
+              <li><a href="#ondas">1. Las Ondas</a></li>
+              <li><a href="#onda-p">— Onda P</a></li>
+              <li><a href="#complejo-qrs">— Complejo QRS</a></li>
+              <li><a href="#onda-t">— Onda T</a></li>
+              <li><a href="#intervalos">2. Los Intervalos</a></li>
+              <li><a href="#intervalo-pr">— Intervalo PR</a></li>
+              <li><a href="#intervalo-qt">— Intervalo QT</a></li>
+              <li><a href="#segmentos">3. Los Segmentos</a></li>
+              <li><a href="#segmento-st">— Segmento ST</a></li>
+              <li><a href="#segmento-pr">— Segmento PR</a></li>
+              <li><a href="#resumen">Resumen</a></li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+      <footer class="site-footer-bottom">
+        <p>Guía de Electrocardiografía &mdash; Libro Digital &copy; 2025</p>
+      </footer>
+    </main>
+  </div>
+  <script src="js/session.js"></script>
+<script src="js/main.js"></script>
+<script src="js/likert.js"></script>
+</body>
+</html>

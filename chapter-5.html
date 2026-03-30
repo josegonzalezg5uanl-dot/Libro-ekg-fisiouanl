@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cap. 5 – Patologías Básicas y Patrones | Guía ECG</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-left">
+      <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+      <a href="index.html" class="site-logo"><i class="fas fa-heartbeat"></i><span>Guía de ECG</span></a>
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Buscar en el libro..."/>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-send-session" id="btnSendSession" onclick="openSendModal()" title="Enviar registro de sesión al profesor">
+        <i class="fas fa-paper-plane"></i><span class="btn-send-label">Enviar</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+      <a href="https://github.com/dmccreary/i-book-v1" target="_blank" class="gh-link"><i class="fab fa-github"></i></a>
+    </div>
+  </header>
+  <div class="overlay" id="overlay"></div>
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        <div class="sidebar-title">Contenido</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Inicio</a></li>
+          <li class="nav-section">Capítulos</li>
+          <li class="nav-item"><a href="chapter-1.html" class="nav-link"><span class="ch-num">1</span> Fundamentos Fisiológicos y Técnicos</a></li>
+          <li class="nav-item"><a href="chapter-2.html" class="nav-link"><span class="ch-num">2</span> Anatomía de las Derivaciones</a></li>
+          <li class="nav-item"><a href="chapter-3.html" class="nav-link"><span class="ch-num">3</span> Componentes del Trazado Normal</a></li>
+          <li class="nav-item"><a href="chapter-4.html" class="nav-link"><span class="ch-num">4</span> Metodología de Interpretación</a></li>
+          <li class="nav-item"><a href="chapter-5.html" class="nav-link active"><span class="ch-num">5</span> Patologías Básicas y Patrones</a></li>
+          <li class="nav-item"><a href="chapter-6.html" class="nav-link"><span class="ch-num">6</span> Talleres de Práctica</a></li>
+          <li class="nav-section">Aprendizaje</li>
+          <li class="nav-item">
+            <a href="autopercepcion.html" class="nav-link">
+              <i class="fas fa-brain" style="color:#a78bfa"></i> Autopercepción
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="chapter-layout">
+          <article class="chapter-content">
+            <h1>Patologías Básicas y Reconocimiento de Patrones</h1>
+            <div class="chapter-meta">
+              <span class="chapter-badge"><i class="fas fa-exclamation-triangle"></i> Capítulo 5</span>
+              <span class="chapter-read-time"><i class="fas fa-clock"></i> ~40 min de lectura</span>
+            </div>
+
+            <p>Una vez dominado lo normal, el siguiente paso es reconocer las alteraciones más frecuentes. Este capítulo cubre los patrones patológicos más importantes que todo médico debe identificar.</p>
+
+            <div class="info-box warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p><strong>Principio fundamental:</strong> El ECG nunca diagnostica por sí solo. Siempre debe interpretarse en conjunto con la <strong>clínica del paciente</strong>, los antecedentes y otros estudios complementarios.</p>
+            </div>
+
+            <!-- CRECIMIENTOS CAVITARIOS -->
+            <h2 id="crecimientos">1. Crecimientos Cavitarios</h2>
+
+            <h3 id="crec-auricular">Hipertrofias Auriculares</h3>
+            <table class="data-table">
+              <thead><tr><th>Patrón</th><th>Derivación clave</th><th>Criterio diagnóstico</th><th>Causa típica</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Crecimiento AD</strong> (P pulmonale)</td><td>Derivación II</td><td>Onda P picuda ≥ 2,5 mm de amplitud</td><td>EPOC, hipertensión pulmonar, estenosis tricuspídea</td></tr>
+                <tr><td><strong>Crecimiento AI</strong> (P mitrale)</td><td>Derivación II / V1</td><td>Onda P bimodal ≥ 0,12 s o componente negativo en V1 ≥ 1 mm × 1 cuadro</td><td>Estenosis mitral, HTA, insuficiencia mitral</td></tr>
+              </tbody>
+            </table>
+
+            <h3 id="crec-ventricular">Hipertrofias Ventriculares</h3>
+            <table class="data-table">
+              <thead><tr><th>Patrón</th><th>Criterio principal</th><th>Signos adicionales</th></tr></thead>
+              <tbody>
+                <tr><td><strong>HVI</strong> (Hipertrofia VI)</td><td>Criterio de Sokolow-Lyon: S en V1 + R en V5 ó V6 &gt; 35 mm</td><td>DAHI, patrón de sobrecarga (ST↓ + T invertida en V5–V6)</td></tr>
+                <tr><td><strong>HVD</strong> (Hipertrofia VD)</td><td>R &gt; S en V1, R en V1 ≥ 7 mm</td><td>DAHD, patrón de sobrecarga en V1–V2</td></tr>
+              </tbody>
+            </table>
+
+            <!-- BLOQUEOS DE RAMA -->
+            <h2 id="bloqueos">2. Bloqueos de Rama</h2>
+            <p>Los bloqueos de rama ocurren cuando la conducción por una de las ramas del Haz de His está retrasada o interrumpida. El resultado es un <strong>QRS ancho (&gt; 0,12 s)</strong> con morfología característica.</p>
+
+            <h3 id="brd">Bloqueo de Rama Derecha (BRD)</h3>
+            <div class="info-box note">
+              <i class="fas fa-info-circle"></i>
+              <p><strong>Criterios diagnósticos del BRD completo:</strong></p>
+            </div>
+            <ul>
+              <li>QRS ≥ 0,12 s (bloqueo completo) ó 0,10–0,12 s (incompleto)</li>
+              <li><strong>V1:</strong> Morfología RSR' (patrón "oreja de conejo") o R ancha y mellada</li>
+              <li><strong>I, V5–V6:</strong> Onda S ancha y empastada</li>
+              <li>Inversión de T en V1–V2 (secundaria al bloqueo)</li>
+            </ul>
+            <p><strong>Causa:</strong> Puede ser normal en personas jóvenes (BRD incompleto). El BRD completo puede asociarse a cardiopatía congénita, TEP agudo, cardiopatía isquémica.</p>
+
+            <h3 id="bri">Bloqueo de Rama Izquierda (BRI)</h3>
+            <div class="info-box danger">
+              <i class="fas fa-exclamation-circle"></i>
+              <p><strong>Importante:</strong> El BRI nuevo en el contexto de dolor torácico debe considerarse equivalente a un IAMCEST hasta demostrar lo contrario (Criterio de Sgarbossa).</p>
+            </div>
+            <ul>
+              <li>QRS ≥ 0,12 s</li>
+              <li><strong>I, aVL, V5–V6:</strong> Onda R ancha, mellada, sin onda Q</li>
+              <li><strong>V1–V3:</strong> Complejo QS o rS con S amplia</li>
+              <li>Discordancia del ST y T (en dirección opuesta al QRS)</li>
+            </ul>
+
+            <!-- ARRITMIAS -->
+            <h2 id="arritmias">3. Arritmias Simples</h2>
+
+            <h3 id="bradi-taqui-sinusal">Bradicardia y Taquicardia Sinusal</h3>
+            <table class="data-table">
+              <thead><tr><th>Arritmia</th><th>FC</th><th>Características ECG</th><th>Causas comunes</th></tr></thead>
+              <tbody>
+                <tr><td>Bradicardia sinusal</td><td>&lt; 60 lpm</td><td>Ritmo sinusal normal pero lento</td><td>Atletas, hipotiroidismo, beta-bloqueadores, vagotomía</td></tr>
+                <tr><td>Taquicardia sinusal</td><td>&gt; 100 lpm</td><td>Ritmo sinusal normal pero rápido</td><td>Fiebre, anemia, dolor, ansiedad, TEP, hipovolemia</td></tr>
+              </tbody>
+            </table>
+
+            <h3 id="fa">Fibrilación Auricular (FA)</h3>
+            <p>La arritmia sostenida más frecuente en adultos. Caracterizada por:</p>
+            <ul>
+              <li><strong>Ausencia de ondas P</strong> → reemplazadas por ondas fibrilatorias (f) irregulares y caóticas</li>
+              <li><strong>R–R completamente irregular</strong> (arritmia arrítmica)</li>
+              <li>QRS estrecho (a menos que haya bloqueo de rama asociado)</li>
+            </ul>
+            <div class="info-box warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p>La FA conlleva riesgo elevado de ictus embólico. Evaluar siempre con la escala <strong>CHA₂DS₂-VASc</strong> para indicación de anticoagulación.</p>
+            </div>
+
+            <h3 id="flutter">Flutter Auricular</h3>
+            <ul>
+              <li>Frecuencia auricular: ~300 lpm, en patrón de "dientes de sierra" (ondas F)</li>
+              <li>Bloqueo AV fisiológico 2:1, 3:1 ó 4:1 → FC ventricular 75–150 lpm</li>
+              <li>Mejor visible en derivaciones II, III, aVF y V1</li>
+            </ul>
+
+            <h3 id="extrasistoles">Extrasístoles</h3>
+            <table class="data-table">
+              <thead><tr><th>Tipo</th><th>Características</th><th>Significado</th></tr></thead>
+              <tbody>
+                <tr><td>Extrasístole auricular (EAP)</td><td>P prematura con morfología diferente, QRS estrecho</td><td>Generalmente benigno</td></tr>
+                <tr><td>Extrasístole ventricular (EV)</td><td>QRS ancho y bizarro, sin onda P previa, pausa compensatoria</td><td>Evaluar cardiopatía subyacente si son frecuentes o complejas</td></tr>
+              </tbody>
+            </table>
+
+            <!-- ISQUEMIA -->
+            <h2 id="isquemia">4. Isquemia, Lesión e Infarto</h2>
+
+            <h3 id="conceptos-isi">El Triángulo Isquemia–Lesión–Infarto</h3>
+            <table class="data-table">
+              <thead><tr><th>Proceso</th><th>Hallazgo ECG</th><th>Reversibilidad</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Isquemia</strong></td><td>Inversión de onda T (isquemia subepicárdica) o T picuda (isquemia subendocárdica)</td><td>Reversible</td></tr>
+                <tr><td><strong>Lesión</strong></td><td>Elevación del ST (lesión subepicárdica) o Depresión del ST (lesión subendocárdica)</td><td>Reversible si se trata</td></tr>
+                <tr><td><strong>Infarto/Necrosis</strong></td><td>Onda Q patológica (&gt; 1 mm de ancho, &gt; 25% de la R)</td><td>Permanente</td></tr>
+              </tbody>
+            </table>
+
+            <h3 id="iamcest">IAMCEST — Infarto con Elevación del ST</h3>
+            <div class="info-box danger">
+              <i class="fas fa-exclamation-circle"></i>
+              <p><strong>Criterios diagnósticos:</strong> Elevación del ST ≥ 1 mm en 2 derivaciones contiguas de miembros, o ≥ 2 mm en 2 derivaciones precordiales contiguas. ¡Activar código infarto de inmediato!</p>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Localización</th><th>Derivaciones con elevación ST</th><th>Arteria responsable probable</th></tr></thead>
+              <tbody>
+                <tr><td>Anterior extensa</td><td>V1–V6</td><td>DA proximal</td></tr>
+                <tr><td>Anterior</td><td>V2–V4</td><td>DA media o distal</td></tr>
+                <tr><td>Lateral alto</td><td>I, aVL</td><td>DA diagonal o CX</td></tr>
+                <tr><td>Inferior</td><td>II, III, aVF</td><td>Coronaria derecha (CD)</td></tr>
+                <tr><td>Posterior</td><td>V7–V9 (o imagen en espejo en V1–V2)</td><td>CX o CD</td></tr>
+              </tbody>
+            </table>
+
+            <!-- ELECTROLITOS -->
+            <h2 id="electrolitos">5. Alteraciones Electrolíticas</h2>
+
+            <h3 id="potasio">Efectos del Potasio</h3>
+            <table class="data-table">
+              <thead><tr><th>Alteración</th><th>K⁺ sérico</th><th>Cambios en ECG</th></tr></thead>
+              <tbody>
+                <tr><td>Hipopotasemia leve</td><td>3,0–3,5 mEq/L</td><td>Aplanamiento de onda T, aparición de onda U prominente</td></tr>
+                <tr><td>Hipopotasemia moderada/grave</td><td>&lt; 3,0 mEq/L</td><td>Fusión de T y U, QT aparentemente prolongado, ST deprimido</td></tr>
+                <tr><td>Hiperpotasemia leve</td><td>5,5–6,5 mEq/L</td><td>Onda T alta, picuda y simétrica ("en tienda de campaña")</td></tr>
+                <tr><td>Hiperpotasemia grave</td><td>&gt; 6,5 mEq/L</td><td>Ensanchamiento del QRS, PR prolongado, onda P desaparece → patrón sinusoidal → FV</td></tr>
+              </tbody>
+            </table>
+
+            <h3 id="calcio">Efectos del Calcio</h3>
+            <table class="data-table">
+              <thead><tr><th>Alteración</th><th>Cambio en ECG</th><th>Mecanismo</th></tr></thead>
+              <tbody>
+                <tr><td>Hipocalcemia</td><td>QT prolongado (QTc &gt; 460 ms)</td><td>Prolongación de la fase 2 (plateau) del PA</td></tr>
+                <tr><td>Hipercalcemia</td><td>QT corto, PR prolongado</td><td>Acortamiento de la fase 2, conducción lenta en nodo AV</td></tr>
+              </tbody>
+            </table>
+
+            <h2 id="resumen">Resumen del Capítulo</h2>
+            <ul>
+              <li><strong>Crecimientos cavitarios:</strong> P pulmonale (AD), P mitrale (AI), Sokolow-Lyon (HVI), R en V1 (HVD).</li>
+              <li><strong>Bloqueos:</strong> BRD = RSR' en V1 + S ancha en V6. BRI = R ancha en I/V6 + QS en V1.</li>
+              <li><strong>FA:</strong> Sin ondas P, R–R irregular. Flutter: ondas en sierra, bloqueo 2:1.</li>
+              <li><strong>Infarto:</strong> T↑ (hiperagudo) → ST↑ (lesión) → Q patológica (necrosis).</li>
+              <li><strong>Potasio:</strong> Alto → T picuda; Bajo → onda U, QT aparente largo.</li>
+              <li><strong>Calcio:</strong> Bajo → QT largo; Alto → QT corto.</li>
+            </ul>
+
+            <div class="chapter-nav">
+              <a href="chapter-4.html" class="ch-nav-btn">
+                <i class="fas fa-chevron-left"></i>
+                <div><span class="nav-label">Anterior</span><span class="nav-title">Metodología de Interpretación</span></div>
+              </a>
+              <a href="chapter-6.html" class="ch-nav-btn">
+                <div><span class="nav-label">Siguiente</span><span class="nav-title">Talleres de Práctica</span></div>
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            </div>
+          </article>
+
+          <aside class="toc">
+            <div class="toc-title">En este capítulo</div>
+            <ul class="toc-list">
+              <li><a href="#crecimientos">1. Crecimientos Cavitarios</a></li>
+              <li><a href="#crec-auricular">— Hipertrofias Auriculares</a></li>
+              <li><a href="#crec-ventricular">— Hipertrofias Ventriculares</a></li>
+              <li><a href="#bloqueos">2. Bloqueos de Rama</a></li>
+              <li><a href="#brd">— BRD</a></li>
+              <li><a href="#bri">— BRI</a></li>
+              <li><a href="#arritmias">3. Arritmias</a></li>
+              <li><a href="#bradi-taqui-sinusal">— Bradi/Taquicardia</a></li>
+              <li><a href="#fa">— Fibrilación Auricular</a></li>
+              <li><a href="#flutter">— Flutter Auricular</a></li>
+              <li><a href="#extrasistoles">— Extrasístoles</a></li>
+              <li><a href="#isquemia">4. Isquemia e Infarto</a></li>
+              <li><a href="#iamcest">— IAMCEST</a></li>
+              <li><a href="#electrolitos">5. Electrolitos</a></li>
+              <li><a href="#resumen">Resumen</a></li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+      <footer class="site-footer-bottom">
+        <p>Guía de Electrocardiografía &mdash; Libro Digital &copy; 2025</p>
+      </footer>
+    </main>
+  </div>
+  <script src="js/session.js"></script>
+<script src="js/main.js"></script>
+<script src="js/likert.js"></script>
+</body>
+</html>
