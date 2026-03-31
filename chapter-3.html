@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cap. 3 – Componentes del Trazado Normal | Guía ECG</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <style>
+    .ap-trigger{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#1a0d35,#0d1f3c);border:1px solid #7c3aed66;border-radius:12px;padding:10px 18px;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:600;color:#c4b5fd;transition:all .2s;position:relative;overflow:hidden;margin:20px 0;width:100%;text-align:left;animation:ap-pulse 3s ease 1.5s 3}
+    .ap-trigger::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#7c3aed11,#1976d211);opacity:0;transition:opacity .2s}
+    .ap-trigger:hover::before{opacity:1}.ap-trigger:hover{border-color:#7c3aed99;transform:translateY(-1px);box-shadow:0 4px 20px #7c3aed22}
+    .ap-trigger-icon{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 2px 10px #7c3aed44}
+    .ap-trigger-body{flex:1}.ap-trigger-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:#7c3aed;margin-bottom:2px}
+    .ap-trigger-text{color:#e0e6f0;font-size:.88rem}.ap-trigger-arrow{color:#7c3aed;font-size:.9rem;transition:transform .2s}
+    .ap-trigger:hover .ap-trigger-arrow{transform:translateX(3px)}
+    @keyframes ap-pulse{0%,100%{box-shadow:0 0 0 0 #7c3aed33}50%{box-shadow:0 0 0 8px #7c3aed00}}
+    .ap-modal-overlay{position:fixed;inset:0;z-index:50000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
+    .ap-modal-overlay.open{opacity:1;pointer-events:all}
+    .ap-modal{background:#0a1628;border:1px solid #7c3aed55;border-radius:20px;padding:32px 28px 26px;max-width:480px;width:92%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 60px #7c3aed22;transform:translateY(20px) scale(.97);transition:transform .3s cubic-bezier(.17,.67,.45,1.2)}
+    .ap-modal-overlay.open .ap-modal{transform:translateY(0) scale(1)}
+    .ap-modal-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px}
+    .ap-modal-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;box-shadow:0 4px 16px #7c3aed44}
+    .ap-modal-badge{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:#7c3aed;font-weight:700;margin-bottom:4px}
+    .ap-modal-title{font-size:1rem;font-weight:800;color:#e0e6f0;line-height:1.4}
+    .ap-modal-context{background:#111827;border-left:3px solid #7c3aed;border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:18px;font-size:.84rem;color:#8899aa;line-height:1.6}
+    .ap-modal-context strong{color:#c4b5fd}
+    .ap-modal-question{font-size:.95rem;font-weight:600;color:#e0e6f0;line-height:1.6;margin-bottom:18px;padding:14px 16px;background:#0d1f35;border:1px solid #1e3a5f;border-radius:10px}
+    .ap-likert{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+    .ap-likert-opt{display:flex;align-items:center;gap:12px;background:#111827;border:2px solid #1e2d40;border-radius:10px;padding:11px 14px;cursor:pointer;font-family:inherit;font-size:.88rem;color:#c8d8e8;text-align:left;transition:all .18s;width:100%}
+    .ap-likert-opt:hover{border-color:#7c3aed77;background:#15103a;transform:translateX(3px)}
+    .ap-likert-opt.selected{border-color:#7c3aed;background:#1a0d35;color:#e0e6f0}
+    .ap-likert-emoji{font-size:1.3rem;flex-shrink:0}.ap-likert-label{font-weight:600;display:block;margin-bottom:2px}.ap-likert-desc{font-size:.78rem;color:#607080}
+    .ap-response{display:none;padding:12px 16px;border-radius:10px;margin-bottom:18px;font-size:.86rem;color:#c8d8e8;line-height:1.65;animation:slide-in .25s ease}
+    @keyframes slide-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .ap-modal-close{width:100%;padding:11px;background:#1e2d40;border:none;color:#8899aa;border-radius:10px;font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+    .ap-modal-close:hover{background:#1e3a5f;color:#e0e6f0}
+    .ap-done-badge{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;color:#22c55e;background:#22c55e18;border:1px solid #22c55e44;border-radius:20px;padding:2px 10px;margin-left:auto;flex-shrink:0}
+    .quiz-cta{background:linear-gradient(135deg,#0d1f3c,#1a0d35);border:1px solid #1976d255;border-radius:14px;padding:24px 28px;margin:28px 0;display:flex;align-items:center;gap:20px}
+    .quiz-cta-icon{font-size:2rem;flex-shrink:0}.quiz-cta-body{flex:1}
+    .quiz-cta-title{font-size:1rem;font-weight:800;color:#e0e6f0;margin-bottom:4px}
+    .quiz-cta-desc{font-size:.84rem;color:#607080;margin-bottom:12px}
+    .quiz-cta-btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1976d2,#4f46e5);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-family:inherit;font-size:.88rem;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s}
+    .quiz-cta-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px #1976d244}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-left">
+      <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+      <a href="index.html" class="site-logo"><i class="fas fa-heartbeat"></i><span>Guía de ECG</span></a>
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Buscar en el libro..."/>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-send-session" id="btnSendSession" onclick="openSendModal()" title="Enviar registro de sesión al profesor">
+        <i class="fas fa-paper-plane"></i><span class="btn-send-label">Enviar</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+      <a href="https://github.com/dmccreary/i-book-v1" target="_blank" class="gh-link"><i class="fab fa-github"></i></a>
+    </div>
+  </header>
+  <div class="overlay" id="overlay"></div>
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        <div class="sidebar-title">Contenido</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Inicio</a></li>
+          <li class="nav-section">Capítulos</li>
+          <li class="nav-item"><a href="chapter-1.html" class="nav-link"><span class="ch-num">1</span> Fundamentos Fisiológicos y Técnicos</a></li>
+          <li class="nav-item"><a href="chapter-2.html" class="nav-link"><span class="ch-num">2</span> Anatomía de las Derivaciones</a></li>
+          <li class="nav-item"><a href="chapter-3.html" class="nav-link active"><span class="ch-num">3</span> Componentes del Trazado Normal</a></li>
+          <li class="nav-item"><a href="chapter-4.html" class="nav-link"><span class="ch-num">4</span> Metodología de Interpretación</a></li>
+          <li class="nav-item"><a href="chapter-5.html" class="nav-link"><span class="ch-num">5</span> Patologías Básicas y Patrones</a></li>
+          <li class="nav-item"><a href="chapter-6.html" class="nav-link"><span class="ch-num">6</span> Talleres de Práctica</a></li>
+          <li class="nav-section">Aprendizaje</li>
+          <li class="nav-item">
+            <a href="autopercepcion.html" class="nav-link">
+              <i class="fas fa-brain" style="color:#a78bfa"></i> Autopercepción
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="chapter-layout">
+          <article class="chapter-content">
+            <h1>Componentes del Trazado Normal</h1>
+            <div class="chapter-meta">
+              <span class="chapter-badge"><i class="fas fa-wave-square"></i> Capítulo 3</span>
+              <span class="chapter-read-time"><i class="fas fa-clock"></i> ~30 min de lectura</span>
+            </div>
+
+            <p>Un ECG normal está formado por una secuencia de <strong>ondas, intervalos y segmentos</strong> que se repiten con cada latido. Aprender a identificar y medir cada componente es la habilidad fundamental del electrocardiografista.</p>
+
+            <div class="info-box note">
+              <i class="fas fa-info-circle"></i>
+              <p><strong>Objetivo:</strong> Identificar, describir y medir correctamente la onda P, el complejo QRS, la onda T, los intervalos PR y QT, y los segmentos ST y PR dentro de los límites normales.</p>
+            </div>
+
+            <h2 id="ondas">1. Las Ondas</h2>
+
+            <h3 id="onda-p">Onda P — Despolarización Auricular</h3>
+            <p>La onda P representa la <strong>despolarización de ambas aurículas</strong>. La primera mitad corresponde a la aurícula derecha y la segunda a la izquierda.</p>
+            <table class="data-table">
+              <thead><tr><th>Parámetro</th><th>Valor normal</th></tr></thead>
+              <tbody>
+                <tr><td>Duración</td><td>≤ 0,12 s (3 cuadros pequeños)</td></tr>
+                <tr><td>Amplitud</td><td>≤ 2,5 mm en derivaciones de miembros</td></tr>
+                <tr><td>Morfología</td><td>Redondeada, positiva en II, negativa en aVR</td></tr>
+                <tr><td>Eje</td><td>0° a +75° (positiva en I, II, aVF)</td></tr>
+              </tbody>
+            </table>
+            <div class="info-box tip">
+              <i class="fas fa-lightbulb"></i>
+              <p>Si la onda P es positiva en II y negativa en aVR, confirma origen sinusal del latido. ¡Esta es la primera pregunta al analizar el ritmo!</p>
+            </div>
+
+            <h3 id="complejo-qrs">Complejo QRS — Despolarización Ventricular</h3>
+            <p>Es la deflexión más prominente del ECG y representa la <strong>despolarización simultánea de ambos ventrículos</strong>. Se compone de tres deflexiones posibles:</p>
+            <ul>
+              <li><strong>Onda Q:</strong> Primera deflexión negativa, antes de cualquier positiva. Representa la despolarización septal de izquierda a derecha.</li>
+              <li><strong>Onda R:</strong> Primera (o única) deflexión positiva.</li>
+              <li><strong>Onda S:</strong> Deflexión negativa que sigue a una R.</li>
+            </ul>
+            <div class="info-box warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p><strong>Nomenclatura:</strong> Se usan letras mayúsculas (Q, R, S) para ondas de gran amplitud y minúsculas (q, r, s) para ondas pequeñas. Un complejo completamente negativo se llama <strong>QS</strong>.</p>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Parámetro</th><th>Valor normal</th></tr></thead>
+              <tbody>
+                <tr><td>Duración</td><td>0,06 – 0,10 s (1,5 a 2,5 cuadros pequeños)</td></tr>
+                <tr><td>Amplitud (R en V5–V6)</td><td>≤ 25 mm</td></tr>
+                <tr><td>Onda Q normal</td><td>&lt; 1 mm de ancho y &lt; 25% de la R siguiente</td></tr>
+              </tbody>
+            </table>
+
+            <h3 id="onda-t">Onda T — Repolarización Ventricular</h3>
+            <p>Representa la <strong>repolarización ventricular</strong>. A diferencia de la despolarización, ocurre en dirección opuesta (de epicardio a endocardio), lo que hace que la onda T sea positiva en la mayoría de derivaciones donde el QRS también es positivo.</p>
+            <table class="data-table">
+              <thead><tr><th>Parámetro</th><th>Valor normal</th></tr></thead>
+              <tbody>
+                <tr><td>Morfología</td><td>Asimétrica: sube lento, baja rápido</td></tr>
+                <tr><td>Polaridad normal</td><td>Positiva en I, II, V3–V6. Negativa en aVR. Variable en III, aVL, V1–V2</td></tr>
+                <tr><td>Amplitud</td><td>≤ 6 mm en miembros, ≤ 10 mm en precordiales</td></tr>
+              </tbody>
+            </table>
+
+            <!-- AUTOPERCEPCIÓN 1 — tras Ondas P y QRS -->
+            <button class="ap-trigger" onclick="openAPModal('ap1')">
+              <span class="ap-trigger-icon">🧠</span>
+              <span class="ap-trigger-body">
+                <span class="ap-trigger-label">Autopercepción · Punto 1 de 2</span>
+                <span class="ap-trigger-text">¿Puedo describir la onda P, el QRS y la onda T con sus valores normales de duración y amplitud?</span>
+              </span>
+              <span id="ap1-done"></span>
+              <span class="ap-trigger-arrow">›</span>
+            </button>
+
+            <h2 id="intervalos">2. Los Intervalos</h2>
+
+            <h3 id="intervalo-pr">Intervalo PR — Conducción Auriculoventricular</h3>
+            <p>Se mide desde el <strong>inicio de la onda P hasta el inicio del complejo QRS</strong>. Representa el tiempo que tarda el impulso en viajar desde el nodo SA hasta el inicio de la despolarización ventricular, incluyendo el retardo fisiológico en el nodo AV.</p>
+            <table class="data-table">
+              <thead><tr><th>Parámetro</th><th>Valor</th><th>Significado clínico</th></tr></thead>
+              <tbody>
+                <tr><td>Normal</td><td>0,12 – 0,20 s (3–5 cuadros pequeños)</td><td>Conducción AV normal</td></tr>
+                <tr><td>PR largo (&gt; 0,20 s)</td><td>Bloqueo AV de 1er grado</td><td>Retraso en nodo AV</td></tr>
+                <tr><td>PR corto (&lt; 0,12 s)</td><td>Preexcitación (WPW) o ritmo de unión</td><td>Vía accesoria o marcapasos ectópico</td></tr>
+              </tbody>
+            </table>
+
+            <h3 id="intervalo-qt">Intervalo QT — Sístole Eléctrica</h3>
+            <p>Se mide desde el <strong>inicio del QRS hasta el final de la onda T</strong>. Representa toda la actividad eléctrica ventricular (despolarización + repolarización). Su duración depende de la frecuencia cardíaca: a mayor frecuencia, menor QT.</p>
+            <p>Por eso se utiliza el <strong>QTc (QT corregido)</strong>, calculado con la fórmula de Bazett:</p>
+            <div style="background:var(--code-bg);border-radius:8px;padding:1rem;margin:1rem 0;font-family:'Roboto Mono',monospace;font-size:.95rem;text-align:center;">
+              QTc = QT / √RR
+            </div>
+            <table class="data-table">
+              <thead><tr><th>QTc</th><th>Interpretación</th></tr></thead>
+              <tbody>
+                <tr><td>&lt; 440 ms (♂) / &lt; 460 ms (♀)</td><td>Normal</td></tr>
+                <tr><td>440–500 ms</td><td>Borderline / monitorizar</td></tr>
+                <tr><td>&gt; 500 ms</td><td>QT largo: riesgo de Torsades de Pointes</td></tr>
+              </tbody>
+            </table>
+            <div class="info-box danger">
+              <i class="fas fa-exclamation-circle"></i>
+              <p><strong>Alerta clínica:</strong> Un QTc &gt; 500 ms es un marcador de riesgo de arritmias ventriculares malignas. Siempre revisar medicamentos que prolongan el QT (antiarrítmicos, antibióticos, antipsicóticos).</p>
+            </div>
+
+            <h2 id="segmentos">3. Los Segmentos</h2>
+
+            <h3 id="segmento-st">Segmento ST — Repolarización Temprana</h3>
+            <p>Es la línea que une el final del complejo QRS (punto J) con el inicio de la onda T. Representa el período entre la despolarización completa y el inicio de la repolarización ventricular.</p>
+            <ul>
+              <li><strong>Normal:</strong> Isoeléctrico (en la línea de base), con variaciones de ±1 mm en miembros y ±2 mm en precordiales.</li>
+              <li><strong>Elevación del ST:</strong> Sugiere lesión miocárdica (infarto agudo, pericarditis).</li>
+              <li><strong>Depresión del ST:</strong> Sugiere isquemia subendocárdica o efecto de digoxina.</li>
+            </ul>
+
+            <h3 id="segmento-pr">Segmento PR — Línea Isoeléctrica</h3>
+            <p>Se extiende desde el final de la onda P hasta el inicio del QRS. Representa el período en que el impulso está siendo retrasado en el nodo AV (nodo AV en reposo eléctrico desde la superficie). Sirve como <strong>línea de referencia isoeléctrica</strong> para medir desplazamientos del segmento ST.</p>
+
+            <!-- AUTOPERCEPCIÓN 2 — tras intervalos y segmentos -->
+            <button class="ap-trigger" onclick="openAPModal('ap2')">
+              <span class="ap-trigger-icon">🧠</span>
+              <span class="ap-trigger-body">
+                <span class="ap-trigger-label">Autopercepción · Punto 2 de 2</span>
+                <span class="ap-trigger-text">¿Entiendo el significado clínico del intervalo PR, el QTc y el segmento ST?</span>
+              </span>
+              <span id="ap2-done"></span>
+              <span class="ap-trigger-arrow">›</span>
+            </button>
+
+            <h2 id="resumen">Resumen del Capítulo</h2>
+            <table class="data-table">
+              <thead><tr><th>Componente</th><th>Origen</th><th>Duración normal</th><th>Amplitud normal</th></tr></thead>
+              <tbody>
+                <tr><td>Onda P</td><td>Despolarización auricular</td><td>≤ 0,12 s</td><td>≤ 2,5 mm</td></tr>
+                <tr><td>Intervalo PR</td><td>Conducción SA→AV→His</td><td>0,12–0,20 s</td><td>—</td></tr>
+                <tr><td>Complejo QRS</td><td>Despolarización ventricular</td><td>0,06–0,10 s</td><td>Variable</td></tr>
+                <tr><td>Segmento ST</td><td>Repolarización temprana</td><td>Variable</td><td>±1–2 mm de la isoeléctrica</td></tr>
+                <tr><td>Onda T</td><td>Repolarización ventricular</td><td>Variable</td><td>≤ 6–10 mm</td></tr>
+                <tr><td>Intervalo QT</td><td>Sístole eléctrica completa</td><td>QTc &lt;440–460 ms</td><td>—</td></tr>
+              </tbody>
+            </table>
+
+            <!-- QUIZ CTA -->
+            <div class="quiz-cta">
+              <span class="quiz-cta-icon">🎮</span>
+              <div class="quiz-cta-body">
+                <div class="quiz-cta-title">Quiz — Capítulo 3</div>
+                <div class="quiz-cta-desc">10 preguntas sobre ondas, intervalos y segmentos del ECG normal. Practica con feedback por cada opción incorrecta.</div>
+                <a href="quiz-3.html" class="quiz-cta-btn"><i class="fas fa-gamepad"></i> Comenzar Quiz</a>
+              </div>
+            </div>
+
+            <div class="chapter-nav">
+              <a href="chapter-2.html" class="ch-nav-btn">
+                <i class="fas fa-chevron-left"></i>
+                <div><span class="nav-label">Anterior</span><span class="nav-title">Anatomía de las Derivaciones</span></div>
+              </a>
+              <a href="chapter-4.html" class="ch-nav-btn">
+                <div><span class="nav-label">Siguiente</span><span class="nav-title">Metodología de Interpretación</span></div>
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            </div>
+          </article>
+
+          <aside class="toc">
+            <div class="toc-title">En este capítulo</div>
+            <ul class="toc-list">
+              <li><a href="#ondas">1. Las Ondas</a></li>
+              <li><a href="#onda-p">— Onda P</a></li>
+              <li><a href="#complejo-qrs">— Complejo QRS</a></li>
+              <li><a href="#onda-t">— Onda T</a></li>
+              <li><a href="#intervalos">2. Los Intervalos</a></li>
+              <li><a href="#intervalo-pr">— Intervalo PR</a></li>
+              <li><a href="#intervalo-qt">— Intervalo QT</a></li>
+              <li><a href="#segmentos">3. Los Segmentos</a></li>
+              <li><a href="#segmento-st">— Segmento ST</a></li>
+              <li><a href="#segmento-pr">— Segmento PR</a></li>
+              <li><a href="#resumen">Resumen</a></li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+      <footer class="site-footer-bottom">
+        <p>Guía de Electrocardiografía &mdash; Libro Digital &copy; 2025</p>
+      </footer>
+    </main>
+  </div>
+  <script src="js/session.js"></script>
+<script src="js/main.js"></script>
+<script src="js/likert.js"></script>
+
+<div id="ap1-overlay" class="ap-modal-overlay" onclick="closeAPModalOnBg(event,'ap1')">
+  <div class="ap-modal">
+    <div class="ap-modal-header"><div class="ap-modal-avatar">🧠</div><div><div class="ap-modal-badge">Autopercepción · Punto 1 de 2</div><div class="ap-modal-title">Ondas P, QRS y T</div></div></div>
+    <div class="ap-modal-context"><strong>Concepto:</strong> Las tres ondas principales del ECG representan despolarización auricular (P), despolarización ventricular (QRS) y repolarización ventricular (T), cada una con valores normales precisos.</div>
+    <div class="ap-modal-question">¿Qué tan seguro/a te sientes para describir la duración, amplitud y significado fisiológico de la onda P, el complejo QRS y la onda T?</div>
+    <div class="ap-likert">
+      <button class="ap-likert-opt" onclick="selectAP('ap1',1,this)"><span class="ap-likert-emoji">😰</span><span><span class="ap-likert-label">No lo entiendo</span><span class="ap-likert-desc">No distingo con claridad las ondas del ECG</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap1',2,this)"><span class="ap-likert-emoji">😕</span><span><span class="ap-likert-label">Muy pocas dudas resueltas</span><span class="ap-likert-desc">Reconozco las ondas pero no sé sus valores normales</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap1',3,this)"><span class="ap-likert-emoji">🤔</span><span><span class="ap-likert-label">Lo entiendo con dudas</span><span class="ap-likert-desc">Conozco algunos valores pero me confundo con otros</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap1',4,this)"><span class="ap-likert-emoji">🙂</span><span><span class="ap-likert-label">Con pequeñas dudas</span><span class="ap-likert-desc">Domino la mayoría pero tengo alguna incertidumbre</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap1',5,this)"><span class="ap-likert-emoji">😎</span><span><span class="ap-likert-label">Lo domino completamente</span><span class="ap-likert-desc">Puedo describir y medir las tres ondas sin dudar</span></span></button>
+    </div>
+    <div class="ap-response" id="ap1-response"></div>
+    <button class="ap-modal-close" onclick="closeAPModal('ap1')"><i class="fas fa-book-open"></i> Continuar leyendo</button>
+  </div>
+</div>
+
+<div id="ap2-overlay" class="ap-modal-overlay" onclick="closeAPModalOnBg(event,'ap2')">
+  <div class="ap-modal">
+    <div class="ap-modal-header"><div class="ap-modal-avatar">🧠</div><div><div class="ap-modal-badge">Autopercepción · Punto 2 de 2</div><div class="ap-modal-title">Intervalos PR, QTc y Segmento ST</div></div></div>
+    <div class="ap-modal-context"><strong>Concepto:</strong> El intervalo PR refleja la conducción AV (0.12–0.20 s), el QTc mide la sístole eléctrica completa y el segmento ST es la clave para detectar isquemia o lesión miocárdica.</div>
+    <div class="ap-modal-question">¿Qué tan seguro/a te sientes para interpretar el significado clínico de un PR largo, un QTc prolongado y una alteración del segmento ST?</div>
+    <div class="ap-likert">
+      <button class="ap-likert-opt" onclick="selectAP('ap2',1,this)"><span class="ap-likert-emoji">😰</span><span><span class="ap-likert-label">No lo entiendo</span><span class="ap-likert-desc">Los intervalos y segmentos me generan mucha confusión</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap2',2,this)"><span class="ap-likert-emoji">😕</span><span><span class="ap-likert-label">Muy pocas dudas resueltas</span><span class="ap-likert-desc">Sé que existen pero no puedo interpretarlos</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap2',3,this)"><span class="ap-likert-emoji">🤔</span><span><span class="ap-likert-label">Lo entiendo con dudas</span><span class="ap-likert-desc">Conozco los límites normales pero dudo en la clínica</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap2',4,this)"><span class="ap-likert-emoji">🙂</span><span><span class="ap-likert-label">Con pequeñas dudas</span><span class="ap-likert-desc">Interpreto bien pero el QTc corregido me cuesta un poco</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap2',5,this)"><span class="ap-likert-emoji">😎</span><span><span class="ap-likert-label">Lo domino completamente</span><span class="ap-likert-desc">Calculo QTc, interpreto PR y ST con seguridad</span></span></button>
+    </div>
+    <div class="ap-response" id="ap2-response"></div>
+    <button class="ap-modal-close" onclick="closeAPModal('ap2')"><i class="fas fa-book-open"></i> Continuar leyendo</button>
+  </div>
+</div>
+
+<script>
+const AP_RESPONSES = {
+  ap1: {
+    1: 'Empieza memorizando: Onda P ≤ 0.12 s y ≤ 2.5 mm. QRS entre 0.06–0.10 s. La onda T asimétrica y positiva en la mayoría de derivaciones donde el QRS también es positivo.',
+    2: 'Bien por reconocerlas. El truco: la P es pequeña y redondeada (auricular), el QRS es la más alta (ventricular), y la T sube lento y baja rápido. Las duraciones son en cuadros pequeños (0.04 s c/u).',
+    3: 'Vas bien encaminado. Para memorizar QRS: máximo 2.5 cuadros pequeños (≤0.10 s). Si tiene más, sospecha bloqueo de rama. Para la T: invertida donde el QRS es positivo ⇒ isquemia o sobrecarga.',
+    4: 'Excelente dominio básico. El siguiente nivel: la onda U (tras la T) normalmente pequeña; si es prominente, piensa hipopotasemia.',
+    5: '¡Dominio completo! Dato clínico: una onda P bifasica en V1 (componente terminal negativo ≥ 1mm × 1 cuadro) es el criterio de crecimiento de aurícula izquierda (P mitrale).'
+  },
+  ap2: {
+    1: 'Empieza con el PR: normal 0.12–0.20 s = 3–5 cuadros pequeños. Si es más largo → bloqueo AV. El ST normal está en la línea isoeléctrica (±1 mm en miembros). El QTc usa la fórmula de Bazett.',
+    2: 'Buen inicio. La regla práctica: PR largo + constante = BAV 1° grado (benigno). ST elevado en múltiples derivaciones cóncavo → pericarditis. ST elevado convexo → IAMCEST (emergencia).',
+    3: 'Vas muy bien. Para el QTc: normal <440 ms en hombres, <460 ms en mujeres. Más de 500 ms = riesgo de Torsades de Pointes. Siempre revisa medicamentos que prolongan el QT.',
+    4: 'Casi perfecto. Un detalle: para medir el ST, usa el segmento PR como referencia isoeléctrica, no la línea de base general del papel. Eso da mayor precisión.',
+    5: '¡Excelente! Dato avanzado: el criterio de Sgarbossa permite detectar IAMCEST incluso en presencia de BRI, que normalmente enmascara los cambios del ST.'
+  }
+};
+const conceptMap = { ap1: 'Ondas P, QRS y T del ECG Normal', ap2: 'Intervalos PR/QTc y Segmento ST' };
+function openAPModal(id)  { document.getElementById(id+'-overlay').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeAPModal(id) { document.getElementById(id+'-overlay').classList.remove('open'); document.body.style.overflow=''; }
+function closeAPModalOnBg(e,id){ if(e.target===document.getElementById(id+'-overlay')) closeAPModal(id); }
+function selectAP(id, level, btn) {
+  document.querySelectorAll('#'+id+'-overlay .ap-likert-opt').forEach(b=>{ b.classList.remove('selected'); b.disabled=true; });
+  btn.classList.add('selected');
+  const resp = document.getElementById(id+'-response');
+  resp.textContent = AP_RESPONSES[id][level];
+  resp.style.display = 'block';
+  resp.style.background = ['','#1a0a0a','#1a0a0a','#0d1a2e','#0a1e12','#0a1e12'][level];
+  resp.style.borderLeft = ['','3px solid #ef4444','3px solid #f97316','3px solid #3b82f6','3px solid #22c55e','3px solid #22c55e'][level];
+  const doneEl = document.getElementById(id+'-done');
+  if(doneEl){ doneEl.innerHTML='<span class="ap-done-badge">✅ Respondido</span>'; }
+  localStorage.setItem('ecg_cap3_'+id, level);
+  if(window.ECGSession) window.ECGSession.logLikert({ capitulo:'Capítulo 3 – Componentes del Trazado Normal', concepto: conceptMap[id], nivel_num: level, nivel_texto: btn.querySelector('.ap-likert-label').textContent });
+}
+(function restoreAPState(){
+  ['ap1','ap2'].forEach(id=>{
+    const saved = localStorage.getItem('ecg_cap3_'+id);
+    if(!saved) return;
+    const doneEl = document.getElementById(id+'-done');
+    if(doneEl) doneEl.innerHTML='<span class="ap-done-badge">✅ Respondido</span>';
+  });
+})();
+</script>
+</body>
+</html>
