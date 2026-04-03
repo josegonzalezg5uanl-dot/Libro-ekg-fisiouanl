@@ -7,6 +7,43 @@
   <link rel="stylesheet" href="css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <style>
+    .ap-trigger{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#1a0d35,#0d1f3c);border:1px solid #7c3aed66;border-radius:12px;padding:10px 18px;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:600;color:#c4b5fd;transition:all .2s;position:relative;overflow:hidden;margin:20px 0;width:100%;text-align:left;animation:ap-pulse 3s ease 1.5s 3}
+    .ap-trigger::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#7c3aed11,#1976d211);opacity:0;transition:opacity .2s}
+    .ap-trigger:hover::before{opacity:1}.ap-trigger:hover{border-color:#7c3aed99;transform:translateY(-1px);box-shadow:0 4px 20px #7c3aed22}
+    .ap-trigger-icon{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 2px 10px #7c3aed44}
+    .ap-trigger-body{flex:1}.ap-trigger-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:#7c3aed;margin-bottom:2px}
+    .ap-trigger-text{color:#e0e6f0;font-size:.88rem}.ap-trigger-arrow{color:#7c3aed;font-size:.9rem;transition:transform .2s}
+    .ap-trigger:hover .ap-trigger-arrow{transform:translateX(3px)}
+    @keyframes ap-pulse{0%,100%{box-shadow:0 0 0 0 #7c3aed33}50%{box-shadow:0 0 0 8px #7c3aed00}}
+    .ap-modal-overlay{position:fixed;inset:0;z-index:50000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
+    .ap-modal-overlay.open{opacity:1;pointer-events:all}
+    .ap-modal{background:#0a1628;border:1px solid #7c3aed55;border-radius:20px;padding:32px 28px 26px;max-width:480px;width:92%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 60px #7c3aed22;transform:translateY(20px) scale(.97);transition:transform .3s cubic-bezier(.17,.67,.45,1.2)}
+    .ap-modal-overlay.open .ap-modal{transform:translateY(0) scale(1)}
+    .ap-modal-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px}
+    .ap-modal-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;box-shadow:0 4px 16px #7c3aed44}
+    .ap-modal-badge{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:#7c3aed;font-weight:700;margin-bottom:4px}
+    .ap-modal-title{font-size:1rem;font-weight:800;color:#e0e6f0;line-height:1.4}
+    .ap-modal-context{background:#111827;border-left:3px solid #7c3aed;border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:18px;font-size:.84rem;color:#8899aa;line-height:1.6}
+    .ap-modal-context strong{color:#c4b5fd}
+    .ap-modal-question{font-size:.95rem;font-weight:600;color:#e0e6f0;line-height:1.6;margin-bottom:18px;padding:14px 16px;background:#0d1f35;border:1px solid #1e3a5f;border-radius:10px}
+    .ap-likert{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+    .ap-likert-opt{display:flex;align-items:center;gap:12px;background:#111827;border:2px solid #1e2d40;border-radius:10px;padding:11px 14px;cursor:pointer;font-family:inherit;font-size:.88rem;color:#c8d8e8;text-align:left;transition:all .18s;width:100%}
+    .ap-likert-opt:hover{border-color:#7c3aed77;background:#15103a;transform:translateX(3px)}
+    .ap-likert-opt.selected{border-color:#7c3aed;background:#1a0d35;color:#e0e6f0}
+    .ap-likert-emoji{font-size:1.3rem;flex-shrink:0}.ap-likert-label{font-weight:600;display:block;margin-bottom:2px}.ap-likert-desc{font-size:.78rem;color:#607080}
+    .ap-response{display:none;padding:12px 16px;border-radius:10px;margin-bottom:18px;font-size:.86rem;color:#c8d8e8;line-height:1.65;animation:slide-in .25s ease}
+    @keyframes slide-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .ap-modal-close{width:100%;padding:11px;background:#1e2d40;border:none;color:#8899aa;border-radius:10px;font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+    .ap-modal-close:hover{background:#1e3a5f;color:#e0e6f0}
+    .ap-done-badge{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;color:#22c55e;background:#22c55e18;border:1px solid #22c55e44;border-radius:20px;padding:2px 10px;margin-left:auto;flex-shrink:0}
+    .quiz-cta{background:linear-gradient(135deg,#0d1f3c,#1a0d35);border:1px solid #1976d255;border-radius:14px;padding:24px 28px;margin:28px 0;display:flex;align-items:center;gap:20px}
+    .quiz-cta-icon{font-size:2rem;flex-shrink:0}.quiz-cta-body{flex:1}
+    .quiz-cta-title{font-size:1rem;font-weight:800;color:#e0e6f0;margin-bottom:4px}
+    .quiz-cta-desc{font-size:.84rem;color:#607080;margin-bottom:12px}
+    .quiz-cta-btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1976d2,#4f46e5);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-family:inherit;font-size:.88rem;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s}
+    .quiz-cta-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px #1976d244}
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -113,6 +150,17 @@
               </figcaption>
             </figure>
 
+            <!-- AUTOPERCEPCIÓN 1 — tras derivaciones de miembros -->
+            <button class="ap-trigger" onclick="openAPModal('ap1')">
+              <span class="ap-trigger-icon">🧠</span>
+              <span class="ap-trigger-body">
+                <span class="ap-trigger-label">Autopercepción · Punto 1 de 2</span>
+                <span class="ap-trigger-text">¿Puedo identificar las 6 derivaciones de miembros y su ángulo en el plano frontal?</span>
+              </span>
+              <span id="ap1-done"></span>
+              <span class="ap-trigger-arrow">›</span>
+            </button>
+
             <h2 id="plano-horizontal">2. Derivaciones del Plano Horizontal (Precordiales)</h2>
             <p>Las derivaciones precordiales V1 a V6 exploran el corazón en el <strong>plano horizontal</strong> (izquierda–derecha, anterior–posterior). Son unipolar y su colocación exacta es crítica para evitar errores diagnósticos.</p>
 
@@ -184,6 +232,17 @@
               </tbody>
             </table>
 
+            <!-- AUTOPERCEPCIÓN 2 — tras sistema hexaxial -->
+            <button class="ap-trigger" onclick="openAPModal('ap2')">
+              <span class="ap-trigger-icon">🧠</span>
+              <span class="ap-trigger-body">
+                <span class="ap-trigger-label">Autopercepción · Punto 2 de 2</span>
+                <span class="ap-trigger-text">¿Entiendo la colocación correcta de los electrodos precordiales V1–V6 y la progresión normal de la onda R?</span>
+              </span>
+              <span id="ap2-done"></span>
+              <span class="ap-trigger-arrow">›</span>
+            </button>
+
             <h2 id="resumen">Resumen del Capítulo</h2>
             <ul>
               <li>Las 12 derivaciones ofrecen 12 perspectivas distintas del corazón.</li>
@@ -192,6 +251,16 @@
               <li>La colocación correcta de electrodos es esencial para evitar errores diagnósticos.</li>
               <li>El sistema hexaxial de Bailey permite calcular el eje eléctrico del corazón.</li>
             </ul>
+
+            <!-- QUIZ CTA -->
+            <div class="quiz-cta">
+              <span class="quiz-cta-icon">🎮</span>
+              <div class="quiz-cta-body">
+                <div class="quiz-cta-title">Quiz — Capítulo 2</div>
+                <div class="quiz-cta-desc">10 preguntas sobre derivaciones, electrodos y el sistema hexaxial. Cada error muestra la explicación y reflexión.</div>
+                <a href="quiz-2.html" class="quiz-cta-btn"><i class="fas fa-gamepad"></i> Comenzar Quiz</a>
+              </div>
+            </div>
 
             <div class="chapter-nav">
               <a href="chapter-1.html" class="ch-nav-btn">
@@ -229,5 +298,93 @@
   <script src="js/session.js"></script>
 <script src="js/main.js"></script>
 <script src="js/likert.js"></script>
+
+<!-- ── Modales de Autopercepción ── -->
+<div id="ap1-overlay" class="ap-modal-overlay" onclick="closeAPModalOnBg(event,'ap1')">
+  <div class="ap-modal">
+    <div class="ap-modal-header">
+      <div class="ap-modal-avatar">🧠</div>
+      <div><div class="ap-modal-badge">Autopercepción · Punto 1 de 2</div><div class="ap-modal-title">Derivaciones del Plano Frontal</div></div>
+    </div>
+    <div class="ap-modal-context"><strong>Concepto:</strong> Las 6 derivaciones de miembros (I, II, III, aVR, aVL, aVF) exploran el corazón en el plano frontal desde distintos ángulos definidos por el sistema hexaxial de Bailey.</div>
+    <div class="ap-modal-question">¿Qué tan seguro/a te sientes para identificar las 6 derivaciones de miembros, sus electrodos positivo y negativo, y sus ángulos en el sistema hexaxial?</div>
+    <div class="ap-likert">
+      <button class="ap-likert-opt" onclick="selectAP('ap1',1,this)"><span class="ap-likert-emoji">😰</span><span><span class="ap-likert-label">No lo entiendo</span><span class="ap-likert-desc">Las derivaciones me confunden completamente</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap1',2,this)"><span class="ap-likert-emoji">😕</span><span><span class="ap-likert-label">Muy pocas dudas resueltas</span><span class="ap-likert-desc">Apenas reconozco I, II, III pero no las aumentadas</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap1',3,this)"><span class="ap-likert-emoji">🤔</span><span><span class="ap-likert-label">Lo entiendo con dudas</span><span class="ap-likert-desc">Sé los nombres pero no los ángulos con seguridad</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap1',4,this)"><span class="ap-likert-emoji">🙂</span><span><span class="ap-likert-label">Con pequeñas dudas</span><span class="ap-likert-desc">Podría explicarlo pero con algunas vacilaciones</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap1',5,this)"><span class="ap-likert-emoji">😎</span><span><span class="ap-likert-label">Lo domino completamente</span><span class="ap-likert-desc">Puedo identificar y dibujar el sistema hexaxial</span></span></button>
+    </div>
+    <div class="ap-response" id="ap1-response"></div>
+    <button class="ap-modal-close" onclick="closeAPModal('ap1')"><i class="fas fa-book-open"></i> Continuar leyendo</button>
+  </div>
+</div>
+
+<div id="ap2-overlay" class="ap-modal-overlay" onclick="closeAPModalOnBg(event,'ap2')">
+  <div class="ap-modal">
+    <div class="ap-modal-header">
+      <div class="ap-modal-avatar">🧠</div>
+      <div><div class="ap-modal-badge">Autopercepción · Punto 2 de 2</div><div class="ap-modal-title">Electrodos Precordiales y Progresión R</div></div>
+    </div>
+    <div class="ap-modal-context"><strong>Concepto:</strong> Las derivaciones V1–V6 se colocan en posiciones anatómicas precisas. La progresión normal de la onda R (pequeña en V1, crece hasta V5) refleja la orientación del vector ventricular izquierdo.</div>
+    <div class="ap-modal-question">¿Qué tan seguro/a te sientes para describir la ubicación exacta de V1–V6 y explicar qué significa la progresión normal de la onda R?</div>
+    <div class="ap-likert">
+      <button class="ap-likert-opt" onclick="selectAP('ap2',1,this)"><span class="ap-likert-emoji">😰</span><span><span class="ap-likert-label">No lo entiendo</span><span class="ap-likert-desc">No sé dónde colocar los electrodos precordiales</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap2',2,this)"><span class="ap-likert-emoji">😕</span><span><span class="ap-likert-label">Muy pocas dudas resueltas</span><span class="ap-likert-desc">Solo recuerdo V1 y V4 aproximadamente</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap2',3,this)"><span class="ap-likert-emoji">🤔</span><span><span class="ap-likert-label">Lo entiendo con dudas</span><span class="ap-likert-desc">Sé la posición de la mayoría pero confundo alguno</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap2',4,this)"><span class="ap-likert-emoji">🙂</span><span><span class="ap-likert-label">Con pequeñas dudas</span><span class="ap-likert-desc">Ubico todos correctamente con pequeña incertidumbre</span></span></button>
+      <button class="ap-likert-opt" onclick="selectAP('ap2',5,this)"><span class="ap-likert-emoji">😎</span><span><span class="ap-likert-label">Lo domino completamente</span><span class="ap-likert-desc">Coloco todos los electrodos y explico la progresión R</span></span></button>
+    </div>
+    <div class="ap-response" id="ap2-response"></div>
+    <button class="ap-modal-close" onclick="closeAPModal('ap2')"><i class="fas fa-book-open"></i> Continuar leyendo</button>
+  </div>
+</div>
+
+<script>
+const AP_RESPONSES = {
+  ap1: {
+    1: 'Dedica más tiempo a la tabla de derivaciones bipolares. La clave: Derivación I va de brazo derecho (−) a brazo izquierdo (+). El triángulo de Einthoven es tu punto de partida.',
+    2: 'Bien por reconocer I, II, III. Para las aumentadas: aVR mira desde arriba-derecha (−150°), aVL desde izquierda (−30°) y aVF desde abajo (+90°). Recuerda: la "a" es de "augmented".',
+    3: 'Vas bien. Para los ángulos: memoriza la secuencia I(0°) → aVL(−30°) → II(60°) → aVF(90°) → III(120°) → aVR(−150°). Son saltos de 30° o 60° en el sistema hexaxial.',
+    4: 'Casi perfecto. El detalle clave que falta: aVR es la única derivación que mira las cavidades derechas desde arriba, por eso su QRS suele ser negativo en ritmo sinusal normal.',
+    5: '¡Excelente dominio! Dato avanzado: la Ley de Einthoven (I + III = II) es útil para detectar electrodos mal colocados en urgencias.'
+  },
+  ap2: {
+    1: 'Empieza por los anclas: V1 está en el 4° espacio intercostal derecho y V4 en el 5° espacio en la línea medioclavicular. Los demás se ubican a partir de estos dos.',
+    2: 'Buen inicio. V2 es el espejo de V1 al lado izquierdo del esternón. V3 va entre V2 y V4. V5 y V6 se sitúan horizontalmente al mismo nivel que V4 en las líneas axilares.',
+    3: 'Muy bien encaminado. El error más frecuente es subir V1/V2 al 2° espacio — eso genera falsos patrones de BRD. Verifica siempre los espacios intercostales palpando las costillas.',
+    4: 'Muy buena comprensión. Para la progresión R: si la onda R no aumenta de V1 a V5 ("poor R progression") puede indicar infarto anterior antiguo o posición incorrecta de electrodos.',
+    5: '¡Perfecto dominio! Dato avanzado: la zona de transición (donde R ≈ S) normalmente cae entre V3 y V4. Si está en V1–V2 sugiere HVD; si está en V5–V6 sugiere rotación horaria o HVI.'
+  }
+};
+const conceptMap = { ap1: 'Derivaciones del Plano Frontal (Sistema Hexaxial)', ap2: 'Electrodos Precordiales y Progresión de Onda R' };
+
+function openAPModal(id)  { document.getElementById(id+'-overlay').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeAPModal(id) { document.getElementById(id+'-overlay').classList.remove('open'); document.body.style.overflow=''; }
+function closeAPModalOnBg(e,id){ if(e.target===document.getElementById(id+'-overlay')) closeAPModal(id); }
+
+function selectAP(id, level, btn) {
+  document.querySelectorAll('#'+id+'-overlay .ap-likert-opt').forEach(b=>{ b.classList.remove('selected'); b.disabled=true; });
+  btn.classList.add('selected');
+  const resp = document.getElementById(id+'-response');
+  resp.textContent = AP_RESPONSES[id][level];
+  resp.style.display = 'block';
+  resp.style.background = ['','#1a0a0a','#1a0a0a','#0d1a2e','#0a1e12','#0a1e12'][level];
+  resp.style.borderLeft = ['','3px solid #ef4444','3px solid #f97316','3px solid #3b82f6','3px solid #22c55e','3px solid #22c55e'][level];
+  const doneEl = document.getElementById(id+'-done');
+  if(doneEl){ doneEl.innerHTML='<span class="ap-done-badge">✅ Respondido</span>'; }
+  localStorage.setItem('ecg_cap2_'+id, level);
+  if(window.ECGSession) window.ECGSession.logLikert({ capitulo:'Capítulo 2 – Anatomía de las Derivaciones', concepto: conceptMap[id], nivel_num: level, nivel_texto: btn.querySelector('.ap-likert-label').textContent });
+}
+
+(function restoreAPState(){
+  ['ap1','ap2'].forEach(id=>{
+    const saved = localStorage.getItem('ecg_cap2_'+id);
+    if(!saved) return;
+    const doneEl = document.getElementById(id+'-done');
+    if(doneEl) doneEl.innerHTML='<span class="ap-done-badge">✅ Respondido</span>';
+  });
+})();
+</script>
 </body>
 </html>

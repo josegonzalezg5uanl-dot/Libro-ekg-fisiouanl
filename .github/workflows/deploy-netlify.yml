@@ -1,0 +1,31 @@
+name: 🚀 Deploy a Netlify
+
+on:
+  # Ejecutar manualmente desde la pestaña "Actions"
+  workflow_dispatch:
+  # O automáticamente cuando subas archivos al repo
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Publicar sitio en Netlify
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: 📦 Instalar Netlify CLI
+        run: npm install -g netlify-cli
+
+      - name: 🚀 Desplegar en Netlify
+        run: |
+          netlify deploy \
+            --dir=. \
+            --prod \
+            --message "Deploy automático desde GitHub Actions"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}

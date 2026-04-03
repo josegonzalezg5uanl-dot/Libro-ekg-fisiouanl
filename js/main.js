@@ -379,6 +379,7 @@ async function submitSession() {
   const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxbcSMnuqUjYjr3Ockrp6M8VlDyYngZUoYEpvNyxqNF3ewnJe99PpCSzdfu785c9RxWZw/exec';
 
   try {
+    // Google Apps Script requiere text/plain para evitar preflight CORS
     const res = await fetch(ENDPOINT, {
       method:  'POST',
       headers: { 'Content-Type': 'text/plain' },

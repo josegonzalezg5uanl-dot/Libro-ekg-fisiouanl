@@ -1,0 +1,134 @@
+name: 📚 Sincronizar Libro ECG desde Genspark
+
+on:
+  # Ejecutar manualmente desde la pestaña "Actions" en GitHub
+  workflow_dispatch:
+  # También ejecutar automáticamente cada vez que hagas push al repo
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-files:
+    name: Descargar y actualizar archivos del libro
+    runs-on: ubuntu-latest
+
+    steps:
+      # ─────────────────────────────────────────────
+      # 1. Obtener el contenido actual del repositorio
+      # ─────────────────────────────────────────────
+      - name: 📥 Checkout del repositorio
+        uses: actions/checkout@v4
+
+      # ─────────────────────────────────────────────
+      # 2. Descargar todos los archivos HTML del libro
+      # ─────────────────────────────────────────────
+      - name: 📄 Descargar index.html (Portada)
+        run: |
+          curl -L "https://wgihdlsm.gensparkspace.com/index.html" \
+               -o "index.html" \
+               --retry 3 --retry-delay 2
+
+      - name: 📄 Descargar chapter-1.html
+        run: |
+          curl -L "https://wgihdlsm.gensparkspace.com/chapter-1.html" \
+               -o "chapter-1.html" \
+               --retry 3 --retry-delay 2
+
+      - name: 📄 Descargar chapter-2.html
+        run: |
+          curl -L "https://wgihdlsm.gensparkspace.com/chapter-2.html" \
+               -o "chapter-2.html" \
+               --retry 3 --retry-delay 2
+
+      - name: 📄 Descargar chapter-3.html
+        run: |
+          curl -L "https://wgihdlsm.gensparkspace.com/chapter-3.html" \
+               -o "chapter-3.html" \
+               --retry 3 --retry-delay 2
+
+      - name: 📄 Descargar chapter-4.html
+        run: |
+          curl -L "https://wgihdlsm.gensparkspace.com/chapter-4.html" \
+               -o "chapter-4.html" \
+               --retry 3 --retry-delay 2
+
+      - name: 📄 Descargar chapter-5.html
+        run: |
+          curl -L "https://wgihdlsm.gensparkspace.com/chapter-5.html" \
+               -o "chapter-5.html" \
+               --retry 3 --retry-delay 2
+
+      - name: 📄 Descargar chapter-6.html
+        run: |
+          curl -L "https://wgihdlsm.gensparkspace.com/chapter-6.html" \
+               -o "chapter-6.html" \
+               --retry 3 --retry-delay 2
+
+      - name: 📄 Descargar ecg-monitor.html
+        run: |
+          curl -L "https://wgihdlsm.gensparkspace.com/ecg-monitor.html" \
+               -o "ecg-monitor.html" \
+               --retry 3 --retry-delay 2
+
+      # ─────────────────────────────────────────────
+      # 3. Descargar CSS
+      # ─────────────────────────────────────────────
+      - name: 🎨 Crear carpeta css/ y descargar style.css
+        run: |
+          mkdir -p css
+          curl -L "https://wgihdlsm.gensparkspace.com/css/style.css" \
+               -o "css/style.css" \
+               --retry 3 --retry-delay 2
+
+      # ─────────────────────────────────────────────
+      # 4. Descargar JavaScript
+      # ─────────────────────────────────────────────
+      - name: ⚙️ Crear carpeta js/ y descargar main.js
+        run: |
+          mkdir -p js
+          curl -L "https://wgihdlsm.gensparkspace.com/js/main.js" \
+               -o "js/main.js" \
+               --retry 3 --retry-delay 2
+
+      - name: ⚙️ Descargar ecg-monitor.js
+        run: |
+          curl -L "https://wgihdlsm.gensparkspace.com/js/ecg-monitor.js" \
+               -o "js/ecg-monitor.js" \
+               --retry 3 --retry-delay 2
+
+      # ─────────────────────────────────────────────
+      # 5. Las imágenes ya están en el repo (images/)
+      #    Solo descargamos las que vienen de Genspark
+      # ─────────────────────────────────────────────
+      - name: 🖼️ Crear carpeta images/ y descargar imágenes de Genspark
+        run: |
+          mkdir -p images
+          curl -L "https://wgihdlsm.gensparkspace.com/images/potencial-accion-ecg.png" \
+               -o "images/potencial-accion-ecg.png" \
+               --retry 3 --retry-delay 2
+          curl -L "https://wgihdlsm.gensparkspace.com/images/regiones-cardiacas-ecg.png" \
+               -o "images/regiones-cardiacas-ecg.png" \
+               --retry 3 --retry-delay 2
+          # Las imágenes del repo de GitHub ya están presentes:
+          # images/derivaciones-frontales.png
+          # images/electrodos-precordiales2.png
+
+      # ─────────────────────────────────────────────
+      # 6. Hacer commit y push de los cambios
+      # ─────────────────────────────────────────────
+      - name: ✅ Verificar archivos descargados
+        run: |
+          echo "=== Archivos descargados ==="
+          ls -lh *.html css/ js/ images/
+
+      - name: 💾 Commit y push de los cambios
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          # Solo hace commit si hay cambios reales
+          git diff --staged --quiet || git commit -m "🔄 Sincronización automática desde Genspark $(date +'%Y-%m-%d %H:%M')"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

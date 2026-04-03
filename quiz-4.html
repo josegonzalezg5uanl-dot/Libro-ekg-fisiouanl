@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quiz Cap. 1 – Fundamentos Fisiológicos | Guía ECG</title>
+  <title>Quiz Cap. 4 – Metodología de Interpretación | Guía ECG</title>
   <link rel="stylesheet" href="css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
@@ -561,7 +561,6 @@
   </style>
 </head>
 <body>
-
   <!-- HEADER -->
   <header class="site-header">
     <div class="header-left">
@@ -583,125 +582,92 @@
     </div>
   </header>
 
-  <div class="overlay" id="overlay"></div>
+  <!-- Modal Enviar Sesión -->
+  <div class="send-modal-overlay" id="sendModalOverlay">
+    <div class="send-modal-box">
+      <div class="send-modal-title"><i class="fas fa-paper-plane" style="color:#1976d2"></i> Enviar sesión al profesor</div>
+      <div class="send-stat-row"><span class="send-stat-label">Alumno</span><span class="send-stat-val" id="sendStatName">—</span></div>
+      <div class="send-stat-row"><span class="send-stat-label">Respuestas de quiz</span><span class="send-stat-val" id="sendStatQuiz">0</span></div>
+      <div class="send-stat-row"><span class="send-stat-label">Autopercepciones</span><span class="send-stat-val" id="sendStatLikert">0</span></div>
+      <div class="send-stat-row"><span class="send-stat-label">Inicio de sesión</span><span class="send-stat-val" id="sendStatTime">—</span></div>
+      <div id="sendStatus"></div>
+      <div class="send-btn-row">
+        <button class="send-btn secondary" onclick="closeSendModal()">Cancelar</button>
+        <button class="send-btn primary" id="sendBtn" onclick="submitSession()"><i class="fas fa-paper-plane"></i> Enviar mi sesión</button>
+      </div>
+    </div>
+  </div>
 
+  <div class="overlay" id="overlay"></div>
   <div class="layout">
-    <!-- SIDEBAR -->
     <nav class="sidebar" id="sidebar">
       <div class="sidebar-inner">
         <div class="sidebar-title">Contenido</div>
         <ul class="nav-list">
           <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Inicio</a></li>
           <li class="nav-section">Capítulos</li>
-          <li class="nav-item"><a href="chapter-1.html" class="nav-link active"><span class="ch-num">1</span> Fundamentos Fisiológicos</a></li>
+          <li class="nav-item"><a href="chapter-1.html" class="nav-link"><span class="ch-num">1</span> Fundamentos Fisiológicos</a></li>
           <li class="nav-item"><a href="chapter-2.html" class="nav-link"><span class="ch-num">2</span> Anatomía de las Derivaciones</a></li>
           <li class="nav-item"><a href="chapter-3.html" class="nav-link"><span class="ch-num">3</span> Componentes del Trazado</a></li>
-          <li class="nav-item"><a href="chapter-4.html" class="nav-link"><span class="ch-num">4</span> Metodología de Interpretación</a></li>
+          <li class="nav-item"><a href="chapter-4.html" class="nav-link active"><span class="ch-num">4</span> Metodología de Interpretación</a></li>
           <li class="nav-item"><a href="chapter-5.html" class="nav-link"><span class="ch-num">5</span> Patologías Básicas</a></li>
           <li class="nav-item"><a href="chapter-6.html" class="nav-link"><span class="ch-num">6</span> Talleres de Práctica</a></li>
-          <li class="nav-section">Simuladores</li>
-          <li class="nav-item">
-            <a href="ecg-monitor.html" class="nav-link">
-              <i class="fas fa-heartbeat" style="color:#e53935"></i> Monitor ECG
-            </a>
-          </li>
           <li class="nav-section">Aprendizaje</li>
-          <li class="nav-item">
-            <a href="autopercepcion.html" class="nav-link">
-              <i class="fas fa-brain" style="color:#a78bfa"></i> Autopercepción
-            </a>
-          </li>
+          <li class="nav-item"><a href="autopercepcion.html" class="nav-link"><i class="fas fa-brain" style="color:#a78bfa"></i> Autopercepción</a></li>
         </ul>
       </div>
     </nav>
 
     <main class="main-content" id="mainContent">
-
-      <!-- HUD — Barra de estado completa -->
+      <!-- HUD -->
       <div class="quiz-hud" id="quizHud" style="display:none">
         <div class="hud-item">
           <span class="hud-icon">⭐</span>
-          <div>
-            <div class="hud-val" id="hudPoints">0</div>
-            <div class="hud-label">Puntos</div>
-          </div>
+          <div><div class="hud-val" id="hudPoints">0</div><div class="hud-label">Puntos</div></div>
         </div>
         <div class="hud-item">
           <span class="hud-icon">⏱️</span>
-          <div>
-            <div class="hud-val timer-val" id="hudTimer">30</div>
-            <div class="hud-label">Segundos</div>
-          </div>
+          <div><div class="hud-val timer-val" id="hudTimer">30</div><div class="hud-label">Segundos</div></div>
         </div>
         <div class="hud-item">
           <span class="hud-icon">🔥</span>
-          <div>
-            <div class="hud-val streak-val" id="hudStreak">0</div>
-            <div class="hud-label">Racha</div>
-          </div>
+          <div><div class="hud-val streak-val" id="hudStreak">0</div><div class="hud-label">Racha</div></div>
         </div>
-        <!-- Barra de Potencial de Acción -->
         <div class="energy-hud">
           <span class="energy-label">⚡ PA</span>
-          <div class="energy-track">
-            <div class="energy-fill" id="energyFill" style="width:100%"></div>
-          </div>
+          <div class="energy-track"><div class="energy-fill" id="energyFill" style="width:100%"></div></div>
           <span class="energy-pct" id="energyPct">100%</span>
         </div>
-        <!-- Vidas -->
         <div class="hud-item" id="hudLivesWrap">
           <span class="hud-icon">❤️</span>
           <div class="lives-display" id="hudLives"></div>
         </div>
-
         <div class="hud-progress">
-          <div class="hud-prog-track">
-            <div class="hud-prog-fill" id="hudProgFill" style="width:0%"></div>
-          </div>
+          <div class="hud-prog-track"><div class="hud-prog-fill" id="hudProgFill" style="width:0%"></div></div>
           <div class="hud-prog-label" id="hudProgLabel">Pregunta 1 de 10</div>
         </div>
       </div>
 
       <div class="quiz-wrap">
-
-        <!-- ═══ PANTALLA INICIO ═══ -->
+        <!-- PANTALLA INICIO -->
         <div id="screen-start">
-          <div class="qs-icon">🧠</div>
-          <div class="qs-title">Quiz — Capítulo 1</div>
-          <div class="qs-sub">
-            Fundamentos Fisiológicos y Técnicos<br/>
-            Pon a prueba lo que aprendiste. Cada error tiene una reflexión que te ayuda a entender <em>por qué</em> te equivocaste.
+          <div class="qs-icon">🔍</div>
+          <div class="qs-title">Quiz — Capítulo 4</div>
+          <div class="qs-sub">Metodología de Interpretación<br/>
+            Domina los 5 pasos sistemáticos: frecuencia, ritmo, eje, morfología y conclusión.
           </div>
-
           <div class="qs-stats">
-            <div class="qs-stat">
-              <span class="qs-stat-num">10</span>
-              <span class="qs-stat-label">Por partida</span>
-            </div>
-            <div class="qs-stat">
-              <span class="qs-stat-num" style="color:#a78bfa">15</span>
-              <span class="qs-stat-label">Banco total</span>
-            </div>
-            <div class="qs-stat">
-              <span class="qs-stat-num" id="statTime">30s</span>
-              <span class="qs-stat-label">Por pregunta</span>
-            </div>
-            <div class="qs-stat">
-              <span class="qs-stat-num" id="statLives">3</span>
-              <span class="qs-stat-label">Vidas</span>
-            </div>
+            <div class="qs-stat"><span class="qs-stat-num">10</span><span class="qs-stat-label">Por partida</span></div>
+            <div class="qs-stat"><span class="qs-stat-num" style="color:#a78bfa">13</span><span class="qs-stat-label">Banco total</span></div>
+            <div class="qs-stat"><span class="qs-stat-num" id="statTime">30s</span><span class="qs-stat-label">Por pregunta</span></div>
+            <div class="qs-stat"><span class="qs-stat-num" id="statLives">3</span><span class="qs-stat-label">Vidas</span></div>
           </div>
-
-          <div style="margin-bottom:12px; color:#8899aa; font-size:.88rem;">Selecciona la dificultad:</div>
           <div class="diff-selector">
-            <button class="diff-btn suave"   onclick="setDiff('suave')">😌 Suave (60s · 3 vidas)</button>
-            <button class="diff-btn medio selected" onclick="setDiff('medio')">😤 Medio (30s · 3 vidas)</button>
-            <button class="diff-btn intenso" onclick="setDiff('intenso')">🔥 Intenso (15s · 2 vidas)</button>
+            <button class="diff-btn suave selected" onclick="setDiff('suave')">😌 Suave (60s)</button>
+            <button class="diff-btn medio" onclick="setDiff('medio')">⚡ Medio (30s)</button>
+            <button class="diff-btn intenso" onclick="setDiff('intenso')">🔥 Intenso (15s)</button>
           </div>
-
-          <button class="btn-next" style="max-width:320px;margin:0 auto" onclick="startQuiz()">
-            <i class="fas fa-play"></i> Comenzar Quiz
-          </button>
+          <button class="start-btn" onclick="startQuiz()"><i class="fas fa-play"></i> Comenzar Quiz</button>
           <!-- Botón Ficha de Personaje -->
           <div style="margin-top:16px">
             <button onclick="showCharacterSheet()" style="
@@ -767,7 +733,7 @@
           <div style="color:#607080;margin-bottom:28px">Puntos acumulados</div>
           <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
             <button class="btn-retry" onclick="restartQuiz()"><i class="fas fa-redo"></i> Reintentar</button>
-            <a href="chapter-1.html" class="btn-back"><i class="fas fa-book"></i> Repasar capítulo</a>
+            <a href="chapter-4.html" class="btn-back"><i class="fas fa-book"></i> Repasar capítulo</a>
           </div>
         </div>
 
@@ -824,8 +790,8 @@
             <button class="btn-retry" onclick="restartQuiz()"><i class="fas fa-redo"></i> Jugar de nuevo</button>
             <button class="btn-retry" onclick="showCharacterSheet()" style="background:#1a0f40;border-color:#7c3aed"><i class="fas fa-scroll"></i> Mi Ficha de Personaje</button>
             <button class="btn-retry" onclick="exportarCSV()" style="background:#10692a"><i class="fas fa-file-csv"></i> Exportar CSV</button>
-            <a href="chapter-1.html" class="btn-back"><i class="fas fa-book"></i> Volver al capítulo</a>
-            <a href="chapter-2.html" class="btn-back" style="border-color:#22c55e;color:#22c55e"><i class="fas fa-arrow-right"></i> Capítulo 2</a>
+            <a href="chapter-4.html" class="btn-back"><i class="fas fa-book"></i> Volver al capítulo</a>
+            <a href="chapter-5.html" class="btn-back" style="border-color:#22c55e;color:#22c55e"><i class="fas fa-arrow-right"></i> Capítulo 5</a>
           </div>
         </div>
 
@@ -833,306 +799,154 @@
     </main>
   </div>
 
-<script src="js/session.js"></script>
-<script src="js/main.js"></script>
-<script>
-/* ═══════════════════════════════════════════════════════
-   BANCO DE PREGUNTAS — CAPÍTULO 1
-   Cada pregunta tiene:
-     type: 'mcq' (opción múltiple) | 'fitb' (fill in blank)
-     q: texto de la pregunta
-     opts: opciones (solo mcq)
-     answer: respuesta correcta (letra para mcq, texto para fitb)
-     why_wrong: objeto {A:'',B:'',C:'',D:''} explicación de por qué cada opción incorrecta está mal
-     reflection: pregunta de reflexión para el estudiante
-     reflection_yes / reflection_no / reflection_partial: respuestas según lo que elija
-     points: puntos base
-═══════════════════════════════════════════════════════ */
-const QUESTIONS = [
-  {
-    type: 'mcq',
-    q: '¿Cuál es el potencial de membrana en reposo de una célula ventricular normal?',
-    opts: { A: '+30 mV', B: '–90 mV', C: '0 mV', D: '–70 mV' },
-    answer: 'B',
-    why_wrong: {
-      A: '+30 mV es el potencial máximo que alcanza la célula durante la Fase 0 (despolarización rápida), no el potencial de reposo.',
-      C: '0 mV sería una célula sin diferencia de potencial entre el interior y exterior. En reposo, el interior de la célula es más negativo que el exterior.',
-      D: '–70 mV corresponde al potencial de reposo de una neurona, no de una célula ventricular cardíaca, que es más negativa (–90 mV).'
-    },
-    reflection: '¿Por qué crees que el interior de la célula cardíaca es negativo en reposo y no positivo o neutro?',
-    reflection_yes: 'Perfecto. La célula mantiene ese gradiente negativo gracias a la bomba Na⁺/K⁺-ATPasa que expulsa 3 Na⁺ por cada 2 K⁺ que entra, generando un exceso de cargas negativas dentro.',
-    reflection_partial: 'El truco está en la bomba Na⁺/K⁺-ATPasa: saca más cargas positivas (3 Na⁺) de las que mete (2 K⁺), dejando el interior con carga neta negativa de –90 mV.',
-    reflection_no: 'No te preocupes. Regresa a la sección "Potencial de Acción" y enfócate específicamente en el concepto de "potencial de membrana en reposo". La clave es la bomba Na⁺/K⁺.',
-    points: 100
-  },
-  {
-    type: 'mcq',
-    q: 'Durante la Fase 2 del potencial de acción cardíaco (meseta o plateau), ¿qué ión es el responsable principal?',
-    opts: { A: 'Na⁺ (entrada)', B: 'K⁺ (salida)', C: 'Ca²⁺ (entrada)', D: 'Cl⁻ (entrada)' },
-    answer: 'C',
-    why_wrong: {
-      A: 'El Na⁺ es el protagonista de la Fase 0 (despolarización rápida), no de la meseta. En la Fase 2 los canales rápidos de Na⁺ ya están inactivados.',
-      B: 'El K⁺ saliente es el responsable de las Fases 1 y 3 (repolarización). En la Fase 2 hay cierta salida de K⁺, pero es el Ca²⁺ entrante el que mantiene el plateau.',
-      D: 'El Cl⁻ no tiene un papel protagonista en el potencial de acción cardíaco en ninguna de sus fases.'
-    },
-    reflection: '¿Recuerdas por qué es tan importante que el Ca²⁺ entre durante la meseta? ¿Qué desencadena esa entrada de calcio?',
-    reflection_yes: '¡Exacto! El Ca²⁺ que entra en la Fase 2 desencadena la liberación de más Ca²⁺ desde el retículo sarcoplásmico, lo que provoca la contracción muscular cardíaca.',
-    reflection_partial: 'La clave es que el Ca²⁺ entrante en Fase 2 actúa como "disparador" para que el retículo sarcoplásmico libere Ca²⁺ adicional, causando la contracción. Sin meseta, no hay contracción sostenida.',
-    reflection_no: 'Revisa la tabla de fases del potencial de acción en el capítulo, específicamente la columna "Ión principal". La Fase 2 es la única con Ca²⁺ como protagonista.',
-    points: 100
-  },
-  {
-    type: 'mcq',
-    q: '¿Cuál es la función principal del Nodo AV en el sistema de conducción?',
-    opts: {
-      A: 'Iniciar el impulso eléctrico cardíaco',
-      B: 'Distribuir el impulso por los ventrículos',
-      C: 'Retrasar el impulso para que las aurículas terminen de contraerse',
-      D: 'Conectar la rama derecha con la izquierda del Haz de His'
-    },
-    answer: 'C',
-    why_wrong: {
-      A: 'Iniciar el impulso es la función del Nodo Sinusal (SA), el marcapasos natural del corazón. El Nodo AV recibe el impulso, no lo origina.',
-      B: 'Distribuir el impulso por los ventrículos es la función de las Fibras de Purkinje, que tienen la mayor velocidad de conducción del sistema.',
-      D: 'El Haz de His es el que se divide en rama derecha e izquierda. El Nodo AV está antes de ese punto y tiene una función diferente.'
-    },
-    reflection: '¿Entiendes por qué es necesario ese retraso de 120-200 ms? ¿Qué pasaría si el impulso llegara a los ventrículos al mismo tiempo que a las aurículas?',
-    reflection_yes: 'Correcto. Sin ese retraso, aurículas y ventrículos se contraerían simultáneamente, perdiendo la sincronía que permite un llenado ventricular eficiente.',
-    reflection_partial: 'Piénsalo así: las aurículas necesitan tiempo para vaciarse hacia los ventrículos. El retraso del Nodo AV es el "pause" que da tiempo al llenado ventricular antes de que se contraigan.',
-    reflection_no: 'Revisa la sección "Nodo Auriculoventricular (AV)" del capítulo. La palabra clave es "retraso fisiológico" y su relación con el intervalo PR en el ECG.',
-    points: 100
-  },
-  {
-    type: 'mcq',
-    topic: 'tiempo',
-    q: 'A la velocidad estándar de 25 mm/s, cada cuadro grande del papel de ECG (5 mm) equivale a:',
-    opts: { A: '0.04 segundos', B: '0.12 segundos', C: '0.20 segundos', D: '1.00 segundo' },
-    answer: 'C',
-    why_wrong: {
-      A: '0.04 s corresponde a 1 mm (cuadro pequeño), no a 5 mm. Recuerda: 1 mm = 1/25 s = 0.04 s.',
-      B: '0.12 s equivale a 3 cuadros pequeños (3 mm), no a un cuadro grande. Es el valor del intervalo PR mínimo normal, no de un cuadro grande.',
-      D: '1.00 segundo equivale a 25 mm (5 cuadros grandes), no a uno solo. A 25 mm/s, 25 mm de papel pasan en 1 segundo.'
-    },
-    reflection: '¿Cuántos cuadros grandes necesitas contar para estimar una frecuencia cardíaca de 75 lpm?',
-    reflection_yes: 'Correcto. A 75 lpm, el intervalo RR es ~0.80 s = 4 cuadros grandes. La regla rápida: 300 ÷ número de cuadros grandes entre R y R.',
-    reflection_partial: 'La fórmula es: FC = 300 ÷ cuadros grandes entre dos ondas R. Prueba: si hay 4 cuadros grandes entre R-R → 300/4 = 75 lpm.',
-    reflection_no: 'Vuelve a la sección "El Papel de Registro". La relación clave: 1 cuadro grande = 0.20 s. Para calcular FC: FC = 300 ÷ cuadros grandes R-R.',
-    points: 100
-  },
-  {
-    type: 'mcq',
-    q: 'En el ECG, la despolarización auricular genera:',
-    opts: { A: 'El complejo QRS', B: 'La onda T', C: 'La onda P', D: 'El segmento ST' },
-    answer: 'C',
-    why_wrong: {
-      A: 'El complejo QRS representa la despolarización ventricular, no auricular. Es la onda más pronunciada del trazado porque la masa ventricular es mucho mayor.',
-      B: 'La onda T representa la repolarización ventricular. Es el proceso opuesto a la despolarización y ocurre después del QRS.',
-      D: 'El segmento ST es la línea isoeléctrica entre el fin del QRS y el inicio de la onda T. Representa el período entre despolarización y repolarización ventricular.'
-    },
-    reflection: '¿Puedes completar la secuencia? Despolarización auricular → __ / Despolarización ventricular → __ / Repolarización ventricular → __',
-    reflection_yes: '¡Excelente! Onda P → QRS → Onda T. Esta secuencia es la base de toda la interpretación del ECG.',
-    reflection_partial: 'La regla nemotécnica del capítulo: D (Despolarización) → P y QRS / R (Repolarización) → T.',
-    reflection_no: 'Regresa a la sección "Despolarización y Repolarización" y memoriza la regla nemotécnica: D → P, QRS / R → T.',
-    points: 100
-  },
-  {
-    type: 'mcq',
-    q: '¿Qué estructura del sistema de conducción tiene la mayor velocidad de conducción?',
-    opts: { A: 'Nodo Sinusal (SA)', B: 'Nodo AV', C: 'Haz de His', D: 'Fibras de Purkinje' },
-    answer: 'D',
-    why_wrong: {
-      A: 'El Nodo SA tiene una velocidad de 1 m/s, que es moderada. Su importancia no es la velocidad sino su automatismo espontáneo a 60-100 lpm.',
-      B: 'El Nodo AV es, paradójicamente, el más LENTO del sistema (0.05 m/s). Su lentitud es intencional para crear el retraso fisiológico.',
-      C: 'El Haz de His conduce a 2-4 m/s, más rápido que el Nodo AV, pero más lento que las Fibras de Purkinje.'
-    },
-    reflection: '¿Por qué crees que las Fibras de Purkinje necesitan ser las más rápidas? ¿Qué problema causaría si condujeran lento?',
-    reflection_yes: 'Correcto. Si las Purkinje fueran lentas, distintas partes del ventrículo se contraerían en momentos diferentes, generando una contracción desincronizada e ineficiente.',
-    reflection_partial: 'La razón es la sincronía: los ventrículos deben contraerse casi simultáneamente para bombear eficientemente. Las Purkinje a 4 m/s logran activar todo el ventrículo en milisegundos.',
-    reflection_no: 'Revisa la tabla de velocidades de conducción en la sección "Sistema de Conducción". Ordena las 4 estructuras de más lenta a más rápida.',
-    points: 100
-  },
-  {
-    type: 'mcq',
-    q: 'Si un vector de despolarización se ALEJA de un electrodo, la deflexión registrada en ese electrodo será:',
-    opts: { A: 'Positiva (hacia arriba)', B: 'Negativa (hacia abajo)', C: 'Bifásica', D: 'No se registra nada' },
-    answer: 'B',
-    why_wrong: {
-      A: 'La deflexión positiva ocurre cuando el vector se ACERCA al electrodo. "Se acerca = sube" en el trazo.',
-      C: 'La deflexión bifásica ocurre cuando el vector es PERPENDICULAR al electrodo, pasando mitad hacia él y mitad alejándose.',
-      D: 'Siempre se registra algo. Un vector que se aleja genera una deflexión negativa, no silencio eléctrico.'
-    },
-    reflection: '¿Puedes recordar la regla completa? Acercamiento → ___ / Alejamiento → ___ / Perpendicular → ___',
-    reflection_yes: 'Excelente: Acercamiento → positiva / Alejamiento → negativa / Perpendicular → bifásica. Esta regla explica por qué cada derivación ve el mismo corazón de forma diferente.',
-    reflection_partial: 'La regla completa: vector que SE ACERCA = deflexión positiva ↑ / vector que SE ALEJA = deflexión negativa ↓ / vector PERPENDICULAR = bifásica ↕',
-    reflection_no: 'Busca en el capítulo la sección "Deflexión según el electrodo". La regla tiene solo 3 casos y es fundamental para entender las derivaciones.',
-    points: 100
-  },
-  {
-    type: 'mcq',
-    topic: 'ion',
-    q: 'La calibración estándar del ECG es 10 mm/mV. Una deflexión de 5 mm de altura equivale a:',
-    opts: { A: '0.1 mV', B: '0.5 mV', C: '1.0 mV', D: '2.0 mV' },
-    answer: 'B',
-    why_wrong: {
-      A: '0.1 mV equivale solo a 1 mm (un cuadro pequeño). Recuerda: 10 mm = 1 mV, por lo que cada mm = 0.1 mV.',
-      C: '1.0 mV equivale a 10 mm (dos cuadros grandes). Si la deflexión mide 5 mm, divide entre 10: 5/10 = 0.5 mV, no 1.0 mV.',
-      D: '2.0 mV equivale a 20 mm. Una deflexión de 5 mm está muy por debajo de ese valor. Recuerda siempre partir de la regla: 10 mm = 1 mV.'
-    },
-    reflection: '¿Qué error clínico podrías cometer si el ECG fue grabado a media calibración (5 mm/mV) y no lo notas?',
-    reflection_yes: 'Correcto. A media calibración las deflexiones miden la mitad, podrías interpretar voltajes normales como bajos y diagnosticar erróneamente "bajos voltajes" o subestimar una hipertrofia ventricular.',
-    reflection_partial: 'A media calibración (5 mm/mV), una onda R de 8 mm en realidad mide 1.6 mV, no 0.8 mV. Siempre verifica la señal de calibración al inicio del trazado.',
-    reflection_no: 'Revisa la sección "El Papel de Registro" y el recuadro de advertencia sobre calibración. La clave: busca siempre la señal cuadrada de 10 mm al inicio del ECG.',
-    points: 100
-  },
-  {
-    type: 'mcq',
-    q: '¿Cuál es la frecuencia de descarga normal del Nodo Sinusal (SA)?',
-    opts: { A: '20-40 lpm', B: '40-60 lpm', C: '60-100 lpm', D: '100-150 lpm' },
-    answer: 'C',
-    why_wrong: {
-      A: '20-40 lpm es la frecuencia de escape de las Fibras de Purkinje. Si el SA falla y las Purkinje toman el mando, el ritmo sería tan lento que causaría síntomas.',
-      B: '40-60 lpm es la frecuencia de escape del Nodo AV. Si el SA falla, el AV puede ser el marcapasos secundario a esta frecuencia.',
-      D: '100-150 lpm sería taquicardia. El SA puede acelerar hasta esas frecuencias, pero no es su rango normal en reposo.'
-    },
-    reflection: '¿Por qué es importante que el SA tenga la frecuencia más alta de todo el sistema de conducción?',
-    reflection_yes: 'Correcto. Al tener la frecuencia más alta, el SA "suprime" el automatismo de las estructuras inferiores, dominando el ritmo. Si el SA falla, el siguiente más rápido toma el control.',
-    reflection_partial: 'El principio es: en el corazón, manda quien más rápido dispara. El SA a 60-100 lpm es más rápido que el AV (40-60) y las Purkinje (20-40), por eso siempre domina.',
-    reflection_no: 'Revisa la tabla de velocidades y frecuencias de escape del capítulo. El concepto clave es "supresión por sobreestimulación" — el SA al ser el más rápido, suprime a los demás.',
-    points: 100
-  },
-  {
-    type: 'mcq',
-    q: 'En el contexto del ECG, ¿qué representa la Fase 4 del potencial de acción en las células del Nodo Sinusal (a diferencia de las células ventriculares)?',
-    opts: {
-      A: 'Reposo absoluto sin actividad eléctrica',
-      B: 'Despolarización diastólica espontánea (automatismo)',
-      C: 'Repolarización rápida por salida de K⁺',
-      D: 'Entrada masiva de Na⁺ para iniciar el siguiente potencial'
-    },
-    answer: 'B',
-    why_wrong: {
-      A: 'En células ventriculares sí hay reposo en Fase 4, pero en el Nodo SA no. Las células marcapasos tienen una corriente de despolarización lenta y espontánea que las hace disparar automáticamente.',
-      C: 'La repolarización rápida por salida de K⁺ corresponde a la Fase 3, no a la Fase 4.',
-      D: 'La entrada masiva de Na⁺ es la Fase 0. La Fase 4 del SA involucra corrientes más lentas (If, o "corriente funny") que generan la despolarización gradual.'
-    },
-    reflection: '¿Qué consecuencia clínica tendría si las células del Nodo SA perdieran su capacidad de despolarización espontánea?',
-    reflection_yes: 'Exacto: se produciría un paro sinusal. El siguiente marcapasos de rescate sería el Nodo AV a 40-60 lpm. Si este también falla, las Purkinje a 20-40 lpm. Si todo falla, paro cardíaco.',
-    reflection_partial: 'Sin automatismo del SA, el corazón dependería del próximo marcapasos: el Nodo AV (40-60 lpm). Esto se llama "ritmo nodal de escape" y es una emergencia clínica.',
-    reflection_no: 'Vuelve a leer la descripción de Fase 4 en la tabla del capítulo: "Estable (trabajo) o despolarización espontánea (marcapasos)". La diferencia entre células de trabajo y células marcapasos está ahí.',
-    points: 120
-  },
+  <script>
+    /* ═══════════════════════════════════════════
+       QUIZ CAP. 4 – METODOLOGÍA DE INTERPRETACIÓN
+    ═══════════════════════════════════════════ */
+    const QUESTIONS = [
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Cuántas derivaciones tiene un ECG estándar de 12 derivaciones?',
+        opts: {A:'6 derivaciones de miembros y 4 precordiales',B:'6 derivaciones de miembros y 6 precordiales',C:'3 bipolares y 9 precordiales',D:'4 bipolares y 8 precordiales'},
+        answer: 'B',
+        why_wrong: {A:'Son 6 derivaciones precordiales (V1–V6), no 4.',C:'Las derivaciones de miembros son 3 bipolares (I, II, III) + 3 aumentadas (aVR, aVL, aVF) = 6 en total.',D:'Las derivaciones bipolares son I, II y III (3), y las precordiales son V1–V6 (6).'},
+        reflection: '¿Cuáles son las 3 derivaciones bipolares de miembros?',
+        reflection_yes: '¡Correcto! I (brazo izq − brazo der), II (pierna izq − brazo der), III (pierna izq − brazo izq). Son la base del triángulo de Einthoven.',
+        reflection_partial: 'Las derivaciones bipolares son I, II y III. Cada una mide la diferencia de potencial entre dos electrodos de miembros.',
+        reflection_no: 'Las derivaciones bipolares son I, II y III. Recuerda la Ley de Einthoven: II = I + III.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Qué mide la derivación bipolar I?',
+        opts: {A:'Diferencia de potencial entre el brazo derecho y la pierna izquierda',B:'Diferencia de potencial entre el brazo izquierdo y el brazo derecho',C:'Potencial del brazo izquierdo respecto a un electrodo central',D:'Diferencia entre la pierna izquierda y la pierna derecha'},
+        answer: 'B',
+        why_wrong: {A:'Esa sería la derivación II (brazo derecho negativo, pierna izquierda positiva).',C:'Eso describe a aVL, una derivación aumentada, no a la bipolar I.',D:'La pierna derecha es la tierra, no participa en el cálculo de la derivación I.'},
+        reflection: '¿En qué dirección apunta el vector que genera deflexión positiva en la derivación I?',
+        reflection_yes: '¡Correcto! El vector apunta de derecha a izquierda (hacia el brazo izquierdo). Por eso en el ECG normal la onda R en I es positiva.',
+        reflection_partial: 'La derivación I mide "brazo izquierdo menos brazo derecho". Un vector que se acerca al brazo izquierdo genera deflexión positiva.',
+        reflection_no: 'La derivación I tiene el electrodo positivo en el brazo izquierdo. Cualquier vector que apunte hacia la izquierda genera deflexión positiva en I.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Qué establece la Ley de Einthoven?',
+        opts: {A:'La suma de las amplitudes de I, II y III es siempre cero',B:'II = I + III en cualquier instante del ciclo cardíaco',C:'La derivación III siempre es negativa en ritmo sinusal',D:'I + II + III = 360° en el plano frontal'},
+        answer: 'B',
+        why_wrong: {A:'No es la suma de amplitudes, sino que II = I + III (la derivación II equivale algebraicamente a la suma de I y III).',C:'La derivación III puede ser positiva, negativa o bifásica según el eje eléctrico.',D:'Los 360° se refieren al sistema hexaxial, no a la ley de Einthoven.'},
+        reflection: '¿Para qué sirve prácticamente la ley de Einthoven?',
+        reflection_yes: 'Exacto: permite verificar la calidad del registro (si II ≈ I + III) y detectar errores de colocación de electrodos.',
+        reflection_partial: 'La ley de Einthoven permite comprobar la coherencia del registro. Si II ≠ I + III, puede haber un error de colocación.',
+        reflection_no: 'La ley de Einthoven (II = I + III) sirve como control de calidad del ECG. Si no se cumple, sospecha error de electrodos.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Cuál de las siguientes derivaciones aumentadas tiene el electrodo positivo en el brazo derecho?',
+        opts: {A:'aVL',B:'aVF',C:'aVR',D:'aVN'},
+        answer: 'C',
+        why_wrong: {A:'aVL tiene el electrodo positivo en el brazo izquierdo (Left).',B:'aVF tiene el electrodo positivo en el pie izquierdo (Foot).',D:'aVN no existe. Las derivaciones aumentadas son aVR, aVL y aVF.'},
+        reflection: '¿Por qué aVR casi siempre muestra deflexiones negativas en el ECG normal?',
+        reflection_yes: 'Correcto. El vector de despolarización ventricular apunta hacia abajo-izquierda, alejándose del brazo derecho. Por eso todas las ondas en aVR son negativas.',
+        reflection_partial: 'aVR "ve" el corazón desde el brazo derecho. Como el vector principal apunta hacia la izquierda y abajo, se aleja de aVR → deflexión negativa.',
+        reflection_no: 'En aVR el electrodo positivo está en el brazo derecho. El vector principal del QRS apunta hacia abajo-izquierda, alejándose → deflexiones negativas en aVR.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿En qué región del corazón "ve" la derivación V1?',
+        opts: {A:'Cara lateral del ventrículo izquierdo',B:'Cara inferior',C:'Tabique interventricular y ventrículo derecho',D:'Cara anterior del ventrículo izquierdo'},
+        answer: 'C',
+        why_wrong: {A:'La cara lateral del VI es explorada por I, aVL, V5 y V6.',B:'La cara inferior es explorada por II, III y aVF.',D:'La cara anterior del VI es explorada principalmente por V2–V4.'},
+        reflection: '¿Por qué el complejo QRS en V1 tiene morfología rS (onda R pequeña y onda S profunda) en el ECG normal?',
+        reflection_yes: 'Correcto. El septum se despolariza de izquierda a derecha (pequeña R en V1), pero luego el VI domina alejándose de V1 (S profunda).',
+        reflection_partial: 'V1 está a la derecha. La despolarización del septum genera una pequeña r; después el vector principal del VI se aleja de V1, generando la S profunda.',
+        reflection_no: 'En V1: la r pequeña se debe a la activación inicial del septum (izquierda → derecha). La S profunda refleja el vector principal del VI que apunta hacia la izquierda.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Cuál es el eje eléctrico normal del QRS en el plano frontal?',
+        opts: {A:'-30° a +30°',B:'0° a +90°',C:'-30° a +90°',D:'+90° a +180°'},
+        answer: 'C',
+        why_wrong: {A:'Ese rango es demasiado estrecho. El eje normal puede llegar hasta +90° en personas con constitución alta y delgada.',B:'Aunque es el rango más "normal", el límite izquierdo aceptado es −30°, no 0°.',D:'Ese rango corresponde a desviación del eje a la derecha (DAHD).'},
+        reflection: '¿Cómo detectas rápidamente el eje usando solo I y aVF?',
+        reflection_yes: '¡Perfecto! I+ y aVF+ = eje normal. I+ y aVF- = DAIH. I- y aVF+ = DAHD. I- y aVF- = eje extremo.',
+        reflection_partial: 'Con la derivación I evalúas si el eje apunta a la izquierda (+) o derecha (-). Con aVF si apunta hacia abajo (+) o arriba (-). Eso define el cuadrante del eje.',
+        reflection_no: 'Método rápido: si I es positiva → el eje apunta a la izquierda. Si aVF es positiva → el eje apunta hacia abajo. I+ / aVF+ = eje en cuadrante normal (0° a +90°).',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿En qué derivación la onda QRS debería ser la más positiva en un eje eléctrico normal de +60°?',
+        opts: {A:'Derivación I (0°)',B:'Derivación II (+60°)',C:'aVF (+90°)',D:'aVL (-30°)'},
+        answer: 'B',
+        why_wrong: {A:'La derivación I está a 0°. A 60° de distancia del eje, la deflexión sería positiva pero no la máxima.',C:'aVF está a 90°, que es 30° alejado del eje de +60°. La deflexión sería menor que en la derivación II.',D:'aVL está a −30°, casi perpendicular al eje de +60°. La deflexión sería mínima o bifásica.'},
+        reflection: '¿Por qué la derivación paralela al vector tiene la deflexión máxima?',
+        reflection_yes: 'Correcto: cuando el electrodo está alineado con el vector, el ángulo entre ellos es 0° y cos(0°)=1, lo que produce la amplitud máxima.',
+        reflection_partial: 'La amplitud de la deflexión es proporcional al coseno del ángulo entre el vector y el eje de la derivación. El máximo se da cuando el ángulo es 0° (paralelo).',
+        reflection_no: 'Principio clave: la derivación paralela al vector de despolarización registra la deflexión máxima. La perpendicular registra deflexión mínima (bifásica).',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Cuándo se produce una deflexión bifásica en una derivación?',
+        opts: {A:'Cuando el vector apunta directamente hacia esa derivación',B:'Cuando el vector es perpendicular al eje de esa derivación',C:'Cuando la amplitud del QRS es mayor a 25 mm',D:'Cuando la frecuencia cardíaca es superior a 100 lpm'},
+        answer: 'B',
+        why_wrong: {A:'Cuando el vector apunta directamente hacia la derivación, la deflexión es máxima y positiva, no bifásica.',C:'Una amplitud mayor a 25 mm es criterio de hipertrofia ventricular, no de deflexión bifásica.',D:'La frecuencia cardíaca no determina la morfología de las deflexiones.'},
+        reflection: '¿En qué derivación sueles ver deflexión bifásica en un eje eléctrico de +60°?',
+        reflection_yes: '¡Exacto! La derivación aVL está a −30°, exactamente perpendicular al eje de +60°. En esa situación aVL mostrará deflexión bifásica o plana.',
+        reflection_partial: 'La derivación perpendicular al vector de despolarización está a 90° de él. Para un eje de +60°, la derivación perpendicular está a +60° − 90° = −30°, que es aVL.',
+        reflection_no: 'Cuando el eje es +60°, la derivación perpendicular (a −30°) es aVL. Por eso en pacientes con eje normal de +60°, aVL suele mostrar deflexión bifásica.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Qué significa una "imagen en espejo" en las derivaciones?',
+        opts: {A:'Que el ECG está grabado al revés',B:'Que las derivaciones de la cara opuesta muestran cambios recíprocos (p. ej., ST↑ en una cara → ST↓ en la opuesta)',C:'Que el paciente tiene dextrocardia',D:'Que se usó calibración doble (20 mm/mV)'},
+        answer: 'B',
+        why_wrong: {A:'Un ECG invertido mostraría ondas P negativas en todas las derivaciones, lo que indicaría un error de colocación o dextrocardia.',C:'La dextrocardia tiene su propio patrón (eje extremo derecho, ondas R decrecientes en precordiales).',D:'La calibración doble afecta la amplitud de todas las deflexiones, no genera cambios recíprocos.'},
+        reflection: '¿En qué situación clínica es especialmente importante reconocer los cambios especulares?',
+        reflection_yes: 'Correcto: en el IAMCEST inferior (ST↑ en II, III, aVF) siempre busca la imagen en espejo en I y aVL (ST↓). Confirma el diagnóstico.',
+        reflection_partial: 'Los cambios especulares son clave en el infarto agudo de miocardio. Si ves ST↑ en cara inferior, busca ST↓ en cara lateral alta (I, aVL).',
+        reflection_no: 'En el infarto agudo, las derivaciones de la cara afectada muestran ST↑, mientras que las derivaciones opuestas muestran ST↓ (imagen en espejo). Esto confirma el diagnóstico.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Cuál de los siguientes pares de derivaciones explora la cara inferior del corazón?',
+        opts: {A:'I y aVL',B:'V1 y V2',C:'II, III y aVF',D:'V5 y V6'},
+        answer: 'C',
+        why_wrong: {A:'I y aVL exploran la cara lateral alta.',B:'V1 y V2 exploran el tabique y la cara septal/anterior derecha.',D:'V5 y V6 exploran la cara lateral baja del ventrículo izquierdo.'},
+        reflection: '¿Por qué II, III y aVF ven la cara inferior del corazón?',
+        reflection_yes: 'Correcto. Estos electrodos están en la parte inferior del triángulo de Einthoven (piernas), por lo que sus ejes apuntan hacia abajo, mirando la cara diafragmática.',
+        reflection_partial: 'Las derivaciones II, III y aVF tienen sus ejes apuntando hacia abajo (+60°, +120° y +90° respectivamente), por eso captan la actividad de la cara inferior del corazón.',
+        reflection_no: 'Las derivaciones II (+60°), III (+120°) y aVF (+90°) tienen sus ejes orientados hacia la cara inferior del corazón (diafragmática). Por eso un infarto inferior afecta estas derivaciones.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Cuál es la derivación precordial que explora la cara lateral del ventrículo izquierdo?',
+        opts: {A:'V1',B:'V3',C:'V4',D:'V5 y V6'},
+        answer: 'D',
+        why_wrong: {A:'V1 explora el tabique interventricular y el ventrículo derecho.',B:'V3 es una derivación de transición entre septum y cara anterior.',C:'V4 marca la transición entre cara anterior y lateral. Su posición es en el punto de máximo impulso (5° EICA, línea medioclavicular).'},
+        reflection: '¿Por qué la onda R en V5–V6 tiene mayor amplitud que en V1–V2?',
+        reflection_yes: 'Correcto. V5–V6 están sobre el ventrículo izquierdo, que es la masa ventricular dominante. El vector principal se aproxima a esas derivaciones → R alta.',
+        reflection_partial: 'En las derivaciones precordiales, la R aumenta desde V1 (dominado por la despolarización septal) hasta V5–V6 (dominado por el ventrículo izquierdo, más grande).',
+        reflection_no: 'V5–V6 están sobre el VI, que tiene mayor masa muscular. El vector principal apunta hacia ellos → R alta. En V1 el vector se aleja → S profunda.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿En qué derivación se ubica normalmente la "zona de transición" del ECG precordial?',
+        opts: {A:'V1',B:'V2',C:'V3 o V4',D:'V6'},
+        answer: 'C',
+        why_wrong: {A:'En V1 la morfología típica es rS, con S mucho mayor que r. No hay transición aquí.',B:'En V2 aún predomina la S. La transición suele estar más avanzada.',D:'En V6 el patrón es qR con R dominante; la transición ya ocurrió antes.'},
+        reflection: '¿Qué indica un patrón de transición anticipada (R>S ya en V1 o V2)?',
+        reflection_yes: 'Correcto: la transición anticipada en V1–V2 puede indicar hipertrofia ventricular derecha (cuando hay R alta en V1), infarto posterior o error de colocación.',
+        reflection_partial: 'Una R>S en V1 es anormal. Puede deberse a HVD, infarto posterior (imagen en espejo) o síndrome de Brugada. Siempre correlacionar con clínica.',
+        reflection_no: 'La zona de transición normal es V3–V4. Una transición anticipada (R>S en V1–V2) sugiere HVD, infarto posterior o dextrocardia. Requiere valoración clínica.',
+      },
+    ];
 
-  // ── PREGUNTAS NUEVAS (set 2) ──────────────────────────────────
-  {
-    type: 'mcq',
-    q: '¿Cuál es el ión responsable de la Fase 0 (despolarización rápida) del potencial de acción en las células ventriculares?',
-    opts: { A: 'Potasio (K⁺)', B: 'Calcio (Ca²⁺)', C: 'Sodio (Na⁺)', D: 'Magnesio (Mg²⁺)' },
-    answer: 'C',
-    why_wrong: {
-      A: 'El K⁺ tiene el papel opuesto: su SALIDA genera la repolarización en las Fases 1 y 3. En Fase 0 los canales de K⁺ están cerrados.',
-      B: 'El Ca²⁺ es el protagonista de la Fase 2 (meseta/plateau), no de la Fase 0. Su entrada es más lenta y sostenida, no rápida como la del Na⁺.',
-      D: 'El Mg²⁺ no tiene un papel directo en las fases del potencial de acción cardíaco. Funciona principalmente como cofactor enzimático.'
-    },
-    reflection: '¿Puedes relacionar la entrada masiva y rápida de Na⁺ en Fase 0 con lo que se ve en el ECG? ¿Qué onda representa ese momento?',
-    reflection_yes: 'Perfecto. La despolarización rápida ventricular (Fase 0 masiva de Na⁺) genera el complejo QRS en el ECG — la onda más prominente del trazado.',
-    reflection_partial: 'La Fase 0 de todas las células ventriculares activándose casi simultáneamente produce la deflexión rápida y pronunciada que llamamos complejo QRS.',
-    reflection_no: 'Regresa a la tabla de fases del potencial de acción. Fase 0 = Na⁺ entrada = despolarización rápida = origen del QRS. Esa cadena es clave.',
-    points: 100
-  },
-  {
-    type: 'mcq',
-    q: '¿Qué estructura del sistema de conducción es conocida como el "marcapasos natural" del corazón?',
-    opts: {
-      A: 'Nodo Auriculoventricular (AV)',
-      B: 'Fibras de Purkinje',
-      C: 'Haz de His',
-      D: 'Nodo Sinusal (SA)'
-    },
-    answer: 'D',
-    why_wrong: {
-      A: 'El Nodo AV es el marcapasos SECUNDARIO — si el SA falla, el AV toma el control a 40-60 lpm. Pero en condiciones normales el SA lo suprime.',
-      B: 'Las Fibras de Purkinje son el marcapasos TERCIARIO de escape (20-40 lpm). Su papel principal es la conducción rápida, no el inicio del impulso.',
-      C: 'El Haz de His es un conductor, no un marcapasos. Su función es transmitir el impulso desde el Nodo AV hacia las ramas y las Purkinje.'
-    },
-    reflection: '¿Por qué el Nodo SA domina como marcapasos y no el AV o las Purkinje, si todos tienen automatismo?',
-    reflection_yes: 'Correcto. El SA tiene la frecuencia espontánea más alta (60-100 lpm), así que siempre llega primero. Los demás no alcanzan a disparar solos porque el SA los "reinicia" antes.',
-    reflection_partial: 'Es una competencia de velocidad: el que dispara más rápido domina. SA gana con 60-100 lpm vs AV con 40-60 y Purkinje con 20-40. El ganador suprime a los demás.',
-    reflection_no: 'Lee la sección "Nodo Sinusal (SA)" y presta atención a la frase "Su automatismo es el más rápido del sistema, por lo que domina el ritmo cardíaco".',
-    points: 100
-  },
-  {
-    type: 'mcq',
-    q: 'En un ECG estándar registrado a 25 mm/s, ¿cuánto tiempo representan 3 cuadros grandes consecutivos?',
-    opts: { A: '0.12 segundos', B: '0.60 segundos', C: '0.20 segundos', D: '1.00 segundo' },
-    answer: 'B',
-    why_wrong: {
-      A: '0.12 segundos sería 3 cuadros PEQUEÑOS (3 × 0.04 s = 0.12 s), no 3 cuadros grandes. Es un valor que coincide con la duración normal del QRS.',
-      C: '0.20 segundos es lo que representa UN solo cuadro grande (5 mm × 0.04 s/mm = 0.20 s). La pregunta pide TRES cuadros grandes.',
-      D: '1.00 segundo equivale a 5 cuadros grandes (5 × 0.20 s). Tres cuadros grandes son solo el 60% de ese segundo.'
-    },
-    reflection: '¿Puedes calcular rápidamente cuántos cuadros grandes hay en un trazado de 6 segundos? ¿Para qué sirve saber eso en la práctica?',
-    reflection_yes: 'Excelente: 6 s ÷ 0.20 s = 30 cuadros grandes. Contar los complejos QRS en 6 segundos y multiplicar por 10 es uno de los métodos para calcular la frecuencia cardíaca.',
-    reflection_partial: 'En 6 segundos hay 30 cuadros grandes. Si cuentas los QRS en esa franja y multiplicas × 10, obtienes la frecuencia en lpm. Muy útil en ritmos irregulares.',
-    reflection_no: 'La clave es: 1 cuadro grande = 0.20 s. Para 3 cuadros grandes: 3 × 0.20 = 0.60 s. Practica con la tabla de escala del capítulo haciendo conversiones.',
-    points: 100
-  },
-  {
-    type: 'mcq',
-    q: 'Si un vector eléctrico de despolarización se aleja directamente de un electrodo de registro, ¿cómo será la deflexión en el ECG?',
-    opts: {
-      A: 'Positiva (hacia arriba)',
-      B: 'Negativa (hacia abajo)',
-      C: 'Isodifásica (bifásica igual hacia arriba y hacia abajo)',
-      D: 'Línea isoeléctrica plana, sin deflexión'
-    },
-    answer: 'B',
-    topic: 'vector',
-    clinical_consequence: '<strong>⚠️ Error de vector:</strong> Tu electrodo está "mirando" hacia el lado opuesto del vector. Es como intentar ver una película de espaldas a la pantalla. Confundir esto te haría reportar una onda negativa como patológica cuando es solo perspectiva del electrodo.',
-    reflection_yes_short: '✅ Entiendo — alejamiento = negativa, como mirar hacia atrás',
-    reflection_partial_short: '🤔 Entiendo la regla pero se me complica aplicarla a derivaciones',
-    reflection_no_short: '❌ Aún confundo cuándo es positiva o negativa una deflexión',
-    why_wrong: {
-      A: 'La deflexión positiva ocurre cuando el vector SE ACERCA al electrodo. "Acercamiento = positiva, alejamiento = negativa" es la regla fundamental.',
-      C: 'La deflexión bifásica (isodifásica) ocurre cuando el vector es PERPENDICULAR al electrodo, pasando la mitad de su recorrido acercándose y la mitad alejándose.',
-      D: 'Siempre habrá alguna deflexión si hay actividad eléctrica. La línea isoeléctrica real ocurre durante períodos de silencio eléctrico (segmentos PR y ST en condiciones normales).'
-    },
-    reflection: 'Aplicando esta regla: si en la derivación DII el vector cardíaco principal se acerca al electrodo, ¿la onda P será positiva o negativa en DII?',
-    reflection_yes: 'Correcto. En DII el vector auricular se aproxima al electrodo positivo, generando una onda P positiva — lo que vemos en ritmo sinusal normal.',
-    reflection_partial: 'En DII con ritmo sinusal, el vector auricular viaja hacia el electrodo positivo (se acerca), generando onda P positiva. Por eso DII es la derivación clásica para evaluar el ritmo.',
-    reflection_no: 'Revisa la sección "Deflexión según el electrodo" del capítulo. La regla es: ACERCAMIENTO → positiva ↑ / ALEJAMIENTO → negativa ↓ / PERPENDICULAR → bifásica ↕',
-    points: 100
-  },
-  {
-    type: 'mcq',
-    q: '¿Qué proceso fisiológico está representado por la aparición de la onda T en el trazado del ECG?',
-    opts: {
-      A: 'Despolarización auricular',
-      B: 'Repolarización ventricular',
-      C: 'Retraso de la conducción en el Nodo AV',
-      D: 'Despolarización ventricular'
-    },
-    answer: 'B',
-    why_wrong: {
-      A: 'La despolarización auricular genera la onda P, la primera onda del ciclo cardíaco. La repolarización auricular existe pero queda oculta dentro del QRS.',
-      C: 'El retraso en el Nodo AV se refleja en la duración del intervalo PR (de inicio de P al inicio del QRS). No genera una onda visible por sí mismo.',
-      D: 'La despolarización ventricular genera el complejo QRS. La onda T viene DESPUÉS y representa el proceso opuesto: la recuperación (repolarización).'
-    },
-    reflection: '¿Por qué crees que la repolarización auricular no genera una onda visible en el ECG como sí lo hace la repolarización ventricular (onda T)?',
-    reflection_yes: 'Exacto: la repolarización auricular es de baja amplitud y ocurre durante el QRS, siendo "tapada" por la gran señal ventricular. Solo se ve en condiciones especiales.',
-    reflection_partial: 'La masa auricular es mucho menor que la ventricular, genera menos voltaje. Además, su repolarización ocurre justo cuando el QRS está en curso, enmascarándola completamente.',
-    reflection_no: 'Vuelve a la sección "Despolarización y Repolarización" y la regla nemotécnica: R (Repolarización) → T. La onda T siempre es repolarización ventricular.',
-    points: 100
-  }
-];
-
-/* ═══════════════════════════════════
-   CONFIGURACIÓN Y ESTADO DEL QUIZ
-═══════════════════════════════════ */
-</script>
+            
+    
+  </script>
+  <script src="js/session.js"></script>
+  <script src="js/main.js"></script>
 <script>
 
-window.CHAPTER_NAME = 'Cap. 1 – Fundamentos Fisiológicos';
-window.BADGE_KEY = 'ecg_badges_cap1';
+window.CHAPTER_NAME = 'Cap. 4 – Metodología de Interpretación';
+window.BADGE_KEY = 'ecg_badges_cap4';
 </script>
 <script src="js/quiz-engine.js"></script>
 </body>

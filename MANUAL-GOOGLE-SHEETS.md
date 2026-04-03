@@ -146,7 +146,7 @@ function doPost(e) {
         ev.capitulo              || '',
         ev.pregunta_texto        || '',
         ev.respuesta_dada        || '',
-        ev.fue_correcta          ? 'SI' : 'NO',
+        (ev.fue_correcta === true || ev.fue_correcta === 'SI') ? 'SI' : 'NO',
         ev.respuesta_correcta    || '',
         ev.tiempo_seg            || 0,
         ev.reflexion_elegida     || '',
