@@ -48,6 +48,15 @@ Libro digital interactivo sobre Electrocardiografía, construido con **HTML5 + C
 - ✅ Pantalla de resultado con insignias, desglose por pregunta e intentos
 - ✅ Integrado con `session.js` (guarda cada respuesta automáticamente)
 
+### Quiz Gamificado (Cap. 2 — `quiz-2.html`)
+- ✅ Banco de preguntas sobre Anatomía de las Derivaciones ECG
+- ✅ Mismo sistema gamificado que el quiz del Capítulo 1
+- ✅ Preguntas sobre posición de electrodos, derivaciones precordiales y anatomía
+- ✅ Sistema de dificultad adaptativo (Suave/Medio/Intenso)
+- ✅ Configuración restaurada de dificultad/energía/insignias (DIFF_CONFIG, ENERGY_CONFIG, ALL_BADGES)
+- ✅ Corrección del cálculo de energía al fallar preguntas
+- ✅ Integración completa con el sistema de sesión y envío de datos
+
 ### Autopercepción en Capítulos (`chapter-1.html`)
 - ✅ **2 marcas de autopercepción inline** en el Capítulo 1 en posiciones estratégicas:
   - Marca 1: tras la tabla de fases del potencial de acción
@@ -95,7 +104,9 @@ MANUAL-GOOGLE-SHEETS.md → Guía paso a paso para configurar Apps Script
 
 ---
 
-## 🔗 URIs del Proyecto
+## 🔗 URIs del Proyecto (entradas funcionales)
+
+> Todas las rutas son estáticas y no requieren parámetros.
 
 | Ruta | Descripción |
 |---|---|
@@ -107,11 +118,18 @@ MANUAL-GOOGLE-SHEETS.md → Guía paso a paso para configurar Apps Script
 | `/chapter-5.html` | Cap. 5 – Patologías y Patrones |
 | `/chapter-6.html` | Cap. 6 – Talleres de Práctica |
 | `/quiz-1.html` | Quiz Gamificado Capítulo 1 |
+| `/quiz-2.html` | Quiz Gamificado Capítulo 2 – Anatomía de Derivaciones |
 | `/ecg-monitor.html` | Monitor ECG Interactivo |
 | `/autopercepcion.html` | Autopercepción del Aprendizaje |
 | `/descargar.html` | Descarga ZIP (no enlazada en menú) |
 
 ---
+
+## 🧩 Modelos de datos, estructuras y almacenamiento
+
+- **localStorage**: `ecg_identity`, `ecg_badges_cap1`, tema (`ecg-theme`).
+- **sessionStorage**: `ecg_session` con respuestas de quiz y autopercepción en la sesión actual.
+- **Google Sheets (Apps Script)**: persistencia de respuestas al profesor vía POST.
 
 ## 📊 Modelo de Datos — Google Sheets
 
@@ -164,14 +182,15 @@ Columnas que llegan al Google Sheet con cada envío (una fila por respuesta de q
 
 ---
 
-## 🔧 Pendiente / Próximos Pasos
+## 🔧 Pendiente / Próximos Pasos (features no implementadas)
+
 
 ### 🔴 Acción inmediata requerida
 - [ ] **Configurar Google Sheets** siguiendo `MANUAL-GOOGLE-SHEETS.md` y reemplazar el `ENDPOINT` en `js/main.js`
 
 ### 📚 Contenido
 - [ ] Agregar 2 marcas de autopercepción en Capítulos 2–6 (mismo patrón que Cap. 1)
-- [ ] Agregar quizzes para Capítulos 2–6 (mismo formato gamificado que `quiz-1.html`)
+- [ ] Agregar quizzes para Capítulos 3–6 (mismo formato gamificado que `quiz-1.html`)
 - [ ] Agregar más imágenes clínicas de trazados ECG reales
 - [ ] Quiz integrador final (preguntas de todos los capítulos)
 
@@ -181,6 +200,12 @@ Columnas que llegan al Google Sheet con cada envío (una fila por respuesta de q
 - [ ] Migración a Supabase cuando se use con más de 1 grupo
 
 ---
+
+## 🧭 Recomendaciones de desarrollo
+
+- Completar autopercepción en Cap. 2–6 para reforzar el aprendizaje metacognitivo.
+- Crear quizzes para Cap. 3–6 con el mismo patrón gamificado.
+- Añadir imágenes clínicas de ECG y casos reales.
 
 ## 🚀 Despliegue
 

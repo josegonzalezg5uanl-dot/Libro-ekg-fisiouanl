@@ -321,16 +321,16 @@ function openSendModal() {
 }
 
 /* ── Cerrar modal ── */
-function closeSendModal() {
+window.closeSendModal = function() {
   document.getElementById('sendModalOverlay').classList.remove('open');
   document.body.style.overflow = '';
 }
-function closeSendModalOnBg(e) {
+window.closeSendModalOnBg = function(e) {
   if (e.target === document.getElementById('sendModalOverlay')) closeSendModal();
 }
 
 /* ── Enviar sesión ── */
-async function submitSession() {
+window.submitSession = async function() {
   const btn      = document.getElementById('sendBtn');
   const statusEl = document.getElementById('sendStatus');
 
@@ -372,11 +372,12 @@ async function submitSession() {
     inicio:      sessionData.startTime || '',
     quizEvents:  sessionData.quizEvents   || [],
     likertEvents:sessionData.likertEvents || [],
-    resumen:     calcResumenEnvio(sessionData)
+    resumen:     window.calcResumenEnvio ? window.calcResumenEnvio(sessionData) : []
   };
 
   // — INTENTO DE ENVÍO — Google Sheets via Apps Script
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxbcSMnuqUjYjr3Ockrp6M8VlDyYngZUoYEpvNyxqNF3ewnJe99PpCSzdfu785c9RxWZw/exec';
+  // IMPORTANTE: Reemplazar con tu URL real de Google Apps Script
+  const ENDPOINT = window.ECG_GOOGLE_SHEETS_ENDPOINT || 'https://script.google.com/macros/s/AKfycbxbcSMnuqUjYjr3Ockrp6M8VlDyYngZUoYEpvNyxqNF3ewnJe99PpCSzdfu785c9RxWZw/exec';
 
   try {
     // Google Apps Script requiere text/plain para evitar preflight CORS
@@ -411,7 +412,7 @@ async function submitSession() {
 }
 
 /* ── Calcular resumen para el payload ── */
-function calcResumenEnvio(s) {
+window.calcResumenEnvio = function(s) {
   const caps = {};
   (s.quizEvents || []).forEach(e => {
     if (!caps[e.capitulo]) caps[e.capitulo] = { correctas: 0, total: 0, puntos: 0 };

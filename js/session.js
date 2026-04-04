@@ -65,7 +65,7 @@
   // ── ¿Ya está identificado? ─────────────────────────
   function isIdentified() {
     const id = loadIdentity();
-    return id && id.nombre && id.nombre.trim() !== '';
+    return id && id.nombre && id.nombre.trim() !== '' && id.nombre !== 'Anónimo';
   }
 
   // ── Obtener identidad actual ───────────────────────

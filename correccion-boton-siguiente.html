@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación - Botón Siguiente Corregido</title>
+    <style>
+        body { 
+            font-family: 'Inter', Arial, sans-serif; 
+            background: #0a0e1a; 
+            color: #e0e6f0; 
+            padding: 20px; 
+            margin: 0;
+            line-height: 1.6;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: rgba(17, 24, 39, 0.9);
+            padding: 30px; 
+            border-radius: 12px;
+            border: 1px solid #1e2d40;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        h1 { 
+            color: #60c8ff; 
+            text-align: center; 
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        .subtitle {
+            text-align: center; 
+            color: #8899aa; 
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        .status-card {
+            background: linear-gradient(135deg, #0d2e1a 0%, #1a1a1a 100%);
+            border: 1px solid #22c55e;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .btn {
+            background: linear-gradient(135deg, #22c55e, #1a9c4a);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        .btn:disabled {
+            background: linear-gradient(135deg, #374151, #4b5563);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .code-block {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            color: #d1d5db;
+        }
+        .result-box {
+            background: #1e2d40;
+            border-left: 4px solid #60c8ff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .success { color: #22c55e; font-weight: bold; }
+        .error { color: #ef4444; font-weight: bold; }
+        .warning { color: #f97316; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 CORRECCIÓN - BOTÓN SIGUIENTE</h1>
+        <p class="subtitle">Corrección del error grave del botón "Siguiente" eliminado</p>
+
+        <div class="status-card">
+            <h3>🎯 Problema Identificado</h3>
+            <p>El botón "Siguiente" fue eliminado completamente del DOM en lugar de simplemente deshabilitarse.</p>
+            <p><strong>Esto es un error grave de UX que impide la navegación normal.</strong></p>
+        </div>
+
+        <div class="status-card">
+            <h3>✅ Corrección Aplicada</h3>
+            <p>Se modificó el comportamiento para que el botón:</p>
+            <ul style="text-align: left; max-width: 600px; margin: 0 auto;">
+                <li>✅ Siempre esté visible en el DOM</li>
+                <li>✅ Se muestre deshabilitado (gris, sin clic) cuando no se puede usar</li>
+                <li>✅ Se habilite (azul, con clic) cuando se responde correctamente</li>
+                <li>✅ Se habilite cuando se pierden todas las vidas (Game Over)</li>
+            </ul>
+        </div>
+
+        <h3>🔍 Código Corregido</h3>
+        <div class="code-block">
+// ANTES (INCORRECTO - ocultaba el botón):
+const btnNext = document.getElementById('btnNext');
+btnNext.disabled = true;
+btnNext.style.display = 'none';  // ❌ ESTO ELIMINA EL BOTÓN
+
+// DESPUÉS (CORRECTO - deshabilita el botón):
+const btnNext = document.getElementById('btnNext');
+btnNext.disabled = true;  // ✅ ESTO DESHABILITA PERO MANTIENE VISIBLE
+        </div>
+
+        <div class="code-block">
+// LÓGICA CONDICIONAL CORRECTA:
+// Solo habilitar siguiente al acertar o cuando ya no haya vidas
+if (correct || state.lives <= 0) {
+    const btnNext = document.getElementById('btnNext');
+    btnNext.disabled = false;  // ✅ Habilitar botón
+    if (state.currentIdx >= state.questions.length - 1) {
+        btnNext.innerHTML = '🏁 Ver resultados <i class="fas fa-flag-checkered"></i>';
+    }
+}
+// Si no se cumple la condición, el botón permanece deshabilitado
+        </div>
+
+        <h3>🎨 Estilos CSS Actualizados</h3>
+        <div class="code-block">
+/* Botón habilitado */
+#btnNext {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #1976d2, #4f46e5);
+    color: #fff; border-radius: 10px; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: all .2s; margin-top: 4px;
+}
+
+/* Botón deshabilitado */
+#btnNext:disabled {
+    opacity: .4; cursor: not-allowed;
+    background: linear-gradient(135deg, #374151, #4b5563);  /* Gris */
+}
+        </div>
+
+        <h3>🧪 Cómo Verificar la Corrección</h3>
+        <div class="result-box">
+            <p><strong>1. Abre el Quiz 2:</strong> El botón "Siguiente" debe estar visible pero deshabilitado (gris)</p>
+            <p><strong>2. Falla una pregunta:</strong> El botón debe permanecer deshabilitado (no puedes hacer clic)</p>
+            <p><strong>3. Responde correctamente:</strong> El botón se habilita y cambia a azul</p>
+            <p><strong>4. Pierde todas las vidas:</strong> El botón se habilita para mostrar Game Over</p>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="btn" onclick="openQuiz()" style="font-size: 16px; padding: 14px 28px;">
+                📖 ABRIR QUIZ 2 PARA VERIFICAR
+            </button>
+        </div>
+
+        <div class="code-block">
+            <strong>💡 Código de diagnóstico rápido para consola:</strong>
+            <br><br>
+// Copia y pega esto en la consola (F12) cuando estés en quiz-2.html
+(function() {
+    console.log('🔧 VERIFICACIÓN DEL BOTÓN SIGUIENTE');
+    console.log('====================================');
+    
+    const btnNext = document.getElementById('btnNext');
+    if (btnNext) {
+        console.log('✅ Botón encontrado en el DOM');
+        console.log('Estado disabled:', btnNext.disabled);
+        console.log('Estado display:', btnNext.style.display || 'no establecido');
+        console.log('Estado visible:', btnNext.offsetParent !== null ? 'SÍ' : 'NO');
+    } else {
+        console.error('❌ Botón NO encontrado en el DOM');
+    }
+    
+    // Probar la lógica condicional
+    console.log('\\n🎯 Prueba de lógica condicional:');
+    console.log('Estado actual:', btnNext.disabled ? 'DESHABILITADO' : 'HABILITADO');
+    console.log('Para habilitar: responder correctamente o perder todas las vidas');
+})();
+        </div>
+
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        function openQuiz() {
+            window.open('quiz-2.html', '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+        }
+
+        // Mensaje de confirmación
+        console.log('✅ CORRECCIÓN DEL BOTÓN SIGUIENTE APLICADA');
+        console.log('El botón ahora se mantiene visible pero deshabilitado cuando no se puede usar.');
+    </script>
+</body>
+</html>
