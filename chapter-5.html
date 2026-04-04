@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cap. 5 – Patologías Básicas y Patrones | Guía ECG</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <style>
+    .ap-trigger{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#1a0d35,#0d1f3c);border:1px solid #7c3aed66;border-radius:12px;padding:10px 18px;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:600;color:#c4b5fd;transition:all .2s;position:relative;overflow:hidden;margin:20px 0;width:100%;text-align:left;animation:ap-pulse 3s ease 1.5s 3}
+    .ap-trigger::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#7c3aed11,#1976d211);opacity:0;transition:opacity .2s}
+    .ap-trigger:hover::before{opacity:1}.ap-trigger:hover{border-color:#7c3aed99;transform:translateY(-1px);box-shadow:0 4px 20px #7c3aed22}
+    .ap-trigger-icon{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;box-shadow:0 2px 10px #7c3aed44}
+    .ap-trigger-body{flex:1}.ap-trigger-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:#7c3aed;margin-bottom:2px}
+    .ap-trigger-text{color:#e0e6f0;font-size:.88rem}.ap-trigger-arrow{color:#7c3aed;font-size:.9rem;transition:transform .2s}
+    .ap-trigger:hover .ap-trigger-arrow{transform:translateX(3px)}
+    @keyframes ap-pulse{0%,100%{box-shadow:0 0 0 0 #7c3aed33}50%{box-shadow:0 0 0 8px #7c3aed00}}
+    .ap-modal-overlay{position:fixed;inset:0;z-index:50000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
+    .ap-modal-overlay.open{opacity:1;pointer-events:all}
+    .ap-modal{background:#0a1628;border:1px solid #7c3aed55;border-radius:20px;padding:32px 28px 26px;max-width:480px;width:92%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 60px #7c3aed22;transform:translateY(20px) scale(.97);transition:transform .3s cubic-bezier(.17,.67,.45,1.2)}
+    .ap-modal-overlay.open .ap-modal{transform:translateY(0) scale(1)}
+    .ap-modal-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px}
+    .ap-modal-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;box-shadow:0 4px 16px #7c3aed44}
+    .ap-modal-badge{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:#7c3aed;font-weight:700;margin-bottom:4px}
+    .ap-modal-title{font-size:1rem;font-weight:800;color:#e0e6f0;line-height:1.4}
+    .ap-modal-context{background:#111827;border-left:3px solid #7c3aed;border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:18px;font-size:.84rem;color:#8899aa;line-height:1.6}
+    .ap-modal-context strong{color:#c4b5fd}
+    .ap-modal-question{font-size:.95rem;font-weight:600;color:#e0e6f0;line-height:1.6;margin-bottom:18px;padding:14px 16px;background:#0d1f35;border:1px solid #1e3a5f;border-radius:10px}
+    .ap-likert{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+    .ap-likert-opt{display:flex;align-items:center;gap:12px;background:#111827;border:2px solid #1e2d40;border-radius:10px;padding:11px 14px;cursor:pointer;font-family:inherit;font-size:.88rem;color:#c8d8e8;text-align:left;transition:all .18s;width:100%}
+    .ap-likert-opt:hover{border-color:#7c3aed77;background:#15103a;transform:translateX(3px)}
+    .ap-likert-opt.selected{border-color:#7c3aed;background:#1a0d35;color:#e0e6f0}
+    .ap-likert-emoji{font-size:1.3rem;flex-shrink:0}.ap-likert-label{font-weight:600;display:block;margin-bottom:2px}.ap-likert-desc{font-size:.78rem;color:#607080}
+    .ap-response{display:none;padding:12px 16px;border-radius:10px;margin-bottom:18px;font-size:.86rem;color:#c8d8e8;line-height:1.65;animation:slide-in .25s ease}
+    @keyframes slide-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .ap-modal-close{width:100%;padding:11px;background:#1e2d40;border:none;color:#8899aa;border-radius:10px;font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+    .ap-modal-close:hover{background:#1e3a5f;color:#e0e6f0}
+    .ap-done-badge{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;color:#22c55e;background:#22c55e18;border:1px solid #22c55e44;border-radius:20px;padding:2px 10px;margin-left:auto;flex-shrink:0}
+    .quiz-cta{background:linear-gradient(135deg,#0d1f3c,#1a0d35);border:1px solid #1976d255;border-radius:14px;padding:24px 28px;margin:28px 0;display:flex;align-items:center;gap:20px}
+    .quiz-cta-icon{font-size:2rem;flex-shrink:0}.quiz-cta-body{flex:1}
+    .quiz-cta-title{font-size:1rem;font-weight:800;color:#e0e6f0;margin-bottom:4px}
+    .quiz-cta-desc{font-size:.84rem;color:#607080;margin-bottom:12px}
+    .quiz-cta-btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1976d2,#4f46e5);color:#fff;border:none;border-radius:8px;padding:9px 20px;font-family:inherit;font-size:.88rem;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s}
+    .quiz-cta-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px #1976d244}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-left">
+      <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+      <a href="index.html" class="site-logo"><i class="fas fa-heartbeat"></i><span>Guía de ECG</span></a>
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Buscar en el libro..."/>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-send-session" id="btnSendSession" onclick="openSendModal()" title="Enviar registro de sesión al profesor">
+        <i class="fas fa-paper-plane"></i><span class="btn-send-label">Enviar</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+      <a href="https://github.com/dmccreary/i-book-v1" target="_blank" class="gh-link"><i class="fab fa-github"></i></a>
+    </div>
+  </header>
+  <div class="overlay" id="overlay"></div>
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        <div class="sidebar-title">Contenido</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Inicio</a></li>
+          <li class="nav-section">Capítulos</li>
+          <li class="nav-item"><a href="chapter-1.html" class="nav-link"><span class="ch-num">1</span> Fundamentos Fisiológicos y Técnicos</a></li>
+          <li class="nav-item"><a href="chapter-2.html" class="nav-link"><span class="ch-num">2</span> Anatomía de las Derivaciones</a></li>
+          <li class="nav-item"><a href="chapter-3.html" class="nav-link"><span class="ch-num">3</span> Componentes del Trazado Normal</a></li>
+          <li class="nav-item"><a href="chapter-4.html" class="nav-link"><span class="ch-num">4</span> Metodología de Interpretación</a></li>
+          <li class="nav-item"><a href="chapter-5.html" class="nav-link active"><span class="ch-num">5</span> Patologías Básicas y Patrones</a></li>
+          <li class="nav-item"><a href="chapter-6.html" class="nav-link"><span class="ch-num">6</span> Talleres de Práctica</a></li>
+          <li class="nav-section">Aprendizaje</li>
+          <li class="nav-item">
+            <a href="autopercepcion.html" class="nav-link">
+              <i class="fas fa-brain" style="color:#a78bfa"></i> Autopercepción
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <main class="main-content">
+      <div class="content-wrapper">
+        <div class="chapter-layout">
+          <article class="chapter-content">
+            <h1>Patologías Básicas y Reconocimiento de Patrones</h1>
+            <div class="chapter-meta">
+              <span class="chapter-badge"><i class="fas fa-exclamation-triangle"></i> Capítulo 5</span>
+              <span class="chapter-read-time"><i class="fas fa-clock"></i> ~40 min de lectura</span>
+            </div>
+
+            <p>Una vez dominado lo normal, el siguiente paso es reconocer las alteraciones más frecuentes. Este capítulo cubre los patrones patológicos más importantes que todo médico debe identificar.</p>
+
+            <div class="info-box warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p><strong>Principio fundamental:</strong> El ECG nunca diagnostica por sí solo. Siempre debe interpretarse en conjunto con la <strong>clínica del paciente</strong>, los antecedentes y otros estudios complementarios.</p>
+            </div>
+
+            <!-- CRECIMIENTOS CAVITARIOS -->
+            <h2 id="crecimientos">1. Crecimientos Cavitarios</h2>
+
+            <h3 id="crec-auricular">Hipertrofias Auriculares</h3>
+            <table class="data-table">
+              <thead><tr><th>Patrón</th><th>Derivación clave</th><th>Criterio diagnóstico</th><th>Causa típica</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Crecimiento AD</strong> (P pulmonale)</td><td>Derivación II</td><td>Onda P picuda ≥ 2,5 mm de amplitud</td><td>EPOC, hipertensión pulmonar, estenosis tricuspídea</td></tr>
+                <tr><td><strong>Crecimiento AI</strong> (P mitrale)</td><td>Derivación II / V1</td><td>Onda P bimodal ≥ 0,12 s o componente negativo en V1 ≥ 1 mm × 1 cuadro</td><td>Estenosis mitral, HTA, insuficiencia mitral</td></tr>
+              </tbody>
+            </table>
+
+            <h3 id="crec-ventricular">Hipertrofias Ventriculares</h3>
+            <table class="data-table">
+              <thead><tr><th>Patrón</th><th>Criterio principal</th><th>Signos adicionales</th></tr></thead>
+              <tbody>
+                <tr><td><strong>HVI</strong> (Hipertrofia VI)</td><td>Criterio de Sokolow-Lyon: S en V1 + R en V5 ó V6 &gt; 35 mm</td><td>DAHI, patrón de sobrecarga (ST↓ + T invertida en V5–V6)</td></tr>
+                <tr><td><strong>HVD</strong> (Hipertrofia VD)</td><td>R &gt; S en V1, R en V1 ≥ 7 mm</td><td>DAHD, patrón de sobrecarga en V1–V2</td></tr>
+              </tbody>
+            </table>
+
+            <!-- BLOQUEOS DE RAMA -->
+            <h2 id="bloqueos">2. Bloqueos de Rama</h2>
+            <p>Los bloqueos de rama ocurren cuando la conducción por una de las ramas del Haz de His está retrasada o interrumpida. El resultado es un <strong>QRS ancho (&gt; 0,12 s)</strong> con morfología característica.</p>
+
+            <h3 id="brd">Bloqueo de Rama Derecha (BRD)</h3>
+            <div class="info-box note">
+              <i class="fas fa-info-circle"></i>
+              <p><strong>Criterios diagnósticos del BRD completo:</strong></p>
+            </div>
+            <ul>
+              <li>QRS ≥ 0,12 s (bloqueo completo) ó 0,10–0,12 s (incompleto)</li>
+              <li><strong>V1:</strong> Morfología RSR' (patrón "oreja de conejo") o R ancha y mellada</li>
+              <li><strong>I, V5–V6:</strong> Onda S ancha y empastada</li>
+              <li>Inversión de T en V1–V2 (secundaria al bloqueo)</li>
+            </ul>
+            <p><strong>Causa:</strong> Puede ser normal en personas jóvenes (BRD incompleto). El BRD completo puede asociarse a cardiopatía congénita, TEP agudo, cardiopatía isquémica.</p>
+
+            <h3 id="bri">Bloqueo de Rama Izquierda (BRI)</h3>
+            <div class="info-box danger">
+              <i class="fas fa-exclamation-circle"></i>
+              <p><strong>Importante:</strong> El BRI nuevo en el contexto de dolor torácico debe considerarse equivalente a un IAMCEST hasta demostrar lo contrario (Criterio de Sgarbossa).</p>
+            </div>
+            <ul>
+              <li>QRS ≥ 0,12 s</li>
+              <li><strong>I, aVL, V5–V6:</strong> Onda R ancha, mellada, sin onda Q</li>
+              <li><strong>V1–V3:</strong> Complejo QS o rS con S amplia</li>
+              <li>Discordancia del ST y T (en dirección opuesta al QRS)</li>
+            </ul>
+
+            <!-- ARRITMIAS -->
+            <h2 id="arritmias">3. Arritmias Simples</h2>
+
+            <h3 id="bradi-taqui-sinusal">Bradicardia y Taquicardia Sinusal</h3>
+            <table class="data-table">
+              <thead><tr><th>Arritmia</th><th>FC</th><th>Características ECG</th><th>Causas comunes</th></tr></thead>
+              <tbody>
+                <tr><td>Bradicardia sinusal</td><td>&lt; 60 lpm</td><td>Ritmo sinusal normal pero lento</td><td>Atletas, hipotiroidismo, beta-bloqueadores, vagotomía</td></tr>
+                <tr><td>Taquicardia sinusal</td><td>&gt; 100 lpm</td><td>Ritmo sinusal normal pero rápido</td><td>Fiebre, anemia, dolor, ansiedad, TEP, hipovolemia</td></tr>
+              </tbody>
+            </table>
+
+            <h3 id="fa">Fibrilación Auricular (FA)</h3>
+            <p>La arritmia sostenida más frecuente en adultos. Caracterizada por:</p>
+            <ul>
+              <li><strong>Ausencia de ondas P</strong> → reemplazadas por ondas fibrilatorias (f) irregulares y caóticas</li>
+              <li><strong>R–R completamente irregular</strong> (arritmia arrítmica)</li>
+              <li>QRS estrecho (a menos que haya bloqueo de rama asociado)</li>
+            </ul>
+            <div class="info-box warning">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p>La FA conlleva riesgo elevado de ictus embólico. Evaluar siempre con la escala <strong>CHA₂DS₂-VASc</strong> para indicación de anticoagulación.</p>
+            </div>
+
+            <h3 id="flutter">Flutter Auricular</h3>
+            <ul>
+              <li>Frecuencia auricular: ~300 lpm, en patrón de "dientes de sierra" (ondas F)</li>
+              <li>Bloqueo AV fisiológico 2:1, 3:1 ó 4:1 → FC ventricular 75–150 lpm</li>
+              <li>Mejor visible en derivaciones II, III, aVF y V1</li>
+            </ul>
+
+            <h3 id="extrasistoles">Extrasístoles</h3>
+            <table class="data-table">
+              <thead><tr><th>Tipo</th><th>Características</th><th>Significado</th></tr></thead>
+              <tbody>
+                <tr><td>Extrasístole auricular (EAP)</td><td>P prematura con morfología diferente, QRS estrecho</td><td>Generalmente benigno</td></tr>
+                <tr><td>Extrasístole ventricular (EV)</td><td>QRS ancho y bizarro, sin onda P previa, pausa compensatoria</td><td>Evaluar cardiopatía subyacente si son frecuentes o complejas</td></tr>
+              </tbody>
+            </table>
+
+            <!-- ISQUEMIA -->
+            <h2 id="isquemia">4. Isquemia, Lesión e Infarto</h2>
+
+            <h3 id="conceptos-isi">El Triángulo Isquemia–Lesión–Infarto</h3>
+            <table class="data-table">
+              <thead><tr><th>Proceso</th><th>Hallazgo ECG</th><th>Reversibilidad</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Isquemia</strong></td><td>Inversión de onda T (isquemia subepicárdica) o T picuda (isquemia subendocárdica)</td><td>Reversible</td></tr>
+                <tr><td><strong>Lesión</strong></td><td>Elevación del ST (lesión subepicárdica) o Depresión del ST (lesión subendocárdica)</td><td>Reversible si se trata</td></tr>
+                <tr><td><strong>Infarto/Necrosis</strong></td><td>Onda Q patológica (&gt; 1 mm de ancho, &gt; 25% de la R)</td><td>Permanente</td></tr>
+              </tbody>
+            </table>
+
+            <h3 id="iamcest">IAMCEST — Infarto con Elevación del ST</h3>
+            <div class="info-box danger">
+              <i class="fas fa-exclamation-circle"></i>
+              <p><strong>Criterios diagnósticos:</strong> Elevación del ST ≥ 1 mm en 2 derivaciones contiguas de miembros, o ≥ 2 mm en 2 derivaciones precordiales contiguas. ¡Activar código infarto de inmediato!</p>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Localización</th><th>Derivaciones con elevación ST</th><th>Arteria responsable probable</th></tr></thead>
+              <tbody>
+                <tr><td>Anterior extensa</td><td>V1–V6</td><td>DA proximal</td></tr>
+                <tr><td>Anterior</td><td>V2–V4</td><td>DA media o distal</td></tr>
+                <tr><td>Lateral alto</td><td>I, aVL</td><td>DA diagonal o CX</td></tr>
+                <tr><td>Inferior</td><td>II, III, aVF</td><td>Coronaria derecha (CD)</td></tr>
+                <tr><td>Posterior</td><td>V7–V9 (o imagen en espejo en V1–V2)</td><td>CX o CD</td></tr>
+              </tbody>
+            </table>
+
+            <!-- ELECTROLITOS -->
+            <h2 id="electrolitos">5. Alteraciones Electrolíticas</h2>
+
+            <h3 id="potasio">Efectos del Potasio</h3>
+            <table class="data-table">
+              <thead><tr><th>Alteración</th><th>K⁺ sérico</th><th>Cambios en ECG</th></tr></thead>
+              <tbody>
+                <tr><td>Hipopotasemia leve</td><td>3,0–3,5 mEq/L</td><td>Aplanamiento de onda T, aparición de onda U prominente</td></tr>
+                <tr><td>Hipopotasemia moderada/grave</td><td>&lt; 3,0 mEq/L</td><td>Fusión de T y U, QT aparentemente prolongado, ST deprimido</td></tr>
+                <tr><td>Hiperpotasemia leve</td><td>5,5–6,5 mEq/L</td><td>Onda T alta, picuda y simétrica ("en tienda de campaña")</td></tr>
+                <tr><td>Hiperpotasemia grave</td><td>&gt; 6,5 mEq/L</td><td>Ensanchamiento del QRS, PR prolongado, onda P desaparece → patrón sinusoidal → FV</td></tr>
+              </tbody>
+            </table>
+
+            <h3 id="calcio">Efectos del Calcio</h3>
+            <table class="data-table">
+              <thead><tr><th>Alteración</th><th>Cambio en ECG</th><th>Mecanismo</th></tr></thead>
+              <tbody>
+                <tr><td>Hipocalcemia</td><td>QT prolongado (QTc &gt; 460 ms)</td><td>Prolongación de la fase 2 (plateau) del PA</td></tr>
+                <tr><td>Hipercalcemia</td><td>QT corto, PR prolongado</td><td>Acortamiento de la fase 2, conducción lenta en nodo AV</td></tr>
+              </tbody>
+            </table>
+
+            <!-- AUTOPERCEPCIÓN 1 – Cap.5 -->
+            <button class="ap-trigger" onclick="openAPModal('ap1')">
+              <span class="ap-trigger-icon">🧠</span>
+              <span class="ap-trigger-body">
+                <span class="ap-trigger-label">Autopercepción 1 · Capítulo 5</span>
+                <span class="ap-trigger-text">¿Qué tan seguro/a te sientes identificando bloqueos de rama y arritmias en el ECG?</span>
+              </span>
+              <span class="ap-trigger-arrow">›</span>
+              <span class="ap-done-badge" id="ap1-done" style="display:none">✅ Completado</span>
+            </button>
+
+            <!-- MODAL AP1 -->
+            <div class="ap-modal-overlay" id="ap1-overlay">
+              <div class="ap-modal">
+                <div class="ap-modal-header">
+                  <div class="ap-modal-avatar">🩺</div>
+                  <div>
+                    <div class="ap-modal-badge">Autopercepción · Cap. 5 · Punto 1</div>
+                    <div class="ap-modal-title">Bloqueos de Rama y Arritmias</div>
+                  </div>
+                </div>
+                <div class="ap-modal-context">
+                  <strong>Contexto:</strong> Has revisado los criterios del BRD (RSR' en V1, S ancha en I/V6) y el BRI (R ancha sin Q en I/V6), así como las arritmias: bradicardia y taquicardia sinusal, FA, flutter y extrasístoles.
+                </div>
+                <div class="ap-modal-question">¿Con qué nivel de confianza reconocerías un BRD completo o una FA en un ECG real de urgencias?</div>
+                <div class="ap-likert" id="ap1-opts">
+                  <button class="ap-likert-opt" onclick="selectAP('ap1',1,this)"><span class="ap-likert-emoji">😟</span><div><span class="ap-likert-label">1 – Muy inseguro/a</span><span class="ap-likert-desc">No lo reconocería con certeza</span></div></button>
+                  <button class="ap-likert-opt" onclick="selectAP('ap1',2,this)"><span class="ap-likert-emoji">😐</span><div><span class="ap-likert-label">2 – Algo inseguro/a</span><span class="ap-likert-desc">Necesito repaso antes de aplicarlo</span></div></button>
+                  <button class="ap-likert-opt" onclick="selectAP('ap1',3,this)"><span class="ap-likert-emoji">🙂</span><div><span class="ap-likert-label">3 – Moderadamente seguro/a</span><span class="ap-likert-desc">Lo entiendo pero me falta práctica</span></div></button>
+                  <button class="ap-likert-opt" onclick="selectAP('ap1',4,this)"><span class="ap-likert-emoji">😊</span><div><span class="ap-likert-label">4 – Bastante seguro/a</span><span class="ap-likert-desc">Podría identificarlo en la mayoría de los casos</span></div></button>
+                  <button class="ap-likert-opt" onclick="selectAP('ap1',5,this)"><span class="ap-likert-emoji">🌟</span><div><span class="ap-likert-label">5 – Muy seguro/a</span><span class="ap-likert-desc">Lo domino y podría explicarlo</span></div></button>
+                </div>
+                <div class="ap-response" id="ap1-response"></div>
+                <button class="ap-modal-close" onclick="closeAPModal('ap1')"><i class="fas fa-times"></i> Cerrar</button>
+              </div>
+            </div>
+
+            <h2 id="resumen">Resumen del Capítulo</h2>
+            <ul>
+              <li><strong>Crecimientos cavitarios:</strong> P pulmonale (AD), P mitrale (AI), Sokolow-Lyon (HVI), R en V1 (HVD).</li>
+              <li><strong>Bloqueos:</strong> BRD = RSR' en V1 + S ancha en V6. BRI = R ancha en I/V6 + QS en V1.</li>
+              <li><strong>FA:</strong> Sin ondas P, R–R irregular. Flutter: ondas en sierra, bloqueo 2:1.</li>
+              <li><strong>Infarto:</strong> T↑ (hiperagudo) → ST↑ (lesión) → Q patológica (necrosis).</li>
+              <li><strong>Potasio:</strong> Alto → T picuda; Bajo → onda U, QT aparente largo.</li>
+              <li><strong>Calcio:</strong> Bajo → QT largo; Alto → QT corto.</li>
+            </ul>
+
+            <!-- AUTOPERCEPCIÓN 2 – Cap.5 -->
+            <button class="ap-trigger" onclick="openAPModal('ap2')">
+              <span class="ap-trigger-icon">💡</span>
+              <span class="ap-trigger-body">
+                <span class="ap-trigger-label">Autopercepción 2 · Capítulo 5</span>
+                <span class="ap-trigger-text">¿Qué tan preparado/a te sientes para reconocer isquemia, infarto y alteraciones electrolíticas?</span>
+              </span>
+              <span class="ap-trigger-arrow">›</span>
+              <span class="ap-done-badge" id="ap2-done" style="display:none">✅ Completado</span>
+            </button>
+
+            <!-- MODAL AP2 -->
+            <div class="ap-modal-overlay" id="ap2-overlay">
+              <div class="ap-modal">
+                <div class="ap-modal-header">
+                  <div class="ap-modal-avatar">❤️‍🩹</div>
+                  <div>
+                    <div class="ap-modal-badge">Autopercepción · Cap. 5 · Punto 2</div>
+                    <div class="ap-modal-title">Isquemia, Infarto y Electrolitos</div>
+                  </div>
+                </div>
+                <div class="ap-modal-context">
+                  <strong>Contexto:</strong> Has estudiado el triángulo isquemia–lesión–infarto (T invertida, ST elevado, onda Q patológica), los criterios del IAMCEST por territorio y el impacto del K⁺ y Ca²⁺ en el ECG.
+                </div>
+                <div class="ap-modal-question">Si ves elevación del ST en II, III y aVF con imagen en espejo en I y aVL, ¿con qué seguridad identificarías el diagnóstico y la arteria responsable?</div>
+                <div class="ap-likert" id="ap2-opts">
+                  <button class="ap-likert-opt" onclick="selectAP('ap2',1,this)"><span class="ap-likert-emoji">😟</span><div><span class="ap-likert-label">1 – Muy inseguro/a</span><span class="ap-likert-desc">No lo identificaría con certeza</span></div></button>
+                  <button class="ap-likert-opt" onclick="selectAP('ap2',2,this)"><span class="ap-likert-emoji">😐</span><div><span class="ap-likert-label">2 – Algo inseguro/a</span><span class="ap-likert-desc">Tengo dudas sobre los territorios</span></div></button>
+                  <button class="ap-likert-opt" onclick="selectAP('ap2',3,this)"><span class="ap-likert-emoji">🙂</span><div><span class="ap-likert-label">3 – Moderadamente seguro/a</span><span class="ap-likert-desc">Identifico el patrón pero no siempre la arteria</span></div></button>
+                  <button class="ap-likert-opt" onclick="selectAP('ap2',4,this)"><span class="ap-likert-emoji">😊</span><div><span class="ap-likert-label">4 – Bastante seguro/a</span><span class="ap-likert-desc">Identifico hallazgos y arteria en la mayoría de casos</span></div></button>
+                  <button class="ap-likert-opt" onclick="selectAP('ap2',5,this)"><span class="ap-likert-emoji">🌟</span><div><span class="ap-likert-label">5 – Muy seguro/a</span><span class="ap-likert-desc">Domino el diagnóstico y el manejo inmediato</span></div></button>
+                </div>
+                <div class="ap-response" id="ap2-response"></div>
+                <button class="ap-modal-close" onclick="closeAPModal('ap2')"><i class="fas fa-times"></i> Cerrar</button>
+              </div>
+            </div>
+
+            <!-- QUIZ CTA -->
+            <div class="quiz-cta">
+              <span class="quiz-cta-icon">🎮</span>
+              <div class="quiz-cta-body">
+                <div class="quiz-cta-title">¿Listo/a para el Quiz del Capítulo 5?</div>
+                <div class="quiz-cta-desc">Pon a prueba tus conocimientos sobre patologías básicas del ECG: arritmias, bloqueos, isquemia e infarto.</div>
+                <a href="quiz-5.html" class="quiz-cta-btn"><i class="fas fa-gamepad"></i> Comenzar Quiz</a>
+              </div>
+            </div>
+
+            <div class="chapter-nav">
+              <a href="chapter-4.html" class="ch-nav-btn">
+                <i class="fas fa-chevron-left"></i>
+                <div><span class="nav-label">Anterior</span><span class="nav-title">Metodología de Interpretación</span></div>
+              </a>
+              <a href="chapter-6.html" class="ch-nav-btn">
+                <div><span class="nav-label">Siguiente</span><span class="nav-title">Talleres de Práctica</span></div>
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            </div>
+          </article>
+
+          <aside class="toc">
+            <div class="toc-title">En este capítulo</div>
+            <ul class="toc-list">
+              <li><a href="#crecimientos">1. Crecimientos Cavitarios</a></li>
+              <li><a href="#crec-auricular">— Hipertrofias Auriculares</a></li>
+              <li><a href="#crec-ventricular">— Hipertrofias Ventriculares</a></li>
+              <li><a href="#bloqueos">2. Bloqueos de Rama</a></li>
+              <li><a href="#brd">— BRD</a></li>
+              <li><a href="#bri">— BRI</a></li>
+              <li><a href="#arritmias">3. Arritmias</a></li>
+              <li><a href="#bradi-taqui-sinusal">— Bradi/Taquicardia</a></li>
+              <li><a href="#fa">— Fibrilación Auricular</a></li>
+              <li><a href="#flutter">— Flutter Auricular</a></li>
+              <li><a href="#extrasistoles">— Extrasístoles</a></li>
+              <li><a href="#isquemia">4. Isquemia e Infarto</a></li>
+              <li><a href="#iamcest">— IAMCEST</a></li>
+              <li><a href="#electrolitos">5. Electrolitos</a></li>
+              <li><a href="#resumen">Resumen</a></li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+      <footer class="site-footer-bottom">
+        <p>Guía de Electrocardiografía &mdash; Libro Digital &copy; 2025</p>
+      </footer>
+    </main>
+  </div>
+  <script src="js/session.js"></script>
+<script src="js/main.js"></script>
+<script src="js/likert.js"></script>
+<script>
+  const AP_RESPONSES = [
+    {bg:'#0d2a1f',border:'#22c55e',icon:'🌟',text:'¡Excelente! Tu nivel de confianza es alto. Los bloqueos de rama y arritmias son pilares del ECG clínico. Sigue practicando con casos reales para mantener esa seguridad.'},
+    {bg:'#0d2a1f',border:'#22c55e',icon:'✅',text:'Muy bien. Tienes una base sólida. Repasa los criterios exactos del BRD (RSR\' en V1) y el BRI (R ancha sin Q en I/V6) para afinar tu diagnóstico.'},
+    {bg:'#1a1a0d',border:'#eab308',icon:'💡',text:'Buen camino. Te recomiendo practicar con ECGs de casos clínicos. El reconocimiento de patrones mejora con la repetición. ¡Ánimo!'},
+    {bg:'#1a1a0d',border:'#eab308',icon:'📖',text:'Normal en este punto del aprendizaje. Revisa las tablas de criterios diagnósticos del capítulo y practica identificar el patrón RSR\' vs. R ancha.'},
+    {bg:'#1a0d0d',border:'#ef4444',icon:'💪',text:'No te preocupes. Estos temas son complejos al inicio. Vuelve a leer las secciones de bloqueos y arritmias con calma, y recuerda: la FA se reconoce por la ausencia de ondas P y el R–R irregular.'},
+    {bg:'#0d2a1f',border:'#22c55e',icon:'🏆',text:'¡Dominio total! Eres capaz de reconocer isquemia, infarto y alteraciones electrolíticas. Aplica siempre la clínica junto al ECG para un diagnóstico completo.'},
+    {bg:'#0d2a1f',border:'#22c55e',icon:'✅',text:'Muy bien. Identificas los patrones principales. Refuerza los territorios: inferior (CD), anterior (DA), lateral (CX) para no dudar en urgencias.'},
+    {bg:'#1a1a0d',border:'#eab308',icon:'💡',text:'Buen progreso. El IAMCEST inferior (ST en II, III, aVF con imagen en espejo en I y aVL) es un patrón clave que vale la pena practicar. ¡Sigue adelante!'},
+    {bg:'#1a1a0d',border:'#eab308',icon:'📖',text:'Ve despacio. La tabla de localización del infarto (derivaciones afectadas → arteria) es tu mejor aliada. Repásala hasta memorizarla.'},
+    {bg:'#1a0d0d',border:'#ef4444',icon:'💪',text:'Sigue practicando. Recuerda: T invertida = isquemia, ST elevado = lesión, Q patológica = necrosis. Esa secuencia es la base del diagnóstico de infarto.'},
+  ];
+  const conceptMap = {
+    ap1: 'Bloqueos de Rama y Arritmias',
+    ap2: 'Isquemia, Infarto y Alteraciones Electrolíticas',
+  };
+
+  function openAPModal(id) {
+    document.getElementById(id+'-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeAPModal(id) {
+    document.getElementById(id+'-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function selectAP(id, level, btn) {
+    const opts = document.getElementById(id+'-opts');
+    opts.querySelectorAll('.ap-likert-opt').forEach(b => { b.disabled = true; b.classList.remove('selected'); });
+    btn.classList.add('selected');
+    const r = AP_RESPONSES[((id==='ap1'?0:5) + level - 1) % AP_RESPONSES.length];
+    const resp = document.getElementById(id+'-response');
+    resp.style.cssText = `display:block;background:${r.bg};border:1px solid ${r.border};`;
+    resp.innerHTML = `<span style="font-size:1.2rem">${r.icon}</span> ${r.text}`;
+    const numStr = id.slice(-1);
+    const badge = document.getElementById(id+'-done');
+    if (badge) { badge.style.display = 'inline-flex'; }
+    const key = `ecg_cap5_${id}`;
+    localStorage.setItem(key, level);
+    if (typeof ECGSession !== 'undefined' && ECGSession.logLikert) {
+      ECGSession.logLikert({
+        capitulo: 'Capítulo 5 – Patologías Básicas y Patrones',
+        concepto: conceptMap[id],
+        nivel_num: level,
+        nivel_texto: ['Muy inseguro/a','Algo inseguro/a','Moderadamente seguro/a','Bastante seguro/a','Muy seguro/a'][level-1],
+      });
+    }
+  }
+  function restoreAPState() {
+    ['ap1','ap2'].forEach(id => {
+      if (localStorage.getItem(`ecg_cap5_${id}`)) {
+        const badge = document.getElementById(id+'-done');
+        if (badge) badge.style.display = 'inline-flex';
+      }
+    });
+  }
+  document.addEventListener('DOMContentLoaded', restoreAPState);
+</script>
+</body>
+</html>

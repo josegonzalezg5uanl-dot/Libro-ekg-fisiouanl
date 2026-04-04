@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Cap. 3 – Componentes del Trazado Normal | Guía ECG</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <style>
+    .hud-val{white-space:nowrap}.hud-label{white-space:nowrap}.hud-prog-label{white-space:nowrap}
+    .quiz-hud{position:sticky;top:60px;z-index:100;background:#0a0e1a;border-bottom:1px solid #1e3a5f;padding:10px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+    .hud-item{display:flex;align-items:center;gap:6px;font-size:.88rem;font-weight:600}
+    .hud-icon{font-size:1.1rem}.hud-val{color:#e0e6f0;min-width:36px}.hud-label{color:#607080;font-size:.75rem}
+    .hud-progress{flex:1;min-width:120px}.hud-prog-track{background:#1e2d40;border-radius:4px;height:6px;overflow:hidden}
+    .hud-prog-fill{height:100%;background:linear-gradient(90deg,#1976d2,#00c8ff);border-radius:4px;transition:width .4s ease}
+    .hud-prog-label{font-size:.72rem;color:#607080;margin-top:2px}
+    .timer-val{color:#22c55e;transition:color .3s;font-size:1rem}.timer-val.warning{color:#f97316}.timer-val.danger{color:#ef4444;animation:pulse-timer .5s infinite alternate}
+    @keyframes pulse-timer{from{opacity:1}to{opacity:.4}}
+    .lives-display{display:flex;gap:3px}.life{font-size:1rem;transition:transform .2s}.life.lost{opacity:.2;transform:scale(.7)}
+    .streak-val{color:#f97316}.streak-val.active{animation:streak-glow .6s ease}
+    @keyframes streak-glow{0%{transform:scale(1)}50%{transform:scale(1.4);color:#fbbf24}100%{transform:scale(1)}}
+    .energy-hud{display:flex;align-items:center;gap:6px;flex:1;min-width:120px}
+    .energy-label{font-size:.72rem;color:#60c8ff;font-weight:700;white-space:nowrap}
+    .energy-track{flex:1;background:#1e2d40;border-radius:4px;height:8px;overflow:hidden}
+    .energy-fill{height:100%;background:linear-gradient(90deg,#22c55e,#84cc16);border-radius:4px;transition:width .4s ease}
+    .energy-pct{font-size:.72rem;color:#607080;white-space:nowrap;min-width:36px}
+    .quiz-wrap{max-width:720px;margin:0 auto;padding:32px 20px 60px}
+    #screen-start{text-align:center;padding:40px 20px}
+    .qs-icon{font-size:4rem;margin-bottom:16px}.qs-title{font-size:1.8rem;font-weight:800;color:#e0e6f0;margin-bottom:8px}
+    .qs-sub{color:#8899aa;font-size:.95rem;margin-bottom:28px;line-height:1.6}
+    .qs-stats{display:flex;justify-content:center;gap:24px;margin-bottom:32px;flex-wrap:wrap}
+    .qs-stat{background:#111827;border:1px solid #1e2d40;border-radius:10px;padding:14px 20px;text-align:center}
+    .qs-stat-num{display:block;font-size:1.4rem;font-weight:700;color:#60c8ff}.qs-stat-label{font-size:.75rem;color:#607080}
+    .diff-selector{display:flex;gap:10px;justify-content:center;margin-bottom:28px;flex-wrap:wrap}
+    .diff-btn{padding:9px 20px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.88rem;font-weight:600;border:2px solid transparent;transition:all .2s}
+    .diff-btn.suave{background:#0d2e1a;border-color:#22c55e;color:#22c55e}.diff-btn.medio{background:#2a1d0a;border-color:#f97316;color:#f97316}.diff-btn.intenso{background:#2a0a0a;border-color:#ef4444;color:#ef4444}
+    .diff-btn.selected,.diff-btn:hover{filter:brightness(1.3);transform:scale(1.04)}
+    .start-btn{background:linear-gradient(135deg,#1976d2,#4f46e5);color:#fff;border:none;border-radius:12px;padding:14px 40px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 4px 20px #1976d244}
+    .start-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px #1976d244}
+    #screen-quiz{display:none}
+    .q-card{background:#111827;border:1px solid #1e3a5f;border-radius:16px;padding:28px 28px 24px;margin-bottom:20px;animation:slide-in .3s ease}
+    @keyframes slide-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .q-type-badge{display:inline-flex;align-items:center;gap:5px;background:#1e3a5f;color:#60c8ff;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:14px}
+    .q-text{font-size:1.05rem;font-weight:600;color:#e0e6f0;line-height:1.6;margin-bottom:22px}
+    .q-options{display:flex;flex-direction:column;gap:10px}
+    .q-opt{background:#0d1f35;border:2px solid #1e3a5f;border-radius:10px;padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .18s;font-size:.9rem;color:#c8d8e8;text-align:left;font-family:inherit;width:100%}
+    .q-opt:hover:not(:disabled){border-color:#1976d2;background:#0d2137;transform:translateX(4px)}
+    .q-opt .opt-letter{width:28px;height:28px;border-radius:50%;background:#1e3a5f;color:#60c8ff;font-weight:700;font-size:.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .q-opt.correct{border-color:#22c55e;background:#0d2e1a;color:#e0e6f0}.q-opt.correct .opt-letter{background:#22c55e;color:#fff}
+    .q-opt.wrong{border-color:#ef4444;background:#2a0a0a;color:#e0e6f0}.q-opt.wrong .opt-letter{background:#ef4444;color:#fff}
+    .q-opt:disabled{cursor:default}
+    .feedback-panel{border-radius:12px;padding:20px 22px;margin-bottom:20px;display:none;animation:slide-in .25s ease}
+    .feedback-panel.correct{display:block;background:#0d2e1a;border:1px solid #22c55e55}
+    .feedback-panel.wrong{display:block;background:#1a0a0a;border:1px solid #ef444455}
+    .fb-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .fb-icon{font-size:1.5rem}.fb-title{font-size:1rem;font-weight:700}
+    .feedback-panel.correct .fb-title{color:#22c55e}.feedback-panel.wrong .fb-title{color:#ef4444}
+    .fb-pts{font-size:.85rem;color:#fbbf24;margin-bottom:10px}
+    .fb-correct-answer{background:#0a1f0a;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:.88rem;color:#86efac}
+    .fb-correct-answer strong{color:#22c55e}
+    .fb-why{background:#1e1010;border-left:3px solid #f97316;border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:14px;font-size:.88rem;color:#c8d8e8;line-height:1.6}
+    .fb-why-title{color:#f97316;font-weight:700;margin-bottom:4px;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}
+    .fb-reflection{background:#0d1f35;border:1px solid #1976d255;border-radius:10px;padding:14px 16px;margin-bottom:14px}
+    .fb-reflection-title{color:#60c8ff;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .fb-reflection-q{font-size:.9rem;color:#c8d8e8;font-weight:600;margin-bottom:12px;line-height:1.5}
+    .npc-opts{display:flex;gap:8px;flex-wrap:wrap}
+    .npc-btn{padding:8px 16px;border-radius:8px;border:1.5px solid #1976d255;background:#0d1f35;color:#c8d8e8;font-family:inherit;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .18s}
+    .npc-btn:hover:not(:disabled){border-color:#1976d2;background:#1e3a5f}
+    .npc-btn:disabled{opacity:.5;cursor:default}
+    .npc-dialog{background:#0d1f35;border:1px solid #1976d255;border-radius:10px;padding:12px 14px;margin-top:10px;font-size:.88rem;color:#c8d8e8;line-height:1.6;display:none;animation:slide-in .2s ease}
+    .npc-dialog.show{display:block}
+    #btnNext{display:none;width:100%;padding:14px;background:linear-gradient(135deg,#1976d2,#4f46e5);border:none;color:#fff;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:4px}
+    #btnNext:hover{transform:translateY(-1px);box-shadow:0 4px 20px #1976d244}
+    #screen-gameover{display:none;text-align:center;padding:40px 20px}
+    .go-icon{font-size:4rem;margin-bottom:16px}.go-title{font-size:1.6rem;font-weight:800;color:#ef4444;margin-bottom:8px}
+    .go-sub{color:#8899aa;font-size:.9rem;margin-bottom:24px}
+    .go-btn{background:linear-gradient(135deg,#1976d2,#4f46e5);color:#fff;border:none;border-radius:10px;padding:12px 32px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+    #screen-result{display:none}
+    .result-hero{text-align:center;padding:32px 0 24px}
+    .result-icon{font-size:4rem;margin-bottom:12px}
+    .result-title{font-size:1.6rem;font-weight:800;color:#e0e6f0;margin-bottom:6px}
+    .result-sub{color:#8899aa;font-size:.9rem;margin-bottom:20px}
+    .result-score-big{font-size:3rem;font-weight:900;color:#60c8ff;margin-bottom:4px}
+    .result-score-label{font-size:.8rem;color:#607080;text-transform:uppercase;letter-spacing:.06em}
+    .result-energy-bar{background:#1e2d40;border-radius:8px;height:12px;overflow:hidden;margin:16px 0 6px}
+    .result-energy-fill{height:100%;border-radius:8px;transition:width 1s ease}
+    .result-energy-label{font-size:.8rem;color:#607080;text-align:center;margin-bottom:20px}
+    .result-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+    .rs-item{background:#111827;border:1px solid #1e2d40;border-radius:10px;padding:12px;text-align:center}
+    .rs-num{display:block;font-size:1.3rem;font-weight:800;color:#60c8ff}.rs-label{font-size:.72rem;color:#607080}
+    .result-badges{margin-bottom:24px}
+    .rb-title{font-size:.8rem;color:#60c8ff;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:12px}
+    .badges-grid{display:flex;flex-wrap:wrap;gap:8px}
+    .badge-chip{display:flex;align-items:center;gap:8px;background:#111827;border:1px solid #1e2d40;border-radius:10px;padding:8px 12px;opacity:.4}
+    .badge-chip.earned{opacity:1;border-color:#7c3aed55;background:#1a0d35}
+    .badge-icon{font-size:1.3rem}.badge-name{font-size:.8rem;font-weight:700;color:#c4b5fd}
+    .result-breakdown{margin-bottom:28px}
+    .breakdown-title{font-size:.8rem;color:#60c8ff;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:12px}
+    .rb-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #1e2d40;font-size:.88rem;color:#c8d8e8}
+    .rb-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}.rb-text{flex:1;line-height:1.5}
+    .rb-pts{font-size:.88rem;font-weight:700;white-space:nowrap}.rb-pts.pos{color:#22c55e}
+    .result-actions{display:flex;gap:12px;flex-wrap:wrap}
+    .ra-btn{flex:1;min-width:140px;padding:12px 16px;border-radius:10px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+    .ra-btn.primary{background:linear-gradient(135deg,#1976d2,#4f46e5);color:#fff;border:none}
+    .ra-btn.secondary{background:#111827;color:#c8d8e8;border:1.5px solid #1e3a5f}
+    .ra-btn:hover{transform:translateY(-1px)}
+    .float-pts{position:fixed;pointer-events:none;font-size:1.2rem;font-weight:800;z-index:9999;animation:float-up 1.2s ease forwards}
+    @keyframes float-up{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-80px)}}
+    .clinical-box{background:#1a0d0a;border:1px solid #ef444433;border-radius:10px;padding:14px 16px;margin-bottom:16px;display:none;animation:slide-in .25s ease}
+    .clinical-box.show{display:block}
+    .clinical-title{color:#ef4444;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+    .char-modal-overlay{position:fixed;inset:0;z-index:30000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.8);backdrop-filter:blur(6px)}
+    .char-modal{background:#0a1628;border:1px solid #1e3a5f;border-radius:20px;padding:36px 32px 28px;max-width:520px;width:94%;box-shadow:0 24px 80px rgba(0,0,0,.6);animation:lk-pop .35s cubic-bezier(.17,.67,.45,1.3);max-height:90vh;overflow-y:auto}
+    @keyframes lk-pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+    .char-header{text-align:center;margin-bottom:24px}
+    .char-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#1976d2,#7c3aed);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:2.4rem;box-shadow:0 0 24px #1976d240}
+    .char-name{font-size:1.3rem;font-weight:800;color:#e0e6f0;margin-bottom:4px}
+    .char-level{display:inline-block;background:#1e3a5f;color:#60c8ff;font-size:.78rem;font-weight:700;letter-spacing:.06em;padding:3px 12px;border-radius:20px}
+    .char-close-btn{width:100%;margin-top:20px;padding:12px;background:#1976d2;border:none;color:#fff;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s}
+    .char-close-btn:hover{background:#1565c0}
+    @media(max-width:600px){.quiz-hud{gap:12px;padding:8px 14px}.q-card{padding:20px 16px}.q-text{font-size:.95rem}}
+    /* Modal enviar sesión */
+    .send-modal-overlay{position:fixed;inset:0;z-index:20000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(6px)}
+    .send-modal-overlay.open{display:flex}
+    .send-modal-box{background:#0a1628;border:1px solid #1e3a5f;border-radius:16px;padding:28px 28px 24px;max-width:440px;width:92%;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+    .send-modal-title{font-size:1.1rem;font-weight:800;color:#e0e6f0;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+    .send-stat-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1e2d40;font-size:.88rem;color:#c8d8e8}
+    .send-stat-label{color:#607080}.send-stat-val{font-weight:700;color:#e0e6f0}
+    #sendStatus{margin-top:12px;font-size:.88rem;min-height:20px;text-align:center}
+    .send-btn-row{display:flex;gap:10px;margin-top:16px}
+    .send-btn{flex:1;padding:11px;border-radius:8px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;border:none}
+    .send-btn.primary{background:linear-gradient(135deg,#1976d2,#4f46e5);color:#fff}
+    .send-btn.secondary{background:#1e2d40;color:#8899aa}
+    .send-btn.has-data{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-left">
+      <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+      <a href="index.html" class="site-logo"><i class="fas fa-heartbeat"></i><span>Guía de ECG</span></a>
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Buscar en el libro..." autocomplete="off"/>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-send-session" id="btnSendSession" onclick="openSendModal()" title="Enviar registro de sesión al profesor">
+        <i class="fas fa-paper-plane"></i><span class="btn-send-label">Enviar</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+    </div>
+  </header>
+
+  <!-- Modal Enviar Sesión -->
+  <div class="send-modal-overlay" id="sendModalOverlay">
+    <div class="send-modal-box">
+      <div class="send-modal-title"><i class="fas fa-paper-plane" style="color:#1976d2"></i> Enviar sesión al profesor</div>
+      <div class="send-stat-row"><span class="send-stat-label">Alumno</span><span class="send-stat-val" id="sendStatName">—</span></div>
+      <div class="send-stat-row"><span class="send-stat-label">Respuestas de quiz</span><span class="send-stat-val" id="sendStatQuiz">0</span></div>
+      <div class="send-stat-row"><span class="send-stat-label">Autopercepciones</span><span class="send-stat-val" id="sendStatLikert">0</span></div>
+      <div class="send-stat-row"><span class="send-stat-label">Inicio de sesión</span><span class="send-stat-val" id="sendStatTime">—</span></div>
+      <div id="sendStatus"></div>
+      <div class="send-btn-row">
+        <button class="send-btn secondary" onclick="closeSendModal()">Cancelar</button>
+        <button class="send-btn primary" id="sendBtn" onclick="submitSession()"><i class="fas fa-paper-plane"></i> Enviar mi sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        <div class="sidebar-title">Contenido</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Inicio</a></li>
+          <li class="nav-section">Capítulos</li>
+          <li class="nav-item"><a href="chapter-1.html" class="nav-link"><span class="ch-num">1</span> Fundamentos Fisiológicos</a></li>
+          <li class="nav-item"><a href="chapter-2.html" class="nav-link"><span class="ch-num">2</span> Anatomía de las Derivaciones</a></li>
+          <li class="nav-item"><a href="chapter-3.html" class="nav-link active"><span class="ch-num">3</span> Componentes del Trazado</a></li>
+          <li class="nav-item"><a href="chapter-4.html" class="nav-link"><span class="ch-num">4</span> Metodología de Interpretación</a></li>
+          <li class="nav-item"><a href="chapter-5.html" class="nav-link"><span class="ch-num">5</span> Patologías Básicas</a></li>
+          <li class="nav-item"><a href="chapter-6.html" class="nav-link"><span class="ch-num">6</span> Talleres de Práctica</a></li>
+          <li class="nav-section">Aprendizaje</li>
+          <li class="nav-item"><a href="autopercepcion.html" class="nav-link"><i class="fas fa-brain" style="color:#a78bfa"></i> Autopercepción</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="main-content" id="mainContent">
+      <!-- HUD -->
+      <div class="quiz-hud" id="quizHud" style="display:none">
+        <div class="hud-item">
+          <span class="hud-icon">⭐</span>
+          <div><div class="hud-val" id="hudPoints">0</div><div class="hud-label">Puntos</div></div>
+        </div>
+        <div class="hud-item">
+          <span class="hud-icon">⏱️</span>
+          <div><div class="hud-val timer-val" id="hudTimer">30</div><div class="hud-label">Segundos</div></div>
+        </div>
+        <div class="hud-item">
+          <span class="hud-icon">🔥</span>
+          <div><div class="hud-val streak-val" id="hudStreak">0</div><div class="hud-label">Racha</div></div>
+        </div>
+        <div class="energy-hud">
+          <span class="energy-label">⚡ PA</span>
+          <div class="energy-track"><div class="energy-fill" id="energyFill" style="width:100%"></div></div>
+          <span class="energy-pct" id="energyPct">100%</span>
+        </div>
+        <div class="hud-item" id="hudLivesWrap">
+          <span class="hud-icon">❤️</span>
+          <div class="lives-display" id="hudLives"></div>
+        </div>
+        <div class="hud-progress">
+          <div class="hud-prog-track"><div class="hud-prog-fill" id="hudProgFill" style="width:0%"></div></div>
+          <div class="hud-prog-label" id="hudProgLabel">Pregunta 1 de 10</div>
+        </div>
+      </div>
+
+      <div class="quiz-wrap">
+        <!-- PANTALLA INICIO -->
+        <div id="screen-start">
+          <div class="qs-icon">📊</div>
+          <div class="qs-title">Quiz — Capítulo 3</div>
+          <div class="qs-sub">Componentes del Trazado Normal<br/>
+            Demuestra que sabes medir e interpretar la onda P, el complejo QRS, la onda T, el intervalo PR y el QTc.
+          </div>
+          <div class="qs-stats">
+            <div class="qs-stat"><span class="qs-stat-num">10</span><span class="qs-stat-label">Por partida</span></div>
+            <div class="qs-stat"><span class="qs-stat-num" style="color:#a78bfa">14</span><span class="qs-stat-label">Banco total</span></div>
+            <div class="qs-stat"><span class="qs-stat-num" id="statTime">30s</span><span class="qs-stat-label">Por pregunta</span></div>
+            <div class="qs-stat"><span class="qs-stat-num" id="statLives">3</span><span class="qs-stat-label">Vidas</span></div>
+          </div>
+          <div class="diff-selector">
+            <button class="diff-btn suave selected" onclick="setDiff('suave')">😌 Suave (60s)</button>
+            <button class="diff-btn medio" onclick="setDiff('medio')">⚡ Medio (30s)</button>
+            <button class="diff-btn intenso" onclick="setDiff('intenso')">🔥 Intenso (15s)</button>
+          </div>
+          <button class="start-btn" onclick="startQuiz()"><i class="fas fa-play"></i> Comenzar Quiz</button>
+        </div>
+
+        <!-- PANTALLA QUIZ -->
+        <div id="screen-quiz">
+          <div id="qCard" class="q-card">
+            <div id="qTypeBadge" class="q-type-badge"></div>
+            <div id="qText" class="q-text"></div>
+            <div id="qBody"></div>
+          </div>
+          <div id="clinicalBox" class="clinical-box"><div class="clinical-title">⚠️ Consecuencia Clínica</div><div id="clinicalText"></div></div>
+          <div id="feedbackPanel" class="feedback-panel">
+            <div class="fb-header"><span class="fb-icon" id="fbIcon"></span><span class="fb-title" id="fbTitle"></span></div>
+            <div class="fb-pts" id="fbPts"></div>
+            <div id="fbCorrectAnswer" class="fb-correct-answer" style="display:none"></div>
+            <div id="fbWhy" class="fb-why" style="display:none"></div>
+            <div id="npcBox" class="fb-reflection" style="display:none">
+              <div class="fb-reflection-title">🩺 Dr. ECG pregunta</div>
+              <div class="fb-reflection-q" id="npcQ"></div>
+              <div class="npc-opts" id="npcOpts"></div>
+              <div class="npc-dialog" id="npcDialog"></div>
+            </div>
+          </div>
+          <button id="btnNext" onclick="nextQuestion()">Siguiente pregunta →</button>
+        </div>
+
+        <!-- PANTALLA GAME OVER -->
+        <div id="screen-gameover">
+          <div class="go-icon">💔</div>
+          <div class="go-title">¡Sin vidas!</div>
+          <div class="go-sub">Se te acabaron las oportunidades. Revisa el capítulo e intenta de nuevo.</div>
+          <button class="go-btn" onclick="restartQuiz()"><i class="fas fa-redo"></i> Intentar otra vez</button>
+        </div>
+
+        <!-- PANTALLA RESULTADO -->
+        <div id="screen-result">
+          <div class="result-hero">
+            <div class="result-icon" id="resultIcon">🎯</div>
+            <div class="result-title" id="resultTitle">¡Bien hecho!</div>
+            <div class="result-sub" id="resultSub">Completaste el quiz del Capítulo 2.</div>
+            <div class="result-score-big" id="resultScore">0</div>
+            <div class="result-score-label">puntos totales</div>
+            <div class="result-energy-bar"><div class="result-energy-fill" id="resultEnergyBar" style="width:100%"></div></div>
+            <div class="result-energy-label" id="resultEnergyPct"></div>
+          </div>
+          <div class="result-stats">
+            <div class="rs-item"><span class="rs-num" id="rCorrect">0</span><span class="rs-label">Correctas</span></div>
+            <div class="rs-item"><span class="rs-num" id="rWrong">0</span><span class="rs-label">Errores</span></div>
+            <div class="rs-item"><span class="rs-num" id="rStreak">0</span><span class="rs-label">Mejor racha</span></div>
+            <div class="rs-item"><span class="rs-num" id="rTime">0s</span><span class="rs-label">Tiempo total</span></div>
+          </div>
+          <div class="result-badges">
+            <div class="rb-title">🏅 Insignias</div>
+            <div class="badges-grid" id="resultBadgesGrid"></div>
+          </div>
+          <div class="result-breakdown">
+            <div class="breakdown-title">📋 Desglose de respuestas</div>
+            <div id="resultBreakdown"></div>
+          </div>
+          <div class="result-actions">
+            <button class="ra-btn secondary" onclick="restartQuiz()"><i class="fas fa-redo"></i> Jugar de nuevo</button>
+            <button class="ra-btn secondary" onclick="showCharacterSheet()"><i class="fas fa-id-card"></i> Ficha</button>
+            <a href="chapter-4.html" class="ra-btn primary" style="text-decoration:none"><i class="fas fa-arrow-right"></i> Capítulo 4</a>
+          </div>
+        </div>
+      </div><!-- /.quiz-wrap -->
+    </main>
+  </div>
+
+  <script>
+    /* ═══════════════════════════════════════════
+       QUIZ CAP. 3 – COMPONENTES DEL TRAZADO NORMAL
+    ═══════════════════════════════════════════ */
+    const QUESTIONS = [
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Qué evento eléctrico representa la onda P en el ECG?',
+        opts: {A:'Repolarización auricular',B:'Despolarización auricular',C:'Despolarización ventricular',D:'Repolarización ventricular'},
+        answer: 'B',
+        why_wrong: {A:'La repolarización auricular ocurre durante el complejo QRS, por lo que queda oculta.',C:'La despolarización ventricular se representa en el complejo QRS.',D:'La repolarización ventricular se representa en la onda T.'},
+        reflection: '¿Por qué normalmente no vemos la onda de repolarización auricular en el ECG?',
+        reflection_yes: 'Correcto: la repolarización auricular (onda Ta) coincide en tiempo con el complejo QRS y queda enterrada por su mayor amplitud.',
+        reflection_partial: 'La repolarización auricular tiene baja amplitud y ocurre al mismo tiempo que el QRS. Por eso no se distingue en el ECG estándar.',
+        reflection_no: 'La repolarización auricular es de baja amplitud y queda oculta por el complejo QRS que ocurre en el mismo momento.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Cuál es la duración normal de la onda P?',
+        opts: {A:'≤ 0.06 s (≤ 1.5 cuadros pequeños)',B:'≤ 0.10 s (≤ 2.5 cuadros pequeños)',C:'≤ 0.12 s (≤ 3 cuadros pequeños)',D:'≤ 0.20 s (≤ 5 cuadros pequeños)'},
+        answer: 'C',
+        why_wrong: {A:'0.06 s es muy corto. Ese es el límite inferior del complejo QRS normal.',B:'0.10 s es el límite superior del QRS normal, no de la onda P.',D:'0.20 s es el límite superior del intervalo PR completo, no solo de la onda P.'},
+        reflection: '¿Qué causa una onda P anormalmente ancha (> 0.12 s)?',
+        reflection_yes: 'Correcto: la onda P ancha (P mitrale) sugiere crecimiento de la aurícula izquierda, como en estenosis mitral, HTA crónica o insuficiencia mitral.',
+        reflection_partial: 'Una P > 0.12 s o bimodal indica conducción interauricular lenta, generalmente por crecimiento de la aurícula izquierda (P mitrale).',
+        reflection_no: 'Una onda P > 0.12 s o bimodal se llama P mitrale y sugiere crecimiento de la aurícula izquierda. Ver en derivación II y/o la porción negativa en V1.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Cuál es el intervalo PR normal en el ECG de adulto?',
+        opts: {A:'0.06 – 0.10 s',B:'0.10 – 0.20 s',C:'0.12 – 0.20 s',D:'0.20 – 0.40 s'},
+        answer: 'C',
+        why_wrong: {A:'0.06–0.10 s es la duración normal del QRS, no del PR.',B:'El límite inferior del PR es 0.12 s. Un PR < 0.12 s sugiere pre-excitación (WPW) o ritmo de la unión AV.',D:'Un PR > 0.20 s ya es patológico (bloqueo AV de 1° grado). El límite normal superior es 0.20 s.'},
+        reflection: '¿Qué condición se asocia a un PR corto (< 0.12 s)?',
+        reflection_yes: 'Correcto: un PR corto sugiere pre-excitación ventricular como en el síndrome de Wolff-Parkinson-White (WPW), donde existe una vía accesoria que evita el nodo AV.',
+        reflection_partial: 'Un PR < 0.12 s indica que la conducción alcanza los ventrículos antes de lo normal. Esto ocurre con vías accesorias (WPW) o con ritmos de la unión AV.',
+        reflection_no: 'Un PR < 0.12 s sugiere pre-excitación (WPW). El impulso llega a los ventrículos por una vía accesoria que "salta" el retraso del nodo AV. Busca también la onda delta.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Cuál es la duración normal del complejo QRS?',
+        opts: {A:'≤ 0.06 s',B:'0.06 – 0.10 s',C:'0.10 – 0.14 s',D:'0.14 – 0.20 s'},
+        answer: 'B',
+        why_wrong: {A:'≤ 0.06 s es demasiado corto para el QRS normal. Podría aparecer en ritmos ectópicos específicos.',C:'Un QRS de 0.10–0.12 s se considera "en el límite", y > 0.12 s es claramente anormal (bloqueo de rama).',D:'Un QRS > 0.14 s es marcadamente anormal, sugiere bloqueo de rama o conducción aberrante.'},
+        reflection: '¿Qué significa un QRS > 0.12 s?',
+        reflection_yes: 'Correcto: un QRS ancho (> 0.12 s) indica conducción anormal a través de los ventrículos, como bloqueo de rama derecha, bloqueo de rama izquierda, o ritmo ventricular.',
+        reflection_partial: 'QRS > 0.12 s = conducción ventricular enlentecida. Las causas más comunes son bloqueo de rama derecha (BRD), bloqueo de rama izquierda (BRI) o ritmo de marcapasos.',
+        reflection_no: 'Un QRS > 0.12 s indica conducción intraventricular anormal. Las causas principales son BRD (RSR\' en V1), BRI (R ancha en I/V6) o ritmo de escape ventricular.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Qué evento eléctrico representa la onda T en el ECG?',
+        opts: {A:'Despolarización auricular',B:'Repolarización auricular',C:'Despolarización ventricular',D:'Repolarización ventricular'},
+        answer: 'D',
+        why_wrong: {A:'La despolarización auricular es la onda P.',B:'La repolarización auricular queda oculta dentro del QRS.',C:'La despolarización ventricular es el complejo QRS.'},
+        reflection: '¿Por qué la onda T tiene la misma orientación que el QRS en derivaciones como V5, V6 y II?',
+        reflection_yes: 'Correcto: aunque la despolarización y repolarización van en direcciones opuestas en una sola célula, en el ventrículo la repolarización ocurre de epicardio a endocardio (dirección inversa), lo que hace que la onda T sea concordante con el QRS.',
+        reflection_partial: 'La secuencia de repolarización (epicardio → endocardio) es opuesta a la despolarización, pero como también el vector es opuesto, el resultado es una T positiva en derivaciones donde el QRS es positivo.',
+        reflection_no: 'Clave: en el ventrículo la repolarización va del epicardio al endocardio (dirección opuesta a la despolarización). El doble cambio de dirección produce que la T sea positiva donde el QRS lo es.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Cuál es el rango normal del QTc (intervalo QT corregido) en hombres?',
+        opts: {A:'< 400 ms',B:'< 440 ms',C:'< 460 ms',D:'< 500 ms'},
+        answer: 'B',
+        why_wrong: {A:'< 400 ms es un umbral demasiado estricto. Un QTc entre 400–440 ms es completamente normal en hombres.',C:'< 460 ms es el límite normal en mujeres (tienen QTc ligeramente más largo de manera fisiológica).',D:'Un QTc > 500 ms es claramente patológico y se asocia a riesgo de torsades de pointes.'},
+        reflection: '¿Por qué es importante medir el QTc en lugar del QT sin corregir?',
+        reflection_yes: 'Correcto: el QT varía inversamente con la frecuencia cardíaca (más corto a mayor FC). La fórmula de Bazett (QTc = QT / √RR) lo corrige a una FC de 60 lpm para comparar.',
+        reflection_partial: 'El QT se acorta cuando la FC aumenta. Para comparar entre pacientes con distintas FC, se usa el QTc (corregido). La fórmula más común es la de Bazett.',
+        reflection_no: 'La corrección del QT es necesaria porque el intervalo QT varía con la FC. El QTc usa la fórmula de Bazett: QTc = QT / √RR. Permite evaluar el riesgo de arritmias sin importar la FC.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Dónde debe estar el segmento ST en condiciones normales?',
+        opts: {A:'Elevado 2 mm en todas las derivaciones',B:'Deprimido 1 mm en derivaciones de miembros',C:'Isoeléctrico (en la línea de base), con variaciones de ±1 mm en miembros y ±2 mm en precordiales',D:'Siempre por encima de la línea de base'},
+        answer: 'C',
+        why_wrong: {A:'Una elevación del ST ≥ 1 mm en ≥ 2 derivaciones contiguas es criterio de IAMCEST.',B:'Una depresión del ST ≥ 0.5–1 mm es anormal y puede indicar isquemia subendocárdica.',D:'El ST puede estar ligeramente elevado en algunas derivaciones precordiales en jóvenes (variante normal), pero no "siempre elevado".'},
+        reflection: '¿Cuándo dices que hay elevación patológica del ST?',
+        reflection_yes: 'Correcto: elevación ≥ 1 mm en ≥ 2 derivaciones contiguas de miembros, o ≥ 2 mm en ≥ 2 derivaciones precordiales contiguas. ¡Esto es un IAMCEST hasta demostrar lo contrario!',
+        reflection_partial: 'El umbral para IAMCEST: ST ≥ 1 mm en ≥ 2 derivaciones de miembros contiguas, o ≥ 2 mm en ≥ 2 derivaciones precordiales contiguas.',
+        reflection_no: 'Criterio de IAMCEST: elevación del ST ≥ 1 mm en ≥ 2 derivaciones de miembros contiguas, o ≥ 2 mm en ≥ 2 derivaciones precordiales contiguas. Ante este hallazgo: ¡activar código infarto!',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: 'En una derivación dada, ¿cuándo se considera que la onda Q es patológica?',
+        opts: {A:'Cuando su duración es ≥ 40 ms (1 mm) y/o su profundidad es ≥ 25% de la R siguiente',B:'Cuando su profundidad es mayor de 5 mm en cualquier derivación',C:'Cuando está presente en las derivaciones II, III y aVF',D:'Cuando el QRS dura menos de 0.08 s'},
+        answer: 'A',
+        why_wrong: {B:'Una Q profunda en derivaciones de miembros puede ser normal si no supera el 25% de la R. Deben cumplirse los criterios específicos.',C:'Ondas Q sepales pequeñas en cara inferior son comunes y no necesariamente patológicas. El criterio es el tamaño.',D:'La duración del QRS determina si hay bloqueo de rama, no la patología de la Q.'},
+        reflection: '¿Qué indica una onda Q patológica?',
+        reflection_yes: 'Exacto: las ondas Q patológicas indican necrosis miocárdica (infarto antiguo). Representan una zona eléctricamente inactiva que ya no genera voltaje.',
+        reflection_partial: 'Las ondas Q patológicas (≥ 40 ms o ≥ 25% de la R) indican necrosis transmural. Son el signo de infarto antiguo en el ECG.',
+        reflection_no: 'Ondas Q patológicas: ≥ 40 ms (1 mm ancho) o profundidad ≥ 25% de la onda R siguiente. Representan áreas de necrosis miocárdica que ya no generan señal eléctrica.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Cómo debe ser la morfología normal de la onda P en la derivación II?',
+        opts: {A:'Negativa y bifásica',B:'Positiva y redondeada, con amplitud ≤ 2.5 mm',C:'Positiva y picuda, con amplitud > 3 mm',D:'Bifásica con componente inicial positivo y final negativo'},
+        answer: 'B',
+        why_wrong: {A:'La onda P negativa en II sugiere ritmo no sinusal (p. ej., ritmo de la unión AV o ritmo ectópico auricular bajo).',C:'Una onda P picuda con amplitud > 2.5 mm en II es criterio de crecimiento de la aurícula derecha (P pulmonale).',D:'La onda P bifásica con componente negativo terminal en II (o en V1 muy prominente) sugiere crecimiento de aurícula izquierda.'},
+        reflection: '¿Por qué la onda P es positiva en II en el ritmo sinusal?',
+        reflection_yes: 'Correcto: el impulso sinusal viaja desde la aurícula derecha (donde está el nodo SA) hacia abajo-izquierda, en dirección al electrodo positivo de la derivación II. Vector que se acerca → deflexión positiva.',
+        reflection_partial: 'El nodo SA está en la aurícula derecha. El impulso se propaga hacia abajo y a la izquierda, lo que coincide con el eje de la derivación II (+60°). Por eso la onda P es positiva en II.',
+        reflection_no: 'En ritmo sinusal, el impulso auricular se origina en el nodo SA (aurícula derecha superior) y viaja hacia abajo-izquierda, hacia la derivación II. Resultado: onda P positiva en II.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Cuál es el valor de QTc por encima del cual existe riesgo aumentado de torsades de pointes?',
+        opts: {A:'> 400 ms',B:'> 440 ms',C:'> 460 ms',D:'> 500 ms'},
+        answer: 'D',
+        why_wrong: {A:'Un QTc > 400 ms simplemente está en el rango normal-alto. No se asocia a mayor riesgo de arritmias malignas por sí solo.',B:'Un QTc > 440 ms en hombres ya está en el límite superior normal, pero el riesgo de torsades no es relevante hasta cifras más altas.',C:'Un QTc entre 440–500 ms se considera limítrofe. El riesgo significativo de torsades empieza a > 500 ms.'},
+        reflection: '¿Qué fármacos pueden prolongar el QTc y aumentar el riesgo de torsades?',
+        reflection_yes: 'Correcto: antiarrítmicos clase IA y III (quinidina, amiodarona, sotalol), antibióticos (macrólidos, fluoroquinolonas), antipsicóticos (haloperidol) y antidepresivos son los más frecuentes.',
+        reflection_partial: 'Los fármacos que prolongan el QTc incluyen: antiarrítmicos (amiodarona, sotalol), antibióticos (azitromicina, ciprofloxacino), antipsicóticos y algunos antihistamínicos.',
+        reflection_no: 'Grupos de fármacos que prolongan QTc: antiarrítmicos (amiodarona, sotalol, quinidina), macrólidos (azitromicina), fluoroquinolonas, antipsicóticos, antidepresivos tricíclicos. Siempre revisar el fármaco antes de prescribir.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Cuál es la amplitud máxima normal de la onda P en derivaciones de miembros?',
+        opts: {A:'1 mm',B:'2.5 mm',C:'3 mm',D:'5 mm'},
+        answer: 'B',
+        why_wrong: {A:'1 mm es demasiado restrictivo. Una P normal puede medir hasta 2.5 mm.',C:'Una onda P > 2.5 mm en derivaciones de miembros es criterio de crecimiento de aurícula derecha (P pulmonale).',D:'Una P de 5 mm sería muy patológica, indicando una hipertrofia auricular severa.'},
+        reflection: '¿En qué derivación se mide principalmente la amplitud de la onda P para evaluar crecimiento auricular?',
+        reflection_yes: 'Correcto: la derivación II es la que mejor refleja la amplitud de la onda P para el diagnóstico de P pulmonale (AD) y P mitrale (AI).',
+        reflection_partial: 'La derivación II tiene su eje a +60°, paralelo al vector auricular. Por eso es la mejor derivación para medir la onda P y evaluar crecimientos auriculares.',
+        reflection_no: 'La derivación II es la más útil para analizar la onda P. Está alineada con la dirección del impulso sinusal (+60°), lo que produce la máxima amplitud de la P.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Qué ocurre en el ECG cuando el intervalo PR es mayor de 0.20 s?',
+        opts: {A:'Síndrome de pre-excitación (WPW)',B:'Bloqueo AV de primer grado',C:'Bloqueo AV completo (tercer grado)',D:'Taquicardia sinusal'},
+        answer: 'B',
+        why_wrong: {A:'WPW se asocia a PR corto (< 0.12 s) más onda delta, no a PR largo.',C:'En el bloqueo AV de 3° grado no existe relación entre ondas P y complejos QRS (disociación AV). El PR no aplica.',D:'La taquicardia sinusal acorta el PR por el aumento del tono simpático. No lo prolonga.'},
+        reflection: '¿Cómo se diferencia el bloqueo AV de 1° del bloqueo AV de 2° grado?',
+        reflection_yes: 'Correcto: en el BAV 1° todos los impulsos se conducen pero con retraso (PR > 0.20 s). En el BAV 2° algunos impulsos no se conducen (hay ondas P sin QRS correspondiente). El Mobitz I muestra alargamiento progresivo del PR hasta que hay una onda P bloqueada.',
+        reflection_partial: 'BAV 1°: todos los P conducen pero con PR largo. BAV 2° tipo Mobitz I: el PR se alarga hasta que una P no se conduce. BAV 2° tipo Mobitz II: el PR es fijo pero algunas P no se conducen.',
+        reflection_no: 'Los bloqueos AV: 1° grado = PR largo pero todos P se conducen; 2° grado Mobitz I = alargamiento del PR hasta P bloqueada (fenómeno de Wenckebach); 2° grado Mobitz II = PR fijo con P bloqueadas; 3° grado = disociación AV completa.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: 'En una persona sana, ¿en qué derivaciones la onda T debe ser normalmente negativa?',
+        opts: {A:'En todas las derivaciones precordiales',B:'Solo en aVR (y a veces en V1)',C:'En II, III y aVF',D:'En I y aVL'},
+        answer: 'B',
+        why_wrong: {A:'Las ondas T en derivaciones precordiales V2–V6 deben ser positivas. Una T negativa en V2–V6 puede indicar isquemia.',C:'En II y aVF la onda T debe ser positiva. Una T negativa en II sugiere isquemia inferior.',D:'La onda T en I debe ser positiva. Una T negativa en I puede indicar isquemia lateral alta.'},
+        reflection: '¿Por qué aVR siempre tiene onda T negativa?',
+        reflection_yes: 'Correcto: aVR "ve" el corazón desde el brazo derecho. El vector de repolarización apunta hacia la izquierda (alejándose de aVR), lo que genera una onda T negativa.',
+        reflection_partial: 'El electrodo de aVR está en el brazo derecho. El vector de repolarización ventricular va hacia la izquierda e inferior, alejándose de aVR → T negativa (normal).',
+        reflection_no: 'En aVR todas las deflexiones son normalmente negativas (P, QRS y T) porque el vector cardíaco principal siempre se aleja del brazo derecho, que es donde está el electrodo positivo de aVR.',
+      },
+      {
+        type: 'mcq', topic: 'general', points: 100,
+        q: '¿Qué representa el segmento PR en el ECG?',
+        opts: {A:'La conducción del impulso por el músculo ventricular',B:'El retraso fisiológico de la conducción en el nodo AV y el sistema His-Purkinje',C:'La repolarización de las aurículas',D:'La sístole ventricular completa'},
+        answer: 'B',
+        why_wrong: {A:'La conducción por el músculo ventricular genera el complejo QRS.',C:'La repolarización auricular ocurre durante el QRS, no durante el segmento PR.',D:'La sístole ventricular abarca desde el inicio del QRS hasta el final de la onda T (complejo QT).'},
+        reflection: '¿Por qué el nodo AV introduce un retraso en la conducción?',
+        reflection_yes: 'Correcto: el retraso del nodo AV (0.05–0.13 s) permite que las aurículas terminen su contracción y llenen los ventrículos antes de que estos se contraigan. Sin ese retraso habría pérdida del "pateo auricular".',
+        reflection_partial: 'El nodo AV retrasa la conducción para dar tiempo a que las aurículas se contraigan completamente y llenen los ventrículos. Esto optimiza el gasto cardíaco.',
+        reflection_no: 'El retraso del nodo AV es fundamental: permite la sístole auricular antes de la ventricular, maximizando el llenado ventricular (hasta 30% del volumen sistólico).',
+      },
+    ];
+
+    const DIFF_CONFIG = {
+      suave:   { time: 60, lives: 3, bonus: 1.0 },
+      medio:   { time: 30, lives: 3, bonus: 1.5 },
+      intenso: { time: 15, lives: 2, bonus: 2.0 },
+    };
+    const ENERGY_CONFIG = {
+      suave:   { lose: 15, recover: 7  },
+      medio:   { lose: 20, recover: 10 },
+      intenso: { lose: 30, recover: 12 },
+    };
+    const BADGE_KEY = 'ecg_badges_cap3';
+
+    // Patch logQuizAnswer into main.js flow
+    function _afterAnswer(correct, given, q) {
+      if (typeof ECGSession !== 'undefined' && ECGSession.logQuizAnswer) {
+        ECGSession.logQuizAnswer({
+          capitulo: 'Capítulo 3 – Componentes del Trazado Normal',
+          pregunta_num: state.currentIdx + 1,
+          pregunta_texto: q.q,
+          respuesta_dada: given,
+          fue_correcta: correct,
+          respuesta_correcta: q.opts ? q.opts[q.answer] : q.answer,
+          tiempo_seg: Math.round(state.timeLeft !== undefined ? (DIFF_CONFIG[state.difficulty].time - state.timeLeft) : 0),
+          reflexion_elegida: '',
+          puntos: correct ? q.points : 0,
+          racha: state.streak,
+        });
+      }
+    }
+  </script>
+  <script src="js/session.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

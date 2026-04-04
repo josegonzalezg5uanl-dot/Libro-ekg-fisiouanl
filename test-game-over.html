@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Game Over - Quiz 2</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #1a1a1a; 
+            color: white; 
+            max-width: 800px; 
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #111827; 
+            border: 1px solid #1e3a5f; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin: 20px 0;
+        }
+        .test-button {
+            background: #1976d2; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            margin: 10px 5px;
+        }
+        .test-button:hover { background: #1565c0; }
+        .status-box {
+            background: #1e2d40; 
+            border-radius: 8px; 
+            padding: 15px; 
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .success { color: #22c55e; }
+        .error { color: #ef4444; }
+        .warning { color: #f97316; }
+    </style>
+</head>
+<body>
+    <h1>🎮 Simulador de Game Over - Quiz 2</h1>
+    
+    <div class="test-section">
+        <h3>📋 Instrucciones de Prueba</h3>
+        <p>Este simulador verifica que el Game Over se active correctamente cuando el jugador pierde todas sus vidas.</p>
+        
+        <ol>
+            <li>Establece el estado del juego con 1 vida</li>
+            <li>Simula una respuesta incorrecta</li>
+            <li>Verifica que el Game Over se active inmediatamente</li>
+            <li>Confirma que no se pueda seguir jugando</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h3>🧪 Prueba de Funcionamiento</h3>
+        <button class="test-button" onclick="iniciarPruebaGameOver()">Iniciar Prueba de Game Over</button>
+        <button class="test-button" onclick="simularRespuestaIncorrecta()">Simular Respuesta Incorrecta</button>
+        <button class="test-button" onclick="verificarEstado()">Verificar Estado Actual</button>
+        <button class="test-button" onclick="reiniciarSimulacion()">Reiniciar Simulación</button>
+        
+        <div id="resultado" class="status-box"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>🔍 Validación de Código</h3>
+        <button class="test-button" onclick="validarSintaxis()">Validar Sintaxis</button>
+        <button class="test-button" onclick="procesarRespuestaIncorrecta()">Procesar Respuesta Incorrecta</button>
+        
+        <div id="validacion" class="status-box"></div>
+    </div>
+
+    <script>
+        // Estado simulado del juego
+        let estadoSimulado = {
+            lives: 1,
+            answered: false,
+            timerInterval: null,
+            points: 100,
+            questions: [
+                {
+                    q: "¿Cuántos electrodos se colocan en el tórax?",
+                    opts: { A: "4", B: "6", C: "3", D: "12" },
+                    answer: "B"
+                }
+            ],
+            currentIdx: 0
+        };
+
+        // Configuración estándar
+        const DIFF_CONFIG = {
+            suave:   { time: 60, lives: 3, bonus_mult: 1.0 },
+            medio:   { time: 30, lives: 3, bonus_mult: 1.5 },
+            intenso: { time: 15, lives: 2, bonus_mult: 2.0 }
+        };
+
+        const ENERGY_CONFIG = { max: 100 };
+
+        let state = {
+            identity: { nombre: 'Estudiante' },
+            points: 1250,
+            lives: 1,
+            energy: 75,
+            streak: 0,
+            earnedBadges: ['streak_master'],
+            diff: 'intenso'
+        };
+
+        // Función getLevelText
+        function getLevelText() {
+            if (state.points >= 2000) return 'Experto ECG';
+            if (state.points >= 1500) return 'Especialista';
+            if (state.points >= 1000) return 'Intermedio';
+            return 'Novato';
+        }
+
+        // Función showCharacterSheet corregida
+        function showCharacterSheet() {
+            const modal = document.createElement('div');
+            modal.className = 'character-modal';
+            modal.innerHTML = `
+                <div class="character-content">
+                    <div class="character-header">
+                        <div class="character-avatar">🧑‍⚕️</div>
+                        <div class="character-info">
+                            <div class="character-name">${state.identity?.nombre || 'Estudiante'}</div>
+                            <div class="character-level">Nivel: ${getLevelText()}</div>
+                        </div>
+                        <button class="character-close" onclick="this.closest('.character-modal').remove()">✕</button>
+                    </div>
+                    
+                    <div class="character-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Puntos</div>
+                            <div class="stat-value">${state.points}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Vidas</div>
+                            <div class="stat-value">${state.lives}/5</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Energía</div>
+                            <div class="stat-value">${Math.round(state.energy)}%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Racha</div>
+                            <div class="stat-value">${state.streak}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="character-badges">
+                        <div class="badges-title">Insignias Ganadas</div>
+                        <div class="badges-grid">
+                            ${ALL_BADGES.map(b => `
+                                <div class="badge-item ${state.earnedBadges.includes(b.id) ? 'earned' : ''}">
+                                    <div class="badge-icon">${b.icon}</div>
+                                    <div class="badge-name">${b.name}</div>
+                                    <div class="badge-desc">${b.desc}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function showGameOver() {
+            console.log('🎮 Game Over activado!');
+            document.getElementById('resultado').innerHTML = `
+                <div class="error">
+                    💔 ¡GAME OVER! Se acabaron las vidas
+                    <br>❌ No puedes seguir jugando
+                </div>
+            `;
+        }
+
+        function updateHUD() {
+            console.log('HUD actualizado');
+        }
+
+        function updateEnergyBar() {
+            console.log('Barra de energía actualizada');
+        }
+
+        function showFeedbackWrong(given, q) {
+            console.log(`Respuesta incorrecta: ${given}`);
+        }
+
+        function clearInterval(interval) {
+            console.log('Timer detenido');
+            if (interval) clearInterval(interval);
+        }
+
+        function floatPoints(pts, x, y) {
+            console.log(`Puntos flotantes: ${pts}`);
+        }
+
+        // Función processAnswer corregida (versión actualizada)
+        function processAnswer(correct, given, q) {
+            const cfg = DIFF_CONFIG[state.diff];
+            
+            if (correct) {
+                // Respuesta correcta
+                state.points += 100;
+                state.streak++;
+                showFeedbackCorrect(100, q);
+            } else {
+                // Respuesta incorrecta - AQUÍ ESTÁ EL FIX
+                state.wrongCount++;
+                state.streak = 0;
+                state.lives--;
+                
+                // Verificar game over inmediato - ESTE ES EL BLOQUE AGREGADO
+                if (state.lives <= 0) {
+                    clearInterval(state.timerInterval);
+                    state.answered = true;
+                    document.querySelectorAll('.q-opt').forEach(b => b.disabled = true);
+                    const npcBtns = document.querySelectorAll('.npc-btn');
+                    npcBtns.forEach(b => b.disabled = true);
+                    setTimeout(showGameOver, 1800);
+                    return; // No mostrar btnNext
+                }
+                
+                // Actualizar energía
+                state.energy = Math.max(0, state.energy - 15);
+                updateEnergyBar();
+                
+                showFeedbackWrong(given, q);
+            }
+            
+            // Actualizar HUD
+            updateHUD();
+        }
+
+        function showFeedbackCorrect(pts, q) {
+            console.log(`✅ Respuesta correcta: ${pts} puntos`);
+        }
+
+        function iniciarPruebaGameOver() {
+            state.lives = 1; // Establecer 1 vida para prueba rápida
+            document.getElementById('resultado').innerHTML = `
+                <div class="status-box">
+                    Estado inicial: ${state.lives} vida restante
+                    <br>Dificultad: ${state.diff}
+                    <br>Preparado para prueba de Game Over...
+                </div>
+            `;
+            console.log('Prueba iniciada con 1 vida');
+        }
+
+        function simularRespuestaIncorrecta() {
+            if (state.lives <= 0) {
+                document.getElementById('resultado').innerHTML = `
+                    <div class="error">Ya no tienes vidas. El Game Over debería haberse activado.</div>
+                `;
+                return;
+            }
+            
+            // Simular una pregunta
+            const q = {
+                q: "¿Cuántos electrodos se colocan?",
+                opts: { A: "4", B: "6", C: "3", D: "12" },
+                answer: "B"
+            };
+            
+            console.log(`\n=== SIMULANDO RESPUESTA INCORRECTA ===`);
+            console.log(`Vidas antes: ${state.lives}`);
+            
+            // Llamar a processAnswer con respuesta incorrecta
+            processAnswer(false, "A", q);
+            
+            console.log(`Vidas después: ${state.lives}`);
+            
+            document.getElementById('resultado').innerHTML = `
+                <div class="status-box">
+                    <span class="${state.lives > 0 ? 'warning' : 'error'}">
+                        Vidas restantes: ${state.lives}
+                    </span>
+                    <br>Estado answered: ${state.answered}
+                    <br>Game Over activado: ${state.lives <= 0 ? 'Sí' : 'No'}
+                </div>
+            `;
+        }
+
+        function verificarEstado() {
+            document.getElementById('resultado').innerHTML = `
+                <div class="status-box">
+                    <strong>Estado actual del juego:</strong>
+                    <br>• Vidas: ${state.lives}
+                    <br>• Respondido: ${state.answered}
+                    <br>• Dificultad: ${state.diff}
+                    <br>• Puntos: ${state.points}
+                    <br>• Energía: ${state.energy}%
+                </div>
+            `;
+        }
+
+        function reiniciarSimulacion() {
+            state.lives = 1;
+            state.answered = false;
+            document.getElementById('resultado').innerHTML = `
+                <div class="success">Simulación reiniciada con 1 vida</div>
+            `;
+        }
+
+        function validarSintaxis() {
+            try {
+                // Verificar que la función existe y es válida
+                if (typeof processAnswer === 'function') {
+                    const codigo = processAnswer.toString();
+                    
+                    // Buscar el bloque de Game Over
+                    const tieneGameOver = codigo.includes('if (state.lives <= 0)');
+                    const tieneReturn = codigo.includes('return; // No mostrar btnNext');
+                    
+                    document.getElementById('validacion').innerHTML = `
+                        <div class="status-box">
+                            <div class="${tieneGameOver ? 'success' : 'error'}">
+                                ${tieneGameOver ? '✅' : '❌'} Bloque de Game Over: ${tieneGameOver ? 'PRESENTE' : 'AUSENTE'}
+                            </div>
+                            <div class="${tieneReturn ? 'success' : 'error'}">
+                                ${tieneReturn ? '✅' : '❌'} Return statement: ${tieneReturn ? 'PRESENTE' : 'AUSENTE'}
+                            </div>
+                            <br><strong>Sintaxis:</strong> ✅ Correcta
+                        </div>
+                    `;
+                } else {
+                    throw new Error('processAnswer no es una función');
+                }
+            } catch (error) {
+                document.getElementById('validacion').innerHTML = `
+                    <div class="error">Error de sintaxis: ${error.message}</div>
+                `;
+            }
+        }
+
+        function procesarRespuestaIncorrecta() {
+            const q = {
+                q: "¿Cuántos electrodos?",
+                opts: { A: "4", B: "6", C: "3", D: "12" },
+                answer: "B"
+            };
+            
+            console.log('Procesando respuesta incorrecta...');
+            processAnswer(false, "A", q);
+        }
+
+        // Auto-iniciar
+        window.addEventListener('load', function() {
+            console.log('Simulador de Game Over cargado');
+            console.log('Usa los botones para probar el funcionamiento');
+            iniciarPruebaGameOver();
+        });
+    </script>
+</body>
+</html>

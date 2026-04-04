@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico - Quiz 2</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #1a1a1a; 
+            color: white;
+            max-width: 1000px; 
+            margin: 0 auto;
+        }
+        .diag-section {
+            background: #111827; 
+            border: 1px solid #1e3a5f; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin: 20px 0;
+        }
+        .error-box {
+            background: #2a0a0a;
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            padding: 15px;
+            color: #ef4444;
+            margin: 10px 0;
+        }
+        .success-box {
+            background: #0d2e1a;
+            border: 1px solid #22c55e;
+            border-radius: 8px;
+            padding: 15px;
+            color: #22c55e;
+            margin: 10px 0;
+        }
+        .code-block {
+            background: #1e2d40;
+            border: 1px solid #3a506b;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            color: #c8d8e8;
+            margin: 10px 0;
+        }
+        .test-button {
+            background: #1976d2; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            margin: 10px 5px;
+        }
+        .test-button:hover { background: #1565c0; }
+        .test-button.error { background: #ef4444; }
+        .test-button.error:hover { background: #dc2626; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Diagnóstico del Quiz 2</h1>
+    
+    <div class="diag-section">
+        <h3>📊 Análisis de Errores</h3>
+        <button class="test-button" onclick="diagnosticarQuiz2()">Iniciar Diagnóstico Completo</button>
+        <button class="test-button error" onclick="verificarErrores()">Verificar Errores de Consola</button>
+        
+        <div id="resultadoDiagnostico"></div>
+    </div>
+
+    <div class="diag-section">
+        <h3>⚡ Verificación Rápida</h3>
+        <button class="test-button" onclick="probarFuncionesBasicas()">Probar Funciones Básicas</button>
+        <button class="test-button" onclick="verificarEstado()">Verificar Estado del Juego</button>
+        
+        <div id="resultadoRapido"></div>
+    </div>
+
+    <div class="diag-section">
+        <h3>🔧 Herramientas de Depuración</h3>
+        <button class="test-button" onclick="mostrarErroresComunes()">Mostrar Errores Comunes</button>
+        <button class="test-button" onclick="limpiarErrores()">Limpiar Consola y Reiniciar</button>
+        
+        <div id="herramientasDebug"></div>
+    </div>
+
+    <script>
+        // Función principal de diagnóstico
+        function diagnosticarQuiz2() {
+            console.clear();
+            console.log('=== INICIANDO DIAGNÓSTICO COMPLETO DEL QUIZ 2 ===');
+            
+            const resultado = document.getElementById('resultadoDiagnostico');
+            resultado.innerHTML = '<div class="code-block">Iniciando diagnóstico... por favor revisa la consola (F12)</div>';
+            
+            try {
+                // Paso 1: Verificar que el archivo se cargó correctamente
+                console.log('📁 Paso 1: Verificando carga del archivo...');
+                console.log('URL actual:', window.location.href);
+                console.log('Estado global:', typeof state);
+                console.log('Funciones principales:', {
+                    processAnswer: typeof processAnswer,
+                    showFeedbackWrong: typeof showFeedbackWrong,
+                    showCharacterSheet: typeof showCharacterSheet,
+                    selectNPCOption: typeof selectNPCOption
+                });
+                
+                // Paso 2: Verificar la corrección específica
+                console.log('\n🔍 Paso 2: Verificando la corrección de textos NPC...');
+                
+                // Crear un estado de prueba mínimo
+                if (typeof state === 'undefined') {
+                    console.error('❌ CRÍTICO: state no está definido');
+                    window.state = {
+                        questions: [{
+                            q: "¿Cuántos electrodos?",
+                            opts: { A: "4", B: "6", C: "3", D: "12" },
+                            answer: "B",
+                            reflection: "¿Por qué crees que se necesitan 6 derivaciones?",
+                            reflection_yes_short: "¡Perfecto! Comprendes la importancia.",
+                            reflection_partial_short: "Entiendo parcialmente, necesito repasar.",
+                            reflection_no_short: "No lo tengo claro, necesito más explicación."
+                        }],
+                        currentIdx: 0,
+                        lives: 3,
+                        earnedBadges: []
+                    };
+                }
+                
+                // Paso 3: Probar la función específica
+                console.log('\n🧪 Paso 3: Probando showFeedbackWrong()...');
+                
+                const q = state.questions[state.currentIdx];
+                const testGiven = 'A'; // Respuesta incorrecta
+                
+                if (typeof showFeedbackWrong === 'function') {
+                    console.log('Ejecutando showFeedbackWrong con datos de prueba...');
+                    showFeedbackWrong(testGiven, q);
+                    
+                    // Verificar los botones después de un delay
+                    setTimeout(() => {
+                        const botones = document.querySelectorAll('.npc-btn');
+                        console.log('Botones NPC encontrados:', botones.length);
+                        
+                        botones.forEach((btn, i) => {
+                            const tipos = ['Sí, entendí', 'Parcialmente', 'No entendí'];
+                            const textoReal = btn.textContent.trim();
+                            console.log(`Botón ${i+1}: "${textoReal}"`);
+                            
+                            // Verificar si es genérico o personalizado
+                            const esGenérico = textoReal === tipos[i];
+                            if (esGenérico) {
+                                console.warn(`⚠️ Botón ${i+1} tiene texto genérico: ${textoReal}`);
+                            } else {
+                                console.log(`✅ Botón ${i+1} tiene texto personalizado: ${textoReal}`);
+                            }
+                        });
+                    }, 500);
+                } else {
+                    console.error('❌ showFeedbackWrong no es una función');
+                }
+                
+                resultado.innerHTML = `
+                    <div class="success-box">
+                        ✅ Diagnóstico iniciado. Revisa la consola (F12) para ver el análisis detallado.
+                    </div>
+                    <div class="code-block">
+                        Estado: ${typeof state !== 'undefined' ? 'DEFINIDO' : 'NO DEFINIDO'}<br>
+                        Funciones: ${typeof showFeedbackWrong === 'function' ? 'DISPONIBLES' : 'PROBLEMA'}
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('❌ ERROR EN DIAGNÓSTICO:', error);
+                resultado.innerHTML = `
+                    <div class="error-box">
+                        ❌ Error durante el diagnóstico: ${error.message}<br>
+                        Stack: ${error.stack}
+                    </div>
+                `;
+            }
+        }
+
+        // Función para verificar errores comunes
+        function mostrarErroresComunes() {
+            console.log('=== ERRORES COMUNES EN QUIZ 2 ===');
+            const resultado = document.getElementById('herramientasDebug');
+            
+            const erroresComunes = [
+                {
+                    error: 'state is not defined',
+                    causa: 'El objeto global state no está inicializado',
+                    solucion: 'Verificar que el script de configuración se cargue antes'
+                },
+                {
+                    error: 'Cannot read property \'reflection_yes_short\' of undefined',
+                    causa: 'La pregunta actual no tiene definidos los textos de reflexión',
+                    solucion: 'Agregar validación con operador || para textos por defecto'
+                },
+                {
+                    error: 'showFeedbackWrong is not a function',
+                    causa: 'Error de sintaxis en la función o archivo dañado',
+                    solucion: 'Verificar que la función esté correctamente definida'
+                },
+                {
+                    error: 'Template literal syntax error',
+                    causa: 'Problema con los template literals (backticks) o variables mal cerradas',
+                    solucion: 'Revisar la sintaxis de todos los template literals'
+                }
+            ];
+            
+            let html = '<h4>Errores comunes y sus soluciones:</h4>';
+            erroresComunes.forEach((error, i) => {
+                html += `
+                    <div style="margin:15px 0;padding:12px;background:#1e2d40;border-radius:6px;">
+                        <strong>${i+1}. ${error.error}</strong><br>
+                        <span style="color:#f97316;">Causa:</span> ${error.causa}<br>
+                        <span style="color:#22c55e;">Solución:</span> ${error.solucion}
+                    </div>
+                `;
+            });
+            
+            resultado.innerHTML = html;
+        }
+
+        // Función para probar funciones básicas
+        function probarFuncionesBasicas() {
+            console.log('=== PROBANDO FUNCIONES BÁSICAS ===');
+            const resultado = document.getElementById('resultadoRapido');
+            
+            let html = '<h4>Resultados de prueba:</h4>';
+            
+            try {
+                // Probar template literals
+                const pruebaTemplate = `Texto de prueba ${1+1}`;
+                console.log('Template literal funciona:', pruebaTemplate);
+                html += '<div class="success-box">✅ Template literals: FUNCIONAN</div>';
+                
+                // Probar funciones comunes
+                const funciones = {
+                    'parseInt': () => parseInt("123"),
+                    'JSON.parse': () => JSON.parse('{"test": true}'),
+                    'Math.max': () => Math.max(1, 2, 3),
+                    'Array.map': () => [1,2,3].map(x => x * 2)
+                };
+                
+                Object.entries(funciones).forEach(([nombre, fn]) => {
+                    try {
+                        const resultado = fn();
+                        console.log(`${nombre}:`, resultado);
+                        html += `<div class="success-box">✅ ${nombre}: FUNCIONA</div>`;
+                    } catch (e) {
+                        console.error(`${nombre} ERROR:`, e);
+                        html += `<div class="error-box">❌ ${nombre}: ERROR</div>`;
+                    }
+                });
+                
+            } catch (error) {
+                console.error('❌ ERROR EN PRUEBAS BÁSICAS:', error);
+                html += `<div class="error-box">Error: ${error.message}</div>`;
+            }
+            
+            resultado.innerHTML = html;
+        }
+
+        // Función para verificar el estado
+        function verificarEstado() {
+            console.log('=== VERIFICANDO ESTADO DEL JUEGO ===');
+            const resultado = document.getElementById('resultadoRapido');
+            
+            if (typeof state === 'undefined') {
+                resultado.innerHTML = '<div class="error-box">❌ CRÍTICO: state no está definido</div>';
+                console.error('❌ CRÍTICO: El objeto global state no existe');
+                return;
+            }
+            
+            console.log('Estado actual:', state);
+            console.log('Preguntas:', state.questions?.length || 0);
+            console.log('Pregunta actual:', state.currentIdx);
+            console.log('Vidas:', state.lives);
+            
+            resultado.innerHTML = `
+                <div class="status-box">
+                    <strong>Estado del juego:</strong><br>
+                    Preguntas cargadas: ${state.questions?.length || 0}<br>
+                    Pregunta actual: ${state.currentIdx + 1}<br>
+                    Vidas: ${state.lives}<br>
+                    Estado: ${typeof state === 'object' ? '✅ DEFINIDO' : '❌ PROBLEMA'}
+                </div>
+            `;
+        }
+
+        // Función para limpiar y reiniciar
+        function limpiarErrores() {
+            console.clear();
+            document.getElementById('resultadoDiagnostico').innerHTML = '';
+            document.getElementById('resultadoRapido').innerHTML = '';
+            document.getElementById('herramientasDebug').innerHTML = '';
+            
+            console.log('=== CONSOLA LIMPIADA ===');
+            console.log('Sistema reiniciado. Prueba ejecutar las funciones de diagnóstico.');
+        }
+
+        // Auto-diagnóstico inicial
+        window.addEventListener('load', function() {
+            console.log('=== SISTEMA DE DIAGNÓSTICO CARGADO ===');
+            console.log('Usa los botones para diagnosticar el problema del Quiz 2');
+            
+            // Verificación rápida inicial
+            setTimeout(() => {
+                if (typeof state === 'undefined') {
+                    console.warn('⚠️ ADVERTENCIA: state no está definido al cargar');
+                }
+                if (typeof showFeedbackWrong === 'undefined') {
+                    console.error('❌ CRÍTICO: showFeedbackWrong no está definida');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

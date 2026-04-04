@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Monitor ECG Interactivo | Guía ECG</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <style>
+    /* ── MONITOR CONTAINER ── */
+    .monitor-page { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .monitor-shell {
+      background: #0a0f0a;
+      border-radius: 16px;
+      border: 2px solid #1a3a1a;
+      box-shadow: 0 0 40px rgba(0,200,80,.12), 0 8px 32px rgba(0,0,0,.6);
+      overflow: hidden;
+      font-family: 'Roboto Mono', monospace;
+    }
+
+    /* ── TOP BAR ── */
+    .monitor-topbar {
+      background: #0d150d;
+      border-bottom: 1px solid #1e3a1e;
+      padding: .6rem 1.2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: .5rem;
+    }
+    .monitor-brand {
+      display: flex; align-items: center; gap: .5rem;
+      color: #00e676; font-size: .85rem; font-weight: 600;
+    }
+    .monitor-brand i { font-size: 1rem; animation: pulse-icon 1s ease-in-out infinite; }
+    @keyframes pulse-icon {
+      0%,100% { opacity: 1; } 50% { opacity: .4; }
+    }
+
+    .monitor-vitals {
+      display: flex; gap: 1.5rem; flex-wrap: wrap;
+    }
+    .vital-item {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .vital-label { font-size: .6rem; color: #4caf50; letter-spacing: .1em; text-transform: uppercase; }
+    .vital-value { font-size: 1.3rem; font-weight: 700; color: #00e676; line-height: 1; }
+    .vital-value.alert-val { color: #ff5252; animation: blink .8s step-end infinite; }
+    .vital-unit  { font-size: .6rem; color: #4caf50; }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    .monitor-status {
+      display: flex; align-items: center; gap: .4rem;
+      font-size: .72rem; color: #4caf50;
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #00e676;
+      box-shadow: 0 0 6px #00e676;
+    }
+    .status-dot.paused { background: #ff9800; box-shadow: 0 0 6px #ff9800; animation: none; }
+
+    /* ── CANVAS ── */
+    .canvas-wrapper {
+      position: relative;
+      background: #050d05;
+      padding: .5rem 0;
+    }
+    #ecgCanvas {
+      display: block;
+      width: 100%;
+      height: 220px;
+      cursor: crosshair;
+    }
+
+    /* Etiquetas de ondas (overlay) */
+    .wave-labels {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+    }
+    .wave-tag {
+      position: absolute;
+      color: rgba(0,230,118,.55);
+      font-size: .65rem; font-weight: 600;
+      letter-spacing: .05em;
+      transition: opacity .3s;
+    }
+
+    /* ── CONTROLES ── */
+    .monitor-controls {
+      background: #0d150d;
+      border-top: 1px solid #1e3a1e;
+      padding: 1rem 1.2rem;
+      display: flex; flex-direction: column; gap: .9rem;
+    }
+
+    /* Fila de ritmos */
+    .rhythm-row {
+      display: flex; gap: .5rem; flex-wrap: wrap; align-items: center;
+    }
+    .rhythm-label {
+      font-size: .68rem; color: #4caf50; text-transform: uppercase;
+      letter-spacing: .08em; margin-right: .3rem;
+    }
+    .rhythm-btn {
+      background: #0f1f0f;
+      border: 1.5px solid #2a5a2a;
+      border-radius: 6px;
+      color: #69f0ae;
+      font-size: .75rem; font-weight: 600;
+      padding: .35rem .8rem;
+      cursor: pointer;
+      font-family: 'Roboto Mono', monospace;
+      transition: all .2s;
+      letter-spacing: .03em;
+    }
+    .rhythm-btn:hover  { background: #1a3a1a; border-color: #00e676; color: #00e676; }
+    .rhythm-btn.active { background: #00e676; border-color: #00e676; color: #052005; font-weight: 700; }
+    .rhythm-btn.danger { border-color: #c62828; color: #ff5252; }
+    .rhythm-btn.danger:hover { background: #1a0a0a; border-color: #ff5252; }
+    .rhythm-btn.danger.active { background: #ff5252; color: #1a0000; border-color: #ff5252; }
+
+    /* Fila de sliders */
+    .sliders-row {
+      display: flex; gap: 1.5rem; flex-wrap: wrap;
+    }
+    .slider-group {
+      display: flex; flex-direction: column; gap: .3rem; min-width: 160px; flex: 1;
+    }
+    .slider-header {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .slider-name  { font-size: .68rem; color: #4caf50; text-transform: uppercase; letter-spacing: .08em; }
+    .slider-val   { font-size: .78rem; color: #00e676; font-weight: 600; }
+
+    input[type=range].ecg-slider {
+      -webkit-appearance: none;
+      width: 100%; height: 4px;
+      background: #1a3a1a;
+      border-radius: 2px; outline: none; cursor: pointer;
+    }
+    input[type=range].ecg-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #00e676;
+      box-shadow: 0 0 6px #00e676;
+      cursor: pointer;
+    }
+    input[type=range].ecg-slider::-moz-range-thumb {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #00e676; border: none;
+      box-shadow: 0 0 6px #00e676;
+    }
+
+    /* Fila de botones de acción */
+    .actions-row {
+      display: flex; gap: .6rem; flex-wrap: wrap; align-items: center;
+      border-top: 1px solid #1e3a1e; padding-top: .8rem;
+    }
+    .action-btn {
+      display: flex; align-items: center; gap: .4rem;
+      background: #0f1f0f; border: 1.5px solid #2a5a2a;
+      border-radius: 6px; color: #69f0ae;
+      font-size: .78rem; font-weight: 600;
+      padding: .45rem 1rem; cursor: pointer;
+      font-family: 'Roboto Mono', monospace;
+      transition: all .2s;
+    }
+    .action-btn:hover { background: #1a3a1a; border-color: #00e676; color: #00e676; }
+    .action-btn.play-btn {
+      background: #00e676; border-color: #00e676;
+      color: #052005; min-width: 100px; justify-content: center;
+    }
+    .action-btn.play-btn:hover { background: #69f0ae; }
+    .action-btn.play-btn.paused-state { background: #ff9800; border-color: #ff9800; color: #1a0800; }
+
+    .action-spacer { flex: 1; }
+
+    .grid-toggle-label {
+      font-size: .68rem; color: #4caf50;
+      display: flex; align-items: center; gap: .4rem;
+      cursor: pointer; user-select: none;
+    }
+    .grid-toggle-label input { accent-color: #00e676; cursor: pointer; }
+
+    /* ── LEYENDA DE ONDAS ── */
+    .wave-legend {
+      background: #0d150d;
+      border-top: 1px solid #1e3a1e;
+      padding: .8rem 1.2rem;
+      display: flex; gap: 1.2rem; flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: .4rem;
+      font-size: .72rem; color: #69f0ae; cursor: pointer;
+      padding: .25rem .5rem; border-radius: 4px;
+      border: 1px solid transparent;
+      transition: all .2s;
+    }
+    .legend-item:hover { border-color: #2a5a2a; background: #0f1f0f; }
+    .legend-item.hl    { border-color: #00e676; background: #0a200a; color: #00e676; }
+    .legend-dot {
+      width: 28px; height: 3px; border-radius: 2px;
+      background: #00e676;
+    }
+    .legend-dot.p-dot { background: #64b5f6; }
+    .legend-dot.q-dot { background: #ff8a65; }
+    .legend-dot.r-dot { background: #00e676; }
+    .legend-dot.s-dot { background: #ce93d8; }
+    .legend-dot.t-dot { background: #ffd54f; }
+    .legend-dot.pr-dot{ background: #4db6ac; height: 2px; }
+    .legend-dot.qt-dot { background: #f48fb1; height: 2px; }
+
+    /* ── INFO PANEL ── */
+    .info-panel {
+      display: none;
+      background: #0a180a;
+      border-top: 1px solid #1e3a1e;
+      padding: .9rem 1.2rem;
+      font-size: .82rem; color: #69f0ae; line-height: 1.6;
+    }
+    .info-panel.visible { display: block; }
+    .info-panel strong  { color: #00e676; }
+    .info-panel .info-title {
+      font-size: .9rem; font-weight: 700; color: #00e676;
+      margin-bottom: .4rem; display: flex; align-items: center; gap: .4rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .monitor-vitals { gap: .8rem; }
+      .vital-value    { font-size: 1rem; }
+      .sliders-row    { flex-direction: column; }
+      #ecgCanvas      { height: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-left">
+      <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+      <a href="index.html" class="site-logo"><i class="fas fa-heartbeat"></i><span>Guía de ECG</span></a>
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Buscar en el libro..."/>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-send-session" id="btnSendSession" onclick="openSendModal()" title="Enviar registro de sesión al profesor">
+        <i class="fas fa-paper-plane"></i><span class="btn-send-label">Enviar</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+      <a href="https://github.com/dmccreary/i-book-v1" target="_blank" class="gh-link"><i class="fab fa-github"></i></a>
+    </div>
+  </header>
+
+  <div class="overlay" id="overlay"></div>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        <div class="sidebar-title">Contenido</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Inicio</a></li>
+          <li class="nav-section">Capítulos</li>
+          <li class="nav-item"><a href="chapter-1.html" class="nav-link"><span class="ch-num">1</span> Fundamentos Fisiológicos</a></li>
+          <li class="nav-item"><a href="chapter-2.html" class="nav-link"><span class="ch-num">2</span> Anatomía de las Derivaciones</a></li>
+          <li class="nav-item"><a href="chapter-3.html" class="nav-link"><span class="ch-num">3</span> Componentes del Trazado Normal</a></li>
+          <li class="nav-item"><a href="chapter-4.html" class="nav-link"><span class="ch-num">4</span> Metodología de Interpretación</a></li>
+          <li class="nav-item"><a href="chapter-5.html" class="nav-link"><span class="ch-num">5</span> Patologías Básicas</a></li>
+          <li class="nav-item"><a href="chapter-6.html" class="nav-link"><span class="ch-num">6</span> Talleres de Práctica</a></li>
+          <li class="nav-section">Simuladores</li>
+          <li class="nav-item"><a href="ecg-monitor.html" class="nav-link active"><i class="fas fa-monitor-heart-rate" style="color:#00e676"></i> Monitor ECG</a></li>
+          <li class="nav-section">Aprendizaje</li>
+          <li class="nav-item">
+            <a href="autopercepcion.html" class="nav-link">
+              <i class="fas fa-brain" style="color:#a78bfa"></i> Autopercepción
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="content-wrapper">
+
+        <div style="margin-bottom:1.5rem;">
+          <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:.4rem;">
+            <i class="fas fa-heartbeat" style="color:var(--accent)"></i> Monitor ECG Interactivo
+          </h1>
+          <p style="color:var(--text-muted);font-size:.95rem;">
+            Simula diferentes ritmos cardíacos en tiempo real. Cambia la frecuencia, velocidad y tipo de arritmia para explorar cómo se ven en el trazado.
+          </p>
+        </div>
+
+        <!-- ══ MONITOR ══ -->
+        <div class="monitor-shell">
+
+          <!-- TOP BAR -->
+          <div class="monitor-topbar">
+            <div class="monitor-brand">
+              <i class="fas fa-heartbeat"></i> ECG MONITOR — Derivación II
+            </div>
+            <div class="monitor-vitals">
+              <div class="vital-item">
+                <span class="vital-label">FC</span>
+                <span class="vital-value" id="ecgCanvas-bpm">72</span>
+                <span class="vital-unit">lpm</span>
+              </div>
+              <div class="vital-item">
+                <span class="vital-label">SpO₂</span>
+                <span class="vital-value" id="spo2Val">98</span>
+                <span class="vital-unit">%</span>
+              </div>
+              <div class="vital-item">
+                <span class="vital-label">PA</span>
+                <span class="vital-value" id="paVal">120/80</span>
+                <span class="vital-unit">mmHg</span>
+              </div>
+              <div class="vital-item">
+                <span class="vital-label">Ritmo</span>
+                <span class="vital-value" id="rhythmLabel" style="font-size:.85rem;">Sinusal</span>
+                <span class="vital-unit">&nbsp;</span>
+              </div>
+            </div>
+            <div class="monitor-status">
+              <div class="status-dot" id="statusDot"></div>
+              <span id="statusText">EN VIVO</span>
+            </div>
+          </div>
+
+          <!-- CANVAS -->
+          <div class="canvas-wrapper">
+            <canvas id="ecgCanvas"></canvas>
+          </div>
+
+          <!-- LEYENDA DE ONDAS -->
+          <div class="wave-legend">
+            <span style="font-size:.68rem;color:#4caf50;align-self:center;margin-right:.3rem;">ONDAS:</span>
+            <div class="legend-item" onclick="showWaveInfo('p')">
+              <div class="legend-dot p-dot"></div> Onda P
+            </div>
+            <div class="legend-item" onclick="showWaveInfo('pr')">
+              <div class="legend-dot pr-dot"></div> Intervalo PR
+            </div>
+            <div class="legend-item" onclick="showWaveInfo('qrs')">
+              <div class="legend-dot r-dot"></div> Complejo QRS
+            </div>
+            <div class="legend-item" onclick="showWaveInfo('st')">
+              <div class="legend-dot s-dot"></div> Segmento ST
+            </div>
+            <div class="legend-item" onclick="showWaveInfo('t')">
+              <div class="legend-dot t-dot"></div> Onda T
+            </div>
+            <div class="legend-item" onclick="showWaveInfo('qt')">
+              <div class="legend-dot qt-dot"></div> Intervalo QT
+            </div>
+          </div>
+
+          <!-- INFO PANEL -->
+          <div class="info-panel" id="infoPanel">
+            <div class="info-title" id="infoPanelTitle"></div>
+            <div id="infoPanelBody"></div>
+          </div>
+
+          <!-- CONTROLES -->
+          <div class="monitor-controls">
+
+            <!-- RITMOS -->
+            <div class="rhythm-row">
+              <span class="rhythm-label">Ritmo:</span>
+              <button class="rhythm-btn active" onclick="setRhythm('normal','Sinusal Normal',this)">Sinusal</button>
+              <button class="rhythm-btn" onclick="setRhythm('tachy','Taquicardia Sinusal',this)">Taquicardia</button>
+              <button class="rhythm-btn" onclick="setRhythm('brady','Bradicardia Sinusal',this)">Bradicardia</button>
+              <button class="rhythm-btn danger" onclick="setRhythm('afib','Fibrilación Auricular',this)">FA</button>
+              <button class="rhythm-btn danger" onclick="setRhythm('flutter','Flutter Auricular',this)">Flutter</button>
+              <button class="rhythm-btn danger" onclick="setRhythm('pvc','Ritmo con EV',this)">EV</button>
+            </div>
+
+            <!-- SLIDERS -->
+            <div class="sliders-row">
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span class="slider-name"><i class="fas fa-tachometer-alt"></i> Velocidad de barrido</span>
+                  <span class="slider-val" id="speedVal">25 mm/s</span>
+                </div>
+                <input type="range" class="ecg-slider" id="speedSlider"
+                  min="0.5" max="2" step="0.5" value="1"
+                  oninput="updateSpeed(this.value)"/>
+              </div>
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span class="slider-name"><i class="fas fa-wave-square"></i> Amplitud (ganancia)</span>
+                  <span class="slider-val" id="ampVal">10 mm/mV</span>
+                </div>
+                <input type="range" class="ecg-slider" id="ampSlider"
+                  min="0.4" max="2" step="0.1" value="1"
+                  oninput="updateAmp(this.value)"/>
+              </div>
+            </div>
+
+            <!-- ACCIONES -->
+            <div class="actions-row">
+              <button class="action-btn play-btn" id="playBtn" onclick="togglePlay()">
+                <i class="fas fa-pause" id="playIcon"></i>
+                <span id="playText">Pausar</span>
+              </button>
+              <button class="action-btn" onclick="captureStrip()">
+                <i class="fas fa-camera"></i> Capturar trazo
+              </button>
+              <button class="action-btn" onclick="resetMonitor()">
+                <i class="fas fa-redo"></i> Reiniciar
+              </button>
+              <div class="action-spacer"></div>
+              <label class="grid-toggle-label">
+                <input type="checkbox" id="gridCheck" checked onchange="toggleGrid(this.checked)"/>
+                Cuadrícula
+              </label>
+            </div>
+
+          </div>
+        </div>
+        <!-- ══ FIN MONITOR ══ -->
+
+        <!-- CAPTURA -->
+        <div id="captureSection" style="display:none;margin-top:1.5rem;">
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:.6rem;display:flex;align-items:center;gap:.5rem;">
+            <i class="fas fa-camera" style="color:var(--primary)"></i> Trazo capturado
+          </h3>
+          <img id="captureImg" style="max-width:100%;border-radius:8px;border:1px solid var(--border);"/>
+          <p style="font-size:.78rem;color:var(--text-muted);margin-top:.4rem;">
+            Clic derecho → "Guardar imagen" para descargar el trazo.
+          </p>
+        </div>
+
+        <!-- REFERENCIA RÁPIDA -->
+        <section style="margin-top:2rem;">
+          <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;">
+            <i class="fas fa-table" style="color:var(--primary)"></i> Referencia rápida de ritmos
+          </h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Ritmo</th><th>FC</th><th>Onda P</th><th>R–R</th><th>Significado clínico</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Sinusal normal</strong></td><td>60–100 lpm</td><td>Positiva en II</td><td>Regular</td><td>Normal</td></tr>
+              <tr><td><strong>Taquicardia sinusal</strong></td><td>&gt;100 lpm</td><td>Positiva en II</td><td>Regular, corto</td><td>Fiebre, anemia, ansiedad, TEP</td></tr>
+              <tr><td><strong>Bradicardia sinusal</strong></td><td>&lt;60 lpm</td><td>Positiva en II</td><td>Regular, largo</td><td>Atletas, hipotiroidismo, β-bloq.</td></tr>
+              <tr><td><strong>Fibrilación auricular</strong></td><td>Variable</td><td>Ausente</td><td>Irregular</td><td>Riesgo embólico → anticoagular</td></tr>
+              <tr><td><strong>Flutter auricular</strong></td><td>150 lpm (2:1)</td><td>Ondas en sierra</td><td>Regular</td><td>Cardioversión / ablación</td></tr>
+              <tr><td><strong>Extrasístole ventricular</strong></td><td>Variable</td><td>Normal + EV</td><td>Irregular</td><td>Evaluar cardiopatía subyacente</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <div style="margin-top:1.5rem;">
+          <a href="chapter-3.html" class="btn-primary" style="display:inline-flex;align-items:center;gap:.5rem;">
+            <i class="fas fa-book-open"></i> Ir al Capítulo 3 — Trazado Normal
+          </a>
+        </div>
+
+      </div>
+      <footer class="site-footer-bottom">
+        <p>Guía de Electrocardiografía &mdash; Monitor ECG Interactivo &copy; 2025</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="js/session.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+  // ============================================================
+  //  MOTOR ECG — Canvas Animation
+  // ============================================================
+  const canvas  = document.getElementById('ecgCanvas');
+  const ctx     = canvas.getContext('2d');
+
+  // Estado global
+  let running      = true;
+  let currentRhythm= 'normal';
+  let speedMult    = 1.0;
+  let ampMult      = 1.0;
+  let showGrid     = true;
+  let lastTime     = null;
+  let animFrame    = null;
+  let cyclePhase   = 0;
+  let beatCount    = 0;
+  let cycleLen     = 0;
+  let pxPerSec     = 0;
+  let cursorX      = 0;
+
+  // Parámetros por ritmo
+  const RHYTHMS = {
+    normal:  { bpm:72,  pAmp:.18, qrsH:1.0, tAmp:.32, noise:.004, irregular:false, flutter:false, pvcEvery:0 },
+    tachy:   { bpm:145, pAmp:.16, qrsH:1.0, tAmp:.28, noise:.004, irregular:false, flutter:false, pvcEvery:0 },
+    brady:   { bpm:40,  pAmp:.20, qrsH:1.0, tAmp:.34, noise:.003, irregular:false, flutter:false, pvcEvery:0 },
+    afib:    { bpm:110, pAmp:.00, qrsH:1.0, tAmp:.28, noise:.022, irregular:true,  flutter:false, pvcEvery:0 },
+    flutter: { bpm:150, pAmp:.10, qrsH:1.0, tAmp:.22, noise:.005, irregular:false, flutter:true,  pvcEvery:0 },
+    pvc:     { bpm:72,  pAmp:.18, qrsH:1.0, tAmp:.32, noise:.004, irregular:false, flutter:false, pvcEvery:4 },
+  };
+
+  // Colores (siempre verde sobre negro — estilo monitor real)
+  const C = {
+    bg:       '#050d05',
+    grid:     '#0d1f0d',
+    gridMain: '#163016',
+    trace:    '#00e676',
+    glow:     'rgba(0,230,118,0.4)',
+    cursor:   'rgba(0,230,118,0.15)',
+  };
+
+  // ── Constantes ECG estándar ──────────────────────────────────
+  // 96 DPI web estándar: 1 pulgada = 96px, 1 pulgada = 25.4mm
+  // → 1 mm real = 96/25.4 ≈ 3.78 px en pantalla de 96 DPI
+  // ECG estándar: velocidad = 25 mm/s
+  // Por tanto: a 60 lpm → RR = 1s → 25mm → 25 × 3.78 ≈ 94.5 px entre R-R
+  const PX_PER_MM      = 96 / 25.4;    // 3.7795 px/mm
+  const MM_PER_SEC_STD = 25;           // 25 mm/s velocidad estándar
+
+  // ── Resize ──
+  function resizeCanvas() {
+    const w = canvas.parentElement.clientWidth || 800;
+    canvas.width  = w;
+    // Altura = 30 mm reales en pantalla (estándar: 3 cuadros grandes verticales)
+    canvas.height = Math.round(30 * PX_PER_MM);  // ≈ 113 px a 96dpi
+    // Si el resultado es muy pequeño, usar mínimo 200px
+    if (canvas.height < 200) canvas.height = 200;
+    // Velocidad en px/s = px_por_mm × mm_por_segundo × multiplicador
+    pxPerSec = PX_PER_MM * MM_PER_SEC_STD * speedMult;
+    calcCycle();
+    drawGrid();
+  }
+
+  // ── Calcular longitud de ciclo en px ─────────────────────────
+  // RR(s) = 60/bpm  →  RR(mm) = RR(s) × 25  →  RR(px) = RR(mm) × PX_PER_MM
+  // Ej.: 60 lpm → RR=1s → 25mm → ~94.5px entre R y R
+  // Ej.: 72 lpm → RR≈0.83s → 20.8mm → ~78.7px entre R y R
+  function calcCycle() {
+    const p  = RHYTHMS[currentRhythm];
+    let rr   = 60 / p.bpm;             // RR en segundos
+    if (p.irregular) rr *= (0.75 + Math.random() * 0.5);
+    cycleLen = rr * pxPerSec;          // longitud del ciclo en px
+  }
+
+  // ── Dibujar cuadrícula ECG proporcional a mm reales ──────────
+  // 1 cuadro pequeño = 1 mm = PX_PER_MM px
+  // 1 cuadro grande  = 5 mm = 5 × PX_PER_MM px
+  function drawGrid() {
+    const W  = canvas.width, H = canvas.height;
+    const sm = PX_PER_MM;        // 1 mm en px  ≈ 3.78 px
+    const lg = PX_PER_MM * 5;   // 5 mm en px  ≈ 18.9 px
+
+    ctx.fillStyle = C.bg;
+    ctx.fillRect(0, 0, W, H);
+    if (!showGrid) return;
+
+    // Cuadros pequeños (1 mm)
+    ctx.lineWidth   = 0.4;
+    ctx.strokeStyle = C.grid;
+    for (let x = 0; x < W; x += sm) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += sm) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    // Cuadros grandes (5 mm)
+    ctx.lineWidth   = 0.9;
+    ctx.strokeStyle = C.gridMain;
+    for (let x = 0; x < W; x += lg) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += lg) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  }
+
+  // ── Función de onda ECG (t = 0..1) ──
+  function ecgWave(t) {
+    const p   = RHYTHMS[currentRhythm];
+    let   val = (Math.random()-.5)*p.noise;
+    const isPVC = p.pvcEvery > 0 && beatCount % p.pvcEvery === 0;
+
+    if (isPVC) {
+      // EV: QRS ancho, bizarro, T invertida
+      val += .75  * gauss(t, .27, .030);
+      val -= .30  * gauss(t, .30, .025);
+      val -= .28  * gauss(t, .24, .018);
+      val -= .45  * gauss(t, .52, .060);   // T invertida
+      return val * ampMult;
+    }
+
+    // Onda P
+    if (!p.irregular) {
+      val += p.pAmp * gauss(t, .10, .035);
+    } else {
+      // Ondas fibrilatorias
+      val += .035 * Math.sin(t * Math.PI * 55 + Math.random());
+      val += .020 * Math.sin(t * Math.PI * 38 + Math.random());
+    }
+
+    // Flutter: ondas en sierra
+    if (p.flutter && t < .28) {
+      val += .09 * Math.sin(t * Math.PI * 30);
+    }
+
+    // QRS
+    const qc = p.irregular ? .25 + (Math.random()-.5)*.06 : .25;
+    val -= .12 * gauss(t, qc-.026, .008);   // Q
+    val += p.qrsH * gauss(t, qc, .011);     // R
+    val -= .22 * gauss(t, qc+.022, .009);   // S
+
+    // Onda T
+    val += p.tAmp * gauss(t, .56, .055);
+
+    return val * ampMult;
+  }
+
+  function gauss(t, mu, sigma) {
+    return Math.exp(-Math.pow((t - mu) / sigma, 2));
+  }
+
+  // ── Loop principal ──
+  function animate(timestamp) {
+    if (!running) return;
+    if (!lastTime) lastTime = timestamp;
+    const dt = Math.min((timestamp - lastTime) / 1000, .05);
+    lastTime = timestamp;
+
+    const W   = canvas.width, H = canvas.height;
+    const mid = H / 2;
+    // Amplitud: 1 mV = 10 mm estándar = 10 × PX_PER_MM px
+    // ampMult es el multiplicador de ganancia (1 = 10mm/mV estándar)
+    const amp = PX_PER_MM * 10 * ampMult;
+    const px  = pxPerSec * dt;
+    const ew  = 20;
+
+    // Borrar franja adelante
+    ctx.fillStyle = C.bg;
+    ctx.fillRect(cursorX, 0, ew + 2, H);
+    redrawGridStrip(cursorX, ew + 2);
+
+    // Cursor glow
+    ctx.fillStyle = C.cursor;
+    ctx.fillRect(cursorX, 0, 3, H);
+
+    // Dibujar trazo
+    ctx.strokeStyle = C.trace;
+    ctx.lineWidth   = 2.0;
+    ctx.shadowColor = C.glow;
+    ctx.shadowBlur  = 8;
+    ctx.lineJoin    = 'round';
+    ctx.lineCap     = 'round';
+
+    const steps = Math.max(2, Math.ceil(px * 3));
+    ctx.beginPath();
+    for (let i = 0; i <= steps; i++) {
+      const fx = cursorX + px * i / steps;
+      const t  = cyclePhase / cycleLen;
+      const y  = mid - ecgWave(t) * amp;
+      i === 0 ? ctx.moveTo(fx % W, y) : ctx.lineTo(fx % W, y);
+      cyclePhase += px / steps;
+      if (cyclePhase >= cycleLen) {
+        cyclePhase -= cycleLen;
+        beatCount++;
+        calcCycle();
+        updateVitals();
+      }
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    cursorX = (cursorX + px) % W;
+    animFrame = requestAnimationFrame(animate);
+  }
+
+  function redrawGridStrip(sx, sw) {
+    if (!showGrid) return;
+    const H  = canvas.height;
+    const sm = PX_PER_MM;
+    const lg = PX_PER_MM * 5;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(sx, 0, sw + 2, H); ctx.clip();
+    ctx.lineWidth = 0.4; ctx.strokeStyle = C.grid;
+    for (let x = Math.floor(sx/sm)*sm; x < sx+sw+2; x += sm) { ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke(); }
+    for (let y = 0; y < H; y += sm) { ctx.beginPath();ctx.moveTo(sx,y);ctx.lineTo(sx+sw+2,y);ctx.stroke(); }
+    ctx.lineWidth = 0.9; ctx.strokeStyle = C.gridMain;
+    for (let x = Math.floor(sx/lg)*lg; x < sx+sw+2; x += lg) { ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke(); }
+    for (let y = 0; y < H; y += lg) { ctx.beginPath();ctx.moveTo(sx,y);ctx.lineTo(sx+sw+2,y);ctx.stroke(); }
+    ctx.restore();
+  }
+
+  // ── Actualizar vitales en pantalla ──
+  function updateVitals() {
+    const p   = RHYTHMS[currentRhythm];
+    let   bpm = p.bpm;
+    if (p.irregular) bpm += Math.round((Math.random()-.5)*22);
+    document.getElementById('ecgCanvas-bpm').textContent = bpm + ' lpm';
+
+    const bpmEl = document.getElementById('ecgCanvas-bpm');
+    bpmEl.classList.toggle('alert-val', bpm > 120 || bpm < 50);
+
+    const dot = document.getElementById('statusDot');
+    dot.classList.toggle('paused', !running);
+    document.getElementById('statusText').textContent = running ? 'EN VIVO' : 'PAUSADO';
+  }
+
+  // ── Controles UI ──
+  function togglePlay() {
+    running = !running;
+    const btn  = document.getElementById('playBtn');
+    const icon = document.getElementById('playIcon');
+    const txt  = document.getElementById('playText');
+    if (running) {
+      btn.classList.remove('paused-state');
+      icon.className = 'fas fa-pause';
+      txt.textContent = 'Pausar';
+      lastTime = null;
+      animFrame = requestAnimationFrame(animate);
+    } else {
+      btn.classList.add('paused-state');
+      icon.className = 'fas fa-play';
+      txt.textContent = 'Reanudar';
+      if (animFrame) cancelAnimationFrame(animFrame);
+    }
+    updateVitals();
+  }
+
+  const rhythmNames = {
+    normal:'Sinusal Normal', tachy:'Taquicardia Sinusal',
+    brady:'Bradicardia Sinusal', afib:'Fibrilación Auricular',
+    flutter:'Flutter Auricular', pvc:'Ritmo con EV'
+  };
+
+  function setRhythm(r, label, btn) {
+    currentRhythm = r;
+    beatCount     = 0;
+    cyclePhase    = 0;
+    calcCycle();
+    updateVitals();
+    document.getElementById('rhythmLabel').textContent = rhythmNames[r] || label;
+    document.querySelectorAll('.rhythm-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    hideInfoPanel();
+  }
+
+  function updateSpeed(v) {
+    speedMult = parseFloat(v);
+    pxPerSec  = PX_PER_MM * MM_PER_SEC_STD * speedMult;
+    calcCycle();
+    const mmps = (MM_PER_SEC_STD * speedMult).toFixed(1);
+    document.getElementById('speedVal').textContent = mmps + ' mm/s';
+  }
+
+  function updateAmp(v) {
+    ampMult = parseFloat(v);
+    const mmpermv = (ampMult * 10).toFixed(0);
+    document.getElementById('ampVal').textContent = mmpermv + ' mm/mV';
+  }
+
+  function toggleGrid(checked) {
+    showGrid = checked;
+    drawGrid();
+  }
+
+  function resetMonitor() {
+    cursorX    = 0;
+    cyclePhase = 0;
+    beatCount  = 0;
+    calcCycle();
+    drawGrid();
+  }
+
+  function captureStrip() {
+    const sec = document.getElementById('captureSection');
+    const img = document.getElementById('captureImg');
+    img.src = canvas.toDataURL('image/png');
+    sec.style.display = 'block';
+    sec.scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+
+  // ── Info de ondas al hacer clic en leyenda ──
+  const WAVE_INFO = {
+    p: {
+      title: '🔵 Onda P — Despolarización Auricular',
+      body:  '<strong>Origen:</strong> Nódulo SA → activación de ambas aurículas.<br><strong>Duración normal:</strong> ≤ 0,12 s (3 cuadros pequeños).<br><strong>Amplitud normal:</strong> ≤ 2,5 mm.<br><strong>Morfología:</strong> Redondeada, positiva en derivación II.<br><strong>Clave clínica:</strong> Si es positiva en II y negativa en aVR → origen sinusal confirmado.'
+    },
+    pr: {
+      title: '🩵 Intervalo PR — Conducción Auriculoventricular',
+      body:  '<strong>Se mide:</strong> Desde el inicio de la onda P hasta el inicio del QRS.<br><strong>Normal:</strong> 0,12 – 0,20 s (3–5 cuadros pequeños).<br><strong>PR largo (&gt;0,20 s):</strong> Bloqueo AV de 1er grado.<br><strong>PR corto (&lt;0,12 s):</strong> Preexcitación (WPW) o ritmo de unión.'
+    },
+    qrs: {
+      title: '🟢 Complejo QRS — Despolarización Ventricular',
+      body:  '<strong>Origen:</strong> Despolarización simultánea de ambos ventrículos vía Haz de His y fibras de Purkinje.<br><strong>Duración normal:</strong> 0,06 – 0,10 s.<br><strong>QRS ancho (&gt;0,12 s):</strong> Bloqueo de rama (BRD o BRI) o ritmo ventricular.<br><strong>Amplitud:</strong> Variable según derivación y masa ventricular.'
+    },
+    st: {
+      title: '🟣 Segmento ST — Repolarización Temprana',
+      body:  '<strong>Normal:</strong> Isoeléctrico (±1 mm en miembros, ±2 mm en precordiales).<br><strong>Elevación del ST:</strong> Infarto agudo (IAMCEST), pericarditis, repolarización precoz.<br><strong>Depresión del ST:</strong> Isquemia subendocárdica, efecto digitálico, HVI con sobrecarga.'
+    },
+    t: {
+      title: '🟡 Onda T — Repolarización Ventricular',
+      body:  '<strong>Morfología normal:</strong> Asimétrica (sube lento, baja rápido), positiva en I, II, V3–V6.<br><strong>T invertida:</strong> Isquemia, HVI con sobrecarga, TEP, miocarditis.<br><strong>T alta y picuda:</strong> Hiperpotasemia, isquemia hiperaguda.<br><strong>T aplanada:</strong> Hipopotasemia, hipotiroidismo.'
+    },
+    qt: {
+      title: '🩷 Intervalo QT — Sístole Eléctrica Completa',
+      body:  '<strong>Se mide:</strong> Desde el inicio del QRS hasta el final de la onda T.<br><strong>QTc normal:</strong> &lt; 440 ms (♂) / &lt; 460 ms (♀) — fórmula de Bazett: QTc = QT / √RR.<br><strong>QTc &gt; 500 ms:</strong> Riesgo de Torsades de Pointes. Revisar medicamentos que prolongan el QT.'
+    }
+  };
+
+  function showWaveInfo(wave) {
+    const panel = document.getElementById('infoPanel');
+    const title = document.getElementById('infoPanelTitle');
+    const body  = document.getElementById('infoPanelBody');
+    const info  = WAVE_INFO[wave];
+    if (!info) return;
+
+    // Resaltar item de leyenda
+    document.querySelectorAll('.legend-item').forEach(li => li.classList.remove('hl'));
+    event.currentTarget.classList.add('hl');
+
+    title.innerHTML = info.title;
+    body.innerHTML  = info.body;
+    panel.classList.add('visible');
+    panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+
+  function hideInfoPanel() {
+    document.getElementById('infoPanel').classList.remove('visible');
+    document.querySelectorAll('.legend-item').forEach(li => li.classList.remove('hl'));
+  }
+
+  // ── Inicialización ──
+  window.addEventListener('load', () => {
+    resizeCanvas();
+    running    = true;
+    lastTime   = null;
+    animFrame  = requestAnimationFrame(animate);
+    updateVitals();
+  });
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+  });
+  </script>
+</body>
+</html>

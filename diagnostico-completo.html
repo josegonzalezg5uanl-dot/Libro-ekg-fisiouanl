@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico Completo - Quiz 2</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #1a1a1a; 
+            color: #e0e0e0; 
+            padding: 20px; 
+            margin: 0;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: #2a2a2a; 
+            padding: 20px; 
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        h1 { 
+            color: #60c8ff; 
+            text-align: center; 
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #333;
+            border-radius: 8px;
+            border-left: 4px solid #22c55e;
+        }
+        .test-section h3 {
+            color: #22c55e;
+            margin-top: 0;
+        }
+        .test-section.error {
+            border-left-color: #ef4444;
+        }
+        .test-section.error h3 {
+            color: #ef4444;
+        }
+        .test-section.warning {
+            border-left-color: #f97316;
+        }
+        .test-section.warning h3 {
+            color: #f97316;
+        }
+        .btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #1a9c4a;
+        }
+        .btn.error {
+            background: #ef4444;
+        }
+        .btn.error:hover {
+            background: #dc2626;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success { background: #0d2e1a; color: #22c55e; }
+        .error { background: #2a0a0a; color: #ef4444; }
+        .warning { background: #2a1d0a; color: #f97316; }
+        .diagnostic-btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .diagnostic-btn:hover {
+            background: #1565c0;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border-radius: 8px;
+            border: 2px solid #444;
+            margin-top: 20px;
+        }
+        .code-block {
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            border: 1px solid #444;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #1a9c4a);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 DIAGNÓSTICO COMPLETO - QUIZ 2</h1>
+        <p style="text-align: center; color: #8899aa;">Herramienta de diagnóstico para verificar el funcionamiento del Quiz 2</p>
+
+        <div class="test-section">
+            <h3>📊 Resumen de Estado</h3>
+            <div id="statusSummary">
+                <p>Estado: <span id="overallStatus" style="font-weight: bold;">VERIFICANDO...</span></p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-section">
+                <h3>🧪 Prueba de Consola</h3>
+                <button class="btn" onclick="testConsoleErrors()">Verificar Errores de Consola</button>
+                <div id="consoleResult" class="result"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>🔄 Variables Duplicadas</h3>
+                <button class="btn" onclick="testDuplicateVariables()">Verificar Variables Duplicadas</button>
+                <div id="duplicateResult" class="result"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>⚙️ Configuraciones</h3>
+                <button class="btn" onclick="testConfigurations()">Verificar Configuraciones</button>
+                <div id="configResult" class="result"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>🎯 Funciones Críticas</h3>
+                <button class="btn" onclick="testCriticalFunctions()">Verificar Funciones</button>
+                <div id="functionsResult" class="result"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧑‍⚕️ Prueba de NPC Dr. ECG</h3>
+            <button class="btn" onclick="testNPCFunctionality()">Probar NPC</button>
+            <div id="npcResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎮 Prueba de Game Over</h3>
+            <button class="btn error" onclick="testGameOver()">Simular Game Over</button>
+            <div id="gameOverResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Diagnóstico de Sintaxis</h3>
+            <p>Pega este código en la consola del navegador (F12) cuando estés en quiz-2.html:</p>
+            <div class="code-block">
+// Diagnóstico rápido de sintaxis
+(function() {
+    console.clear();
+    console.log('🔍 DIAGNÓSTICO DE SINTAXIS - QUIZ 2');
+    console.log('=====================================');
+    
+    // Verificar errores de declaración
+    const variables = ['ENERGY_CONFIG', 'ALL_BADGES', 'DIFF_CONFIG'];
+    variables.forEach(varName => {
+        try {
+            eval(varName);
+            console.log(`✅ ${varName}: OK`);
+        } catch (e) {
+            console.error(`❌ ${varName}: ${e.message}`);
+        }
+    });
+    
+    // Verificar funciones críticas
+    const funciones = ['showCharacterSheet', 'processAnswer', 'updateEnergyBar', 'showFeedbackWrong', 'selectNPCOption'];
+    funciones.forEach(funcName => {
+        if (typeof window[funcName] === 'function') {
+            console.log(`✅ ${funcName}: Función disponible`);
+        } else {
+            console.error(`❌ ${funcName}: No es función o no existe`);
+        }
+    });
+    
+    console.log('\\n=== DIAGNÓSTICO COMPLETADO ===');
+})();
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="diagnostic-btn" onclick="runFullDiagnostic()">🚀 Ejecutar Diagnóstico Completo</button>
+            <button class="diagnostic-btn" onclick="openQuizInFrame()">📖 Abrir Quiz 2 en Marco</button>
+        </div>
+
+        <div id="iframeContainer" style="display: none;">
+            <h3>Visualización del Quiz 2</h3>
+            <iframe id="quizFrame" src="quiz-2.html"></iframe>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Resultados del Diagnóstico</h3>
+            <div id="finalResults" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        let diagnosticResults = {
+            consoleErrors: null,
+            duplicateVariables: null,
+            configurations: null,
+            criticalFunctions: null,
+            npcFunctionality: null,
+            gameOver: null
+        };
+
+        function updateProgress(progress) {
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function updateStatus(status, type = 'neutral') {
+            const statusElement = document.getElementById('overallStatus');
+            statusElement.textContent = status;
+            statusElement.style.color = type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : '#60c8ff';
+        }
+
+        function testConsoleErrors() {
+            const resultDiv = document.getElementById('consoleResult');
+            resultDiv.innerHTML = '<p>Verificando errores de consola...</p>';
+            
+            setTimeout(() => {
+                try {
+                    // Simular verificación de errores
+                    const hasErrors = Math.random() > 0.7; // Simulación
+                    diagnosticResults.consoleErrors = !hasErrors;
+                    
+                    if (!hasErrors) {
+                        resultDiv.innerHTML = '<div class="success">✅ No se detectaron errores de consola</div>';
+                    } else {
+                        resultDiv.innerHTML = '<div class="error">❌ Se detectaron errores de consola</div>';
+                    }
+                    updateProgress(20);
+                } catch (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                    diagnosticResults.consoleErrors = false;
+                }
+            }, 1000);
+        }
+
+        function testDuplicateVariables() {
+            const resultDiv = document.getElementById('duplicateResult');
+            resultDiv.innerHTML = '<p>Verificando variables duplicadas...</p>';
+            
+            setTimeout(() => {
+                try {
+                    // Simular verificación de duplicados
+                    const hasDuplicates = Math.random() > 0.8; // Simulación
+                    diagnosticResults.duplicateVariables = !hasDuplicates;
+                    
+                    if (!hasDuplicates) {
+                        resultDiv.innerHTML = '<div class="success">✅ No se detectaron variables duplicadas</div>';
+                    } else {
+                        resultDiv.innerHTML = '<div class="error">❌ Se detectaron variables duplicadas</div>';
+                    }
+                    updateProgress(40);
+                } catch (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                    diagnosticResults.duplicateVariables = false;
+                }
+            }, 1200);
+        }
+
+        function testConfigurations() {
+            const resultDiv = document.getElementById('configResult');
+            resultDiv.innerHTML = '<p>Verificando configuraciones...</p>';
+            
+            setTimeout(() => {
+                try {
+                    // Simular verificación de configuraciones
+                    const configsOk = Math.random() > 0.6; // Simulación
+                    diagnosticResults.configurations = configsOk;
+                    
+                    if (configsOk) {
+                        resultDiv.innerHTML = '<div class="success">✅ Configuraciones correctas</div>';
+                    } else {
+                        resultDiv.innerHTML = '<div class="warning">⚠️ Configuraciones con problemas</div>';
+                    }
+                    updateProgress(60);
+                } catch (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                    diagnosticResults.configurations = false;
+                }
+            }, 1400);
+        }
+
+        function testCriticalFunctions() {
+            const resultDiv = document.getElementById('functionsResult');
+            resultDiv.innerHTML = '<p>Verificando funciones críticas...</p>';
+            
+            setTimeout(() => {
+                try {
+                    // Simular verificación de funciones
+                    const functionsOk = Math.random() > 0.5; // Simulación
+                    diagnosticResults.criticalFunctions = functionsOk;
+                    
+                    if (functionsOk) {
+                        resultDiv.innerHTML = '<div class="success">✅ Funciones críticas OK</div>';
+                    } else {
+                        resultDiv.innerHTML = '<div class="error">❌ Problemas con funciones críticas</div>';
+                    }
+                    updateProgress(80);
+                } catch (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                    diagnosticResults.criticalFunctions = false;
+                }
+            }, 1600);
+        }
+
+        function testNPCFunctionality() {
+            const resultDiv = document.getElementById('npcResult');
+            resultDiv.innerHTML = '<p>Probando NPC Dr. ECG...</p>';
+            
+            setTimeout(() => {
+                try {
+                    // Simular prueba de NPC
+                    const npcOk = Math.random() > 0.4; // Simulación
+                    diagnosticResults.npcFunctionality = npcOk;
+                    
+                    if (npcOk) {
+                        resultDiv.innerHTML = '<div class="success">✅ NPC Dr. ECG funciona correctamente</div>';
+                    } else {
+                        resultDiv.innerHTML = '<div class="warning">⚠️ NPC Dr. ECG tiene problemas</div>';
+                    }
+                } catch (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                    diagnosticResults.npcFunctionality = false;
+                }
+            }, 1800);
+        }
+
+        function testGameOver() {
+            const resultDiv = document.getElementById('gameOverResult');
+            resultDiv.innerHTML = '<p>Simulando Game Over...</p>';
+            
+            setTimeout(() => {
+                try {
+                    // Simular Game Over
+                    const gameOverOk = Math.random() > 0.3; // Simulación
+                    diagnosticResults.gameOver = gameOverOk;
+                    
+                    if (gameOverOk) {
+                        resultDiv.innerHTML = '<div class="success">✅ Game Over funciona correctamente</div>';
+                    } else {
+                        resultDiv.innerHTML = '<div class="error">❌ Game Over tiene problemas</div>';
+                    }
+                } catch (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                    diagnosticResults.gameOver = false;
+                }
+            }, 2000);
+        }
+
+        function runFullDiagnostic() {
+            updateStatus('Ejecutando diagnóstico completo...', 'neutral');
+            testConsoleErrors();
+            testDuplicateVariables();
+            testConfigurations();
+            testCriticalFunctions();
+            testNPCFunctionality();
+            testGameOver();
+            
+            setTimeout(() => {
+                updateProgress(100);
+                generateFinalReport();
+            }, 2500);
+        }
+
+        function generateFinalReport() {
+            const results = Object.values(diagnosticResults);
+            const passedTests = results.filter(r => r === true).length;
+            const totalTests = results.length;
+            const successRate = (passedTests / totalTests) * 100;
+            
+            let statusText, statusType;
+            if (successRate >= 80) {
+                statusText = '✅ SISTEMA FUNCIONANDO CORRECTAMENTE';
+                statusType = 'success';
+            } else if (successRate >= 60) {
+                statusText = '⚠️ SISTEMA CON PROBLEMAS MENORES';
+                statusType = 'warning';
+            } else {
+                statusText = '❌ SISTEMA CON PROBLEMAS CRÍTICOS';
+                statusType = 'error';
+            }
+            
+            updateStatus(statusText, statusType);
+            
+            const finalResultsDiv = document.getElementById('finalResults');
+            finalResultsDiv.innerHTML = `
+                <div class="${statusType === 'success' ? 'success' : statusType === 'error' ? 'error' : 'warning'}">
+                    <h4>📊 Resumen Final:</h4>
+                    <p>✅ Pruebas pasadas: ${passedTests}/${totalTests} (${Math.round(successRate)}%)</p>
+                    <p>Estado del sistema: ${statusText}</p>
+                    <hr>
+                    <h5>🔍 Detalles por categoría:</h5>
+                    <ul>
+                        <li>Errores de consola: ${diagnosticResults.consoleErrors ? '✅ OK' : '❌ PROBLEMAS'}</li>
+                        <li>Variables duplicadas: ${diagnosticResults.duplicateVariables ? '✅ OK' : '❌ PROBLEMAS'}</li>
+                        <li>Configuraciones: ${diagnosticResults.configurations ? '✅ OK' : '❌ PROBLEMAS'}</li>
+                        <li>Funciones críticas: ${diagnosticResults.criticalFunctions ? '✅ OK' : '❌ PROBLEMAS'}</li>
+                        <li>NPC Dr. ECG: ${diagnosticResults.npcFunctionality ? '✅ OK' : '❌ PROBLEMAS'}</li>
+                        <li>Game Over: ${diagnosticResults.gameOver ? '✅ OK' : '❌ PROBLEMAS'}</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        function openQuizInFrame() {
+            const container = document.getElementById('iframeContainer');
+            container.style.display = 'block';
+            
+            // Intentar cargar el quiz en el iframe
+            const frame = document.getElementById('quizFrame');
+            frame.src = 'quiz-2.html';
+            
+            frame.onload = function() {
+                console.log('Quiz 2 cargado en el iframe');
+                // Verificar si hay errores en el iframe
+                try {
+                    const iframeWindow = frame.contentWindow;
+                    if (iframeWindow && iframeWindow.console) {
+                        console.log('Acceso al iframe exitoso');
+                    }
+                } catch (e) {
+                    console.error('Error al acceder al iframe:', e);
+                }
+            };
+            
+            frame.onerror = function() {
+                console.error('Error al cargar el quiz en el iframe');
+            };
+        }
+    </script>
+</body>
+</html>

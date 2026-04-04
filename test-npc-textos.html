@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Textos Personalizados del NPC - Quiz 2</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #1a1a1a; 
+            color: white; 
+            max-width: 800px; 
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #111827; 
+            border: 1px solid #1e3a5f; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin: 20px 0;
+        }
+        .test-button {
+            background: #1976d2; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            margin: 10px 5px;
+        }
+        .test-button:hover { background: #1565c0; }
+        .status-box {
+            background: #1e2d40; 
+            border-radius: 8px; 
+            padding: 15px; 
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .success { color: #22c55e; }
+        .error { color: #ef4444; }
+        .warning { color: #f97316; }
+        .npc-container {
+            background: #0d1f12; 
+            border: 1px solid #22c55e; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin: 15px 0;
+        }
+        .npc-buttons {
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            margin-top: 15px;
+        }
+        .npc-btn {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+        .npc-btn:hover {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: rgba(34, 197, 94, 0.5);
+        }
+        .question-box {
+            background: #1a1a1a; 
+            border: 1px solid #333; 
+            border-radius: 8px; 
+            padding: 15px; 
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Prueba de Textos Personalizados del NPC - Quiz 2</h1>
+    
+    <div class="test-section">
+        <h3>📋 Descripción de la Prueba</h3>
+        <p>Esta prueba verifica que los botones del NPC (Dr. ECG) muestren los textos cortos personalizados de cada pregunta, en lugar de textos genéricos.</p>
+        
+        <h4>¿Qué debe pasar?</h4>
+        <ul>
+            <li>Los botones deben mostrar textos específicos como: "¡Perfecto! Comprendes la importancia de las 6 derivaciones."</li>
+            <li>No deben mostrar textos genéricos como: "Sí, entendí"</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h3>🎮 Simulador de Pregunta</h3>
+        <button class="test-button" onclick="crearPreguntaDePrueba()">Crear Pregunta de Prueba</button>
+        <button class="test-button" onclick="mostrarFeedbackIncorrecto()">Simular Respuesta Incorrecta</button>
+        <button class="test-button" onclick="verificarTextos()">Verificar Textos de Botones</button>
+        
+        <div id="resultado" class="status-box"></div>
+        
+        <div id="preguntaSimulada" class="question-box" style="display:none;">
+            <h4>Pregunta Simulada:</h4>
+            <div id="textoPregunta"></div>
+            <div id="infoPregunta"></div>
+        </div>
+        
+        <div id="npcContainer" class="npc-container" style="display:none;">
+            <h4>🧑‍⚕️ Dr. ECG pregunta:</h4>
+            <div id="npcPregunta"></div>
+            <div id="npcButtons" class="npc-buttons"></div>
+        </div>
+    </div>
+
+    <script>
+        // Estado simulado
+        let estadoSimulado = {
+            questions: [],
+            currentIdx: 0,
+            lives: 3
+        };
+
+        // Función para crear una pregunta de prueba con textos personalizados
+        function crearPreguntaDePrueba() {
+            console.log('Creando pregunta de prueba...');
+            
+            // Crear una pregunta simulada con textos personalizados
+            const preguntaPrueba = {
+                q: "¿Cuántos electrodos se colocan en el tórax para las derivaciones precordiales?",
+                opts: { 
+                    A: "4 electrodos", 
+                    B: "6 electrodos", 
+                    C: "3 electrodos", 
+                    D: "12 electrodos" 
+                },
+                answer: "B",
+                reflection: "¿Por qué crees que se necesitan exactamente 6 derivaciones precordiales y no más ni menos?",
+                reflection_yes_short: "¡Perfecto! Comprendes la importancia de las 6 derivaciones.",
+                reflection_partial_short: "Entiendo parcialmente, pero necesito repasar el concepto.",
+                reflection_no_short: "No lo tengo claro, necesito más explicación.",
+                reflection_yes: "Excelente reflexión. Las 6 derivaciones precordiales son fundamentales porque permiten evaluar la actividad eléctrica del corazón en diferentes planos anatómicos. Cada derivación ofrece una perspectiva única que, en conjunto, proporciona una visión completa de la función cardíaca.",
+                reflection_partial: "Es comprensible que tengas dudas. Las 6 derivaciones pueden parecer muchas al principio, pero cada una tiene un propósito específico. Te recomiendo repasar la anatomía de las derivaciones y cómo se relacionan con las diferentes regiones del corazón.",
+                reflection_no: "No te preocupes, es normal tener dificultades al principio. Las derivaciones precordiales pueden ser complejas de entender. Te sugiero que revises el material teórico sobre el sistema de derivaciones ECG y practiques con ejemplos visuales para comprender mejor su utilidad clínica."
+            };
+            
+            estadoSimulado.questions = [preguntaPrueba];
+            estadoSimulado.currentIdx = 0;
+            
+            // Mostrar información de la pregunta
+            document.getElementById('textoPregunta').innerHTML = `<strong>${preguntaPrueba.q}</strong>`;
+            document.getElementById('infoPregunta').innerHTML = `
+                <div style="margin-top:10px;font-size:14px;color:#8899aa;">
+                    <strong>Textos cortos personalizados:</strong><br>
+                    ✅ Sí: "${preguntaPrueba.reflection_yes_short}"<br>
+                    🤔 Parcial: "${preguntaPrueba.reflection_partial_short}"<br>
+                    ❌ No: "${preguntaPrueba.reflection_no_short}"
+                </div>
+            `;
+            
+            document.getElementById('preguntaSimulada').style.display = 'block';
+            document.getElementById('resultado').innerHTML = '<div class="success">✅ Pregunta de prueba creada con textos personalizados</div>';
+        }
+
+        // Función para mostrar el feedback de respuesta incorrecta
+        function mostrarFeedbackIncorrecto() {
+            if (estadoSimulado.questions.length === 0) {
+                document.getElementById('resultado').innerHTML = '<div class="error">❌ Primero crea una pregunta de prueba</div>';
+                return;
+            }
+            
+            const q = estadoSimulado.questions[estadoSimulado.currentIdx];
+            
+            // Mostrar la pregunta del Dr. ECG
+            document.getElementById('npcPregunta').textContent = q.reflection;
+            
+            // Crear los botones con textos personalizados (mismo código que el fix)
+            const yesText = q.reflection_yes_short || '✅ Entiendo — el error tiene sentido ahora';
+            const partialText = q.reflection_partial_short || '🤔 Entendí algo, pero necesito repasar';
+            const noText = q.reflection_no_short || '❌ No lo veo aún, necesito más contexto';
+            
+            const npcButtons = document.getElementById('npcButtons');
+            npcButtons.innerHTML = `
+                <button class="npc-btn" onclick="seleccionarOpcion('yes')">${yesText}</button>
+                <button class="npc-btn" onclick="seleccionarOpcion('partial')">${partialText}</button>
+                <button class="npc-btn" onclick="seleccionarOpcion('no')">${noText}</button>
+            `;
+            
+            document.getElementById('npcContainer').style.display = 'block';
+            document.getElementById('resultado').innerHTML = '<div class="success">✅ Feedback incorrecto mostrado. ¡Observa los textos de los botones!</div>';
+        }
+
+        // Función para seleccionar una opción del NPC
+        function seleccionarOpcion(tipo) {
+            const q = estadoSimulado.questions[estadoSimulado.currentIdx];
+            let respuesta = '';
+            
+            switch(tipo) {
+                case 'yes':
+                    respuesta = q.reflection_yes;
+                    break;
+                case 'partial':
+                    respuesta = q.reflection_partial;
+                    break;
+                case 'no':
+                    respuesta = q.reflection_no;
+                    break;
+            }
+            
+            // Mostrar la respuesta del Dr. ECG
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = `
+                <div class="status-box">
+                    <strong>Respuesta del Dr. ECG (${tipo}):</strong><br>
+                    <div style="margin-top:8px;font-style:italic;">${respuesta}</div>
+                    <div style="margin-top:10px;color:#22c55e;">
+                        ✅ ¡La reflexión ha sido registrada!
+                    </div>
+                </div>
+            `;
+            
+            // Deshabilitar botones
+            document.querySelectorAll('.npc-btn').forEach(btn => btn.disabled = true);
+        }
+
+        // Función para verificar que los textos sean correctos
+        function verificarTextos() {
+            const botones = document.querySelectorAll('.npc-btn');
+            const q = estadoSimulado.questions[estadoSimulado.currentIdx];
+            
+            if (botones.length === 0) {
+                document.getElementById('resultado').innerHTML = '<div class="error">❌ No hay botones NPC para verificar</div>';
+                return;
+            }
+            
+            const textosEsperados = [
+                q.reflection_yes_short || '✅ Entiendo — el error tiene sentido ahora',
+                q.reflection_partial_short || '🤔 Entendí algo, pero necesito repasar',
+                q.reflection_no_short || '❌ No lo veo aún, necesito más contexto'
+            ];
+            
+            let todosCorrectos = true;
+            let mensaje = '<div class="status-box"><strong>Verificación de textos:</strong><br>';
+            
+            botones.forEach((btn, i) => {
+                const textoReal = btn.textContent.trim();
+                const textoEsperado = textosEsperados[i];
+                const esCorrecto = textoReal === textoEsperado;
+                
+                mensaje += `<br><span class="${esCorrecto ? 'success' : 'error'}">`;
+                mensaje += `${esCorrecto ? '✅' : '❌'} Botón ${i + 1}: "${textoReal}"`;
+                mensaje += `</span>`;
+                
+                if (!esCorrecto) {
+                    mensaje += `<br><span style="color:#f97316;">Esperado: "${textoEsperado}"</span>`;
+                    todosCorrectos = false;
+                }
+            });
+            
+            mensaje += `<br><br><strong>Resultado:</strong> `;
+            mensaje += todosCorrectos ? 
+                '<span class="success">¡Todos los textos son personalizados! El fix funciona correctamente.</span>' :
+                '<span class="error">Algunos botones tienen textos genéricos. El fix puede no estar aplicado.</span>';
+            
+            mensaje += '</div>';
+            document.getElementById('resultado').innerHTML = mensaje;
+        }
+
+        // Auto-iniciar con una pregunta de prueba
+        window.addEventListener('load', function() {
+            console.log('Simulador de textos personalizados cargado');
+            console.log('El simulador creará automáticamente una pregunta de prueba al cargar');
+            crearPreguntaDePrueba();
+        });
+    </script>
+</body>
+</html>
