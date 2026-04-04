@@ -342,22 +342,22 @@
           <!-- LEYENDA DE ONDAS -->
           <div class="wave-legend">
             <span style="font-size:.68rem;color:#4caf50;align-self:center;margin-right:.3rem;">ONDAS:</span>
-            <div class="legend-item" onclick="showWaveInfo('p')">
+            <div class="legend-item" onclick="showWaveInfo('p', event)">
               <div class="legend-dot p-dot"></div> Onda P
             </div>
-            <div class="legend-item" onclick="showWaveInfo('pr')">
+            <div class="legend-item" onclick="showWaveInfo('pr', event)">
               <div class="legend-dot pr-dot"></div> Intervalo PR
             </div>
-            <div class="legend-item" onclick="showWaveInfo('qrs')">
+            <div class="legend-item" onclick="showWaveInfo('qrs', event)">
               <div class="legend-dot r-dot"></div> Complejo QRS
             </div>
-            <div class="legend-item" onclick="showWaveInfo('st')">
+            <div class="legend-item" onclick="showWaveInfo('st', event)">
               <div class="legend-dot s-dot"></div> Segmento ST
             </div>
-            <div class="legend-item" onclick="showWaveInfo('t')">
+            <div class="legend-item" onclick="showWaveInfo('t', event)">
               <div class="legend-dot t-dot"></div> Onda T
             </div>
-            <div class="legend-item" onclick="showWaveInfo('qt')">
+            <div class="legend-item" onclick="showWaveInfo('qt', event)">
               <div class="legend-dot qt-dot"></div> Intervalo QT
             </div>
           </div>
@@ -806,7 +806,7 @@
     }
   };
 
-  function showWaveInfo(wave) {
+  function showWaveInfo(wave, event) {
     const panel = document.getElementById('infoPanel');
     const title = document.getElementById('infoPanelTitle');
     const body  = document.getElementById('infoPanelBody');
