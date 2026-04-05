@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Cap. 1 – Fundamentos Fisiológicos | Guía ECG</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <style>
+    /* ═══════════════════════════════════════
+       QUIZ GAMIFICADO — ESTILOS
+    ═══════════════════════════════════════ */
+
+    /* ── HUD (barra superior de stats) ── */
+    .quiz-hud {
+      position: sticky; top: 60px; z-index: 100;
+      background: #0a0e1a;
+      border-bottom: 1px solid #1e3a5f;
+      padding: 10px 24px;
+      display: flex; align-items: center; gap: 20px;
+      flex-wrap: wrap;
+    }
+    .hud-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.88rem; font-weight: 600;
+    }
+    .hud-icon { font-size: 1.1rem; }
+    .hud-val  { color: #e0e6f0; min-width: 36px; }
+    .hud-label{ color: #607080; font-size: 0.75rem; }
+
+    /* Barra de progreso de preguntas */
+    .hud-progress { flex: 1; min-width: 120px; }
+    .hud-prog-track {
+      background: #1e2d40; border-radius: 4px; height: 6px; overflow: hidden;
+    }
+    .hud-prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1976d2, #00c8ff);
+      border-radius: 4px;
+      transition: width .4s ease;
+    }
+    .hud-prog-label { font-size: .72rem; color: #607080; margin-top: 2px; }
+
+    /* Temporizador — se pone rojo cuando queda poco */
+    .timer-val { color: #22c55e; transition: color .3s; font-size: 1rem; }
+    .timer-val.warning { color: #f97316; }
+    .timer-val.danger  { color: #ef4444; animation: pulse-timer .5s infinite alternate; }
+    @keyframes pulse-timer { from {opacity:1} to {opacity:.4} }
+
+    /* Vidas */
+    .lives-display { display: flex; gap: 3px; }
+    .life { font-size: 1rem; transition: transform .2s; }
+    .life.lost { opacity: .2; transform: scale(.7); }
+
+    /* Racha */
+    .streak-val { color: #f97316; }
+    .streak-val.active { animation: streak-glow .6s ease; }
+    @keyframes streak-glow {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.4); color: #fbbf24; }
+      100% { transform: scale(1); }
+    }
+
+    /* ── Wrapper principal ── */
+    .quiz-wrap {
+      max-width: 720px; margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* ── Pantalla de inicio ── */
+    #screen-start {
+      text-align: center; padding: 40px 20px;
+    }
+    .qs-icon { font-size: 4rem; margin-bottom: 16px; }
+    .qs-title { font-size: 1.8rem; font-weight: 800; color: #e0e6f0; margin-bottom: 8px; }
+    .qs-sub   { color: #8899aa; font-size: .95rem; margin-bottom: 28px; line-height: 1.6; }
+    .qs-stats {
+      display: flex; justify-content: center; gap: 24px;
+      margin-bottom: 32px; flex-wrap: wrap;
+    }
+    .qs-stat {
+      background: #111827; border: 1px solid #1e2d40;
+      border-radius: 10px; padding: 14px 20px; text-align: center;
+    }
+    .qs-stat-num   { display: block; font-size: 1.4rem; font-weight: 700; color: #60c8ff; }
+    .qs-stat-label { font-size: .75rem; color: #607080; }
+
+    /* Selector de dificultad */
+    .diff-selector {
+      display: flex; gap: 10px; justify-content: center; margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .diff-btn {
+      padding: 9px 20px; border-radius: 8px; cursor: pointer;
+      font-family: inherit; font-size: .88rem; font-weight: 600;
+      border: 2px solid transparent; transition: all .2s;
+    }
+    .diff-btn.suave   { background: #0d2e1a; border-color: #22c55e; color: #22c55e; }
+    .diff-btn.medio   { background: #2a1d0a; border-color: #f97316; color: #f97316; }
+    .diff-btn.intenso { background: #2a0a0a; border-color: #ef4444; color: #ef4444; }
+    .diff-btn.selected, .diff-btn:hover { filter: brightness(1.3); transform: scale(1.04); }
+
+    /* ── Tarjeta de pregunta ── */
+    #screen-quiz { display: none; }
+
+    .q-card {
+      background: #111827;
+      border: 1px solid #1e3a5f;
+      border-radius: 16px;
+      padding: 28px 28px 24px;
+      margin-bottom: 20px;
+      animation: slide-in .3s ease;
+    }
+    @keyframes slide-in {
+      from { opacity:0; transform: translateY(16px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .q-type-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #1e3a5f; color: #60c8ff;
+      font-size: .72rem; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 20px;
+      margin-bottom: 14px;
+    }
+
+    .q-text {
+      font-size: 1.05rem; font-weight: 600; color: #e0e6f0;
+      line-height: 1.6; margin-bottom: 22px;
+    }
+    .q-text code {
+      background: #1e3a5f; color: #60c8ff;
+      padding: 1px 6px; border-radius: 4px;
+    }
+
+    /* Opciones múltiple */
+    .q-options { display: flex; flex-direction: column; gap: 10px; }
+    .q-opt {
+      background: #0d1f35;
+      border: 2px solid #1e3a5f;
+      border-radius: 10px; padding: 12px 16px;
+      cursor: pointer; display: flex; align-items: center; gap: 12px;
+      transition: all .18s; font-size: .9rem; color: #c8d8e8;
+      text-align: left; font-family: inherit; width: 100%;
+    }
+    .q-opt:hover:not(:disabled) { border-color: #1976d2; background: #0d2137; transform: translateX(4px); }
+    .q-opt .opt-letter {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #1e3a5f; color: #60c8ff;
+      font-weight: 700; font-size: .82rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .q-opt.correct  { border-color: #22c55e; background: #0d2e1a; color: #e0e6f0; }
+    .q-opt.correct .opt-letter { background: #22c55e; color: #fff; }
+    .q-opt.wrong    { border-color: #ef4444; background: #2a0a0a; color: #e0e6f0; }
+    .q-opt.wrong .opt-letter { background: #ef4444; color: #fff; }
+    .q-opt:disabled { cursor: default; }
+
+    /* Fill in the blank */
+    .fitb-wrap { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .fitb-input {
+      background: #0d1f35; border: 2px solid #1e3a5f;
+      border-radius: 8px; padding: 10px 14px;
+      color: #e0e6f0; font-family: inherit; font-size: .95rem;
+      flex: 1; min-width: 200px; outline: none;
+      transition: border-color .2s;
+    }
+    .fitb-input:focus { border-color: #1976d2; }
+    .fitb-input.correct { border-color: #22c55e; background: #0d2e1a; }
+    .fitb-input.wrong   { border-color: #ef4444; background: #2a0a0a; }
+    .fitb-btn {
+      background: #1976d2; border: none; color: #fff;
+      padding: 10px 20px; border-radius: 8px; cursor: pointer;
+      font-family: inherit; font-weight: 600; font-size: .9rem;
+      transition: background .2s;
+    }
+    .fitb-btn:hover { background: #1565c0; }
+
+    /* ── Panel de feedback (respuesta correcta/incorrecta) ── */
+    .feedback-panel {
+      border-radius: 12px; padding: 20px 22px;
+      margin-bottom: 20px; display: none;
+      animation: slide-in .25s ease;
+    }
+    .feedback-panel.correct {
+      display: block;
+      background: #0d2e1a; border: 1px solid #22c55e55;
+    }
+    .feedback-panel.wrong {
+      display: block;
+      background: #1a0a0a; border: 1px solid #ef444455;
+    }
+
+    .fb-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 12px;
+    }
+    .fb-icon { font-size: 1.5rem; }
+    .fb-title { font-size: 1rem; font-weight: 700; }
+    .feedback-panel.correct .fb-title { color: #22c55e; }
+    .feedback-panel.wrong   .fb-title { color: #ef4444; }
+
+    .fb-correct-answer {
+      background: #0a1f0a; border-radius: 8px; padding: 10px 14px;
+      margin-bottom: 14px; font-size: .88rem; color: #86efac;
+    }
+    .fb-correct-answer strong { color: #22c55e; }
+
+    /* Explicación de por qué está mal */
+    .fb-why {
+      background: #1e1010; border-left: 3px solid #f97316;
+      border-radius: 0 8px 8px 0; padding: 12px 14px;
+      margin-bottom: 14px; font-size: .88rem; color: #c8d8e8;
+      line-height: 1.6;
+    }
+    .fb-why-title { color: #f97316; font-weight: 700; margin-bottom: 4px; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; }
+
+    /* Pregunta de reflexión */
+    .fb-reflection {
+      background: #0d1f35; border: 1px solid #1976d255;
+      border-radius: 10px; padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+    .fb-reflection-title {
+      color: #60c8ff; font-size: .78rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+    }
+    .fb-reflection-q {
+      color: #c8d8e8; font-size: .9rem; font-style: italic;
+      line-height: 1.6; margin-bottom: 10px;
+    }
+    /* Opciones de reflexión (¿entendiste por qué te equivocaste?) */
+    .reflection-opts { display: flex; gap: 8px; flex-wrap: wrap; }
+    .reflection-opt {
+      padding: 6px 14px; border-radius: 20px; cursor: pointer;
+      font-family: inherit; font-size: .82rem; font-weight: 600;
+      border: 1px solid; transition: all .2s;
+    }
+    .reflection-opt.yes { border-color: #22c55e; color: #22c55e; background: transparent; }
+    .reflection-opt.no  { border-color: #ef4444; color: #ef4444; background: transparent; }
+    .reflection-opt.partial { border-color: #f97316; color: #f97316; background: transparent; }
+    .reflection-opt:hover { filter: brightness(1.3); }
+    .reflection-opt.selected { filter: brightness(1.3); }
+    .reflection-opt.yes.selected     { background: #22c55e22; }
+    .reflection-opt.no.selected      { background: #ef444422; }
+    .reflection-opt.partial.selected { background: #f9731622; }
+
+    /* Mensaje post-reflexión */
+    .reflection-response {
+      margin-top: 10px; padding: 8px 12px;
+      border-radius: 8px; font-size: .84rem; color: #c8d8e8;
+      display: none; line-height: 1.5;
+    }
+
+    /* Puntos ganados/perdidos */
+    .points-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 12px; border-radius: 20px;
+      font-weight: 700; font-size: .85rem;
+    }
+    .points-badge.gained { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; }
+    .points-badge.lost   { background: #ef444422; color: #ef4444; border: 1px solid #ef444444; }
+
+    /* ── Botón siguiente ── */
+    .btn-next {
+      width: 100%; padding: 13px;
+      background: #1976d2; border: none; color: #fff;
+      border-radius: 10px; font-size: 1rem; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+      transition: background .2s, transform .15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-next:hover { background: #1565c0; transform: translateY(-2px); }
+    .btn-next:disabled { background: #1e2d40; color: #607080; cursor: default; transform: none; }
+
+    /* ── Pantalla de resultado final ── */
+    #screen-result { display: none; text-align: center; padding: 20px; }
+    .result-icon { font-size: 4rem; margin-bottom: 16px; }
+    .result-title { font-size: 1.6rem; font-weight: 800; color: #e0e6f0; margin-bottom: 8px; }
+    .result-sub   { color: #8899aa; margin-bottom: 28px; }
+
+    .result-score-big {
+      font-size: 3rem; font-weight: 800; color: #60c8ff;
+      margin-bottom: 6px;
+    }
+    .result-score-label { color: #607080; font-size: .88rem; margin-bottom: 28px; }
+
+    .result-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px; margin-bottom: 28px; text-align: center;
+    }
+    .result-stat {
+      background: #111827; border: 1px solid #1e2d40;
+      border-radius: 10px; padding: 14px 10px;
+    }
+    .result-stat-num   { display: block; font-size: 1.3rem; font-weight: 700; color: #60c8ff; }
+    .result-stat-label { font-size: .72rem; color: #607080; }
+
+    /* Desglose por pregunta */
+    .result-breakdown { text-align: left; margin-bottom: 28px; }
+    .result-breakdown h3 {
+      font-size: .85rem; color: #60c8ff; text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: 12px;
+    }
+    .rb-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid #1e2d40;
+      font-size: .84rem;
+    }
+    .rb-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .rb-text { color: #8899aa; flex: 1; line-height: 1.4; }
+    .rb-text strong { color: #c8d8e8; }
+    .rb-pts { font-weight: 700; font-size: .82rem; flex-shrink: 0; }
+    .rb-pts.pos { color: #22c55e; }
+    .rb-pts.neg { color: #ef4444; }
+
+    .result-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-retry {
+      background: #1976d2; color: #fff; border: none;
+      padding: 11px 24px; border-radius: 8px;
+      font-family: inherit; font-weight: 700; font-size: .9rem;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: background .2s;
+    }
+    .btn-retry:hover { background: #1565c0; }
+    .btn-back {
+      background: transparent; color: #60c8ff;
+      border: 1px solid #1e3a5f; padding: 11px 24px; border-radius: 8px;
+      font-family: inherit; font-weight: 600; font-size: .9rem;
+      cursor: pointer; text-decoration: none;
+      display: flex; align-items: center; gap: 6px;
+      transition: background .2s;
+    }
+    .btn-back:hover { background: #1e3a5f; }
+
+    /* ── Animación de puntos flotantes ── */
+    .float-points {
+      position: fixed; font-size: 1.2rem; font-weight: 800;
+      pointer-events: none; z-index: 9999;
+      animation: float-up 1.2s ease forwards;
+    }
+    @keyframes float-up {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-80px) scale(1.3); }
+    }
+
+    /* ── Pantalla de "sin vidas" ── */
+    #screen-gameover { display: none; text-align: center; padding: 40px 20px; }
+
+    /* ═════════════════════════════════════
+       BARRA DE POTENCIAL DE ACCIÓN (Energía)
+    ═════════════════════════════════════ */
+    .energy-hud {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 0; flex: 1; min-width: 180px;
+    }
+    .energy-label {
+      font-size: .7rem; color: #60c8ff; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em; flex-shrink: 0;
+    }
+    .energy-track {
+      flex: 1; background: #1e2d40; border-radius: 6px;
+      height: 10px; overflow: visible; position: relative;
+    }
+    .energy-fill {
+      height: 100%; border-radius: 6px;
+      background: linear-gradient(90deg, #22c55e, #84cc16);
+      transition: width .6s cubic-bezier(.4,0,.2,1), background .4s;
+      position: relative;
+    }
+    .energy-fill.low  { background: linear-gradient(90deg, #f97316, #fbbf24); }
+    .energy-fill.crit { background: linear-gradient(90deg, #ef4444, #f97316); animation: energy-pulse .8s infinite alternate; }
+    @keyframes energy-pulse { from {opacity:1} to {opacity:.5} }
+    .energy-pct {
+      font-size: .72rem; color: #607080; min-width: 34px; text-align: right;
+    }
+
+    /* ═════════════════════════════════════
+       DUELO NPC — Caja de diálogo didáctico
+    ═════════════════════════════════════ */
+    .npc-box {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: #0d1f35; border: 1px solid #1976d255;
+      border-radius: 14px; padding: 16px 18px;
+      margin-bottom: 14px; animation: slide-in .3s ease;
+    }
+    .npc-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg, #1976d2, #0d47a1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; flex-shrink: 0;
+      box-shadow: 0 0 12px #1976d240;
+    }
+    .npc-bubble {
+      flex: 1;
+    }
+    .npc-name {
+      font-size: .7rem; color: #60c8ff; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px;
+    }
+    .npc-text {
+      font-size: .9rem; color: #c8d8e8; line-height: 1.65;
+      font-style: italic; margin-bottom: 12px;
+    }
+    .npc-opts {
+      display: flex; flex-direction: column; gap: 7px;
+    }
+    .npc-opt {
+      background: #111827; border: 1px solid #1e3a5f;
+      border-radius: 8px; padding: 9px 14px;
+      cursor: pointer; font-size: .85rem; color: #c8d8e8;
+      text-align: left; font-family: inherit; transition: all .18s;
+    }
+    .npc-opt:hover { border-color: #1976d2; background: #0d2137; transform: translateX(3px); }
+    .npc-opt.chosen-correct { border-color: #22c55e; background: #0d2e1a; color: #86efac; }
+    .npc-opt.chosen-wrong   { border-color: #ef4444; background: #2a0a0a; color: #fca5a5; }
+
+    /* ═════════════════════════════════════
+       POTION — Recuperación de energía por reflexión
+    ═════════════════════════════════════ */
+    .potion-toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, #064e3b, #065f46);
+      border: 1px solid #22c55e; border-radius: 12px;
+      padding: 12px 22px; font-size: .9rem; color: #86efac;
+      font-weight: 700; z-index: 9999;
+      display: flex; align-items: center; gap: 10px;
+      animation: potion-rise .4s ease;
+      box-shadow: 0 8px 32px #22c55e33;
+    }
+    @keyframes potion-rise {
+      from { opacity:0; transform: translate(-50%, 20px); }
+      to   { opacity:1; transform: translate(-50%, 0); }
+    }
+
+    /* ═════════════════════════════════════
+       INSIGNIAS DE ESPECIALISTA
+    ═════════════════════════════════════ */
+    .badges-section {
+      background: #0d1f35; border: 1px solid #1e3a5f;
+      border-radius: 14px; padding: 20px 22px; margin-bottom: 24px;
+    }
+    .badges-title {
+      font-size: .78rem; color: #60c8ff; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+    }
+    .badges-grid {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .badge-chip {
+      display: flex; align-items: center; gap: 8px;
+      background: #111827; border: 1px solid #1e2d40;
+      border-radius: 20px; padding: 7px 14px;
+      font-size: .82rem; transition: all .3s;
+    }
+    .badge-chip.earned {
+      border-color: #fbbf2488; background: #1c1400;
+      animation: badge-pop .5s cubic-bezier(.17,.67,.45,1.5);
+    }
+    @keyframes badge-pop {
+      0%   { transform: scale(0.6); opacity: 0; }
+      70%  { transform: scale(1.15); }
+      100% { transform: scale(1);   opacity: 1; }
+    }
+    .badge-chip .badge-icon { font-size: 1.1rem; }
+    .badge-chip .badge-name { color: #607080; font-weight: 600; }
+    .badge-chip.earned .badge-name { color: #fbbf24; }
+    .badge-chip .badge-locked { font-size: .7rem; color: #3a4a5a; }
+
+    /* ═════════════════════════════════════
+       CONSECUENCIA CLÍNICA (banner especial)
+    ═════════════════════════════════════ */
+    .clinical-consequence {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: #1a0a00; border: 1px solid #92400e;
+      border-radius: 10px; padding: 12px 16px;
+      margin-bottom: 12px; font-size: .86rem; color: #fcd34d;
+      line-height: 1.6;
+    }
+    .clinical-consequence .cc-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .clinical-consequence strong { color: #f97316; }
+
+    /* ═════════════════════════════════════
+       FICHA DE PERSONAJE (modal al final)
+    ═════════════════════════════════════ */
+    .char-modal-overlay {
+      position: fixed; inset: 0; z-index: 30000;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,.8); backdrop-filter: blur(6px);
+    }
+    .char-modal {
+      background: #0a1628; border: 1px solid #1e3a5f;
+      border-radius: 20px; padding: 36px 32px 28px;
+      max-width: 520px; width: 94%;
+      box-shadow: 0 24px 80px rgba(0,0,0,.6);
+      animation: lk-pop .35s cubic-bezier(.17,.67,.45,1.3);
+      max-height: 90vh; overflow-y: auto;
+    }
+    .char-header {
+      text-align: center; margin-bottom: 24px;
+    }
+    .char-avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, #1976d2 0%, #7c3aed 100%);
+      margin: 0 auto 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.4rem;
+      box-shadow: 0 0 24px #1976d240;
+    }
+    .char-name { font-size: 1.3rem; font-weight: 800; color: #e0e6f0; margin-bottom: 4px; }
+    .char-level {
+      display: inline-block; background: #1e3a5f;
+      color: #60c8ff; font-size: .78rem; font-weight: 700;
+      letter-spacing: .06em; padding: 3px 12px; border-radius: 20px;
+    }
+    .char-energy-section { margin-bottom: 20px; }
+    .char-energy-label {
+      font-size: .75rem; color: #60c8ff; text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: 8px; font-weight: 700;
+    }
+    .char-energy-bar {
+      background: #1e2d40; border-radius: 8px; height: 16px;
+      overflow: hidden; margin-bottom: 4px;
+    }
+    .char-energy-fill {
+      height: 100%; border-radius: 8px;
+      transition: width .8s ease;
+    }
+    .char-stats-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-bottom: 20px;
+    }
+    .char-stat {
+      background: #111827; border: 1px solid #1e2d40;
+      border-radius: 10px; padding: 12px;
+      text-align: center;
+    }
+    .char-stat-num { display: block; font-size: 1.4rem; font-weight: 800; color: #60c8ff; }
+    .char-stat-label { font-size: .7rem; color: #607080; }
+    .char-badges-title {
+      font-size: .75rem; color: #60c8ff; text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: 12px; font-weight: 700;
+    }
+    .char-close-btn {
+      width: 100%; margin-top: 20px; padding: 12px;
+      background: #1976d2; border: none; color: #fff;
+      border-radius: 10px; font-size: .95rem; font-weight: 700;
+      cursor: pointer; font-family: inherit; transition: background .2s;
+    }
+    .char-close-btn:hover { background: #1565c0; }
+
+    @media (max-width: 600px) {
+      .quiz-hud { gap: 12px; padding: 8px 14px; }
+      .q-card   { padding: 20px 16px; }
+      .q-text   { font-size: .95rem; }
+      .char-modal { padding: 24px 18px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-left">
+      <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+      <a href="index.html" class="site-logo"><i class="fas fa-heartbeat"></i><span>Guía de ECG</span></a>
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Buscar en el libro..." autocomplete="off"/>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-send-session" id="btnSendSession" onclick="openSendModal()" title="Enviar registro de sesión al profesor">
+        <i class="fas fa-paper-plane"></i><span class="btn-send-label">Enviar</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+    </div>
+  </header>
+
+  <div class="overlay" id="overlay"></div>
+
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        <div class="sidebar-title">Contenido</div>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Inicio</a></li>
+          <li class="nav-section">Capítulos</li>
+          <li class="nav-item"><a href="chapter-1.html" class="nav-link active"><span class="ch-num">1</span> Fundamentos Fisiológicos</a></li>
+          <li class="nav-item"><a href="chapter-2.html" class="nav-link"><span class="ch-num">2</span> Anatomía de las Derivaciones</a></li>
+          <li class="nav-item"><a href="chapter-3.html" class="nav-link"><span class="ch-num">3</span> Componentes del Trazado</a></li>
+          <li class="nav-item"><a href="chapter-4.html" class="nav-link"><span class="ch-num">4</span> Metodología de Interpretación</a></li>
+          <li class="nav-item"><a href="chapter-5.html" class="nav-link"><span class="ch-num">5</span> Patologías Básicas</a></li>
+          <li class="nav-item"><a href="chapter-6.html" class="nav-link"><span class="ch-num">6</span> Talleres de Práctica</a></li>
+          <li class="nav-section">Simuladores</li>
+          <li class="nav-item">
+            <a href="ecg-monitor.html" class="nav-link">
+              <i class="fas fa-heartbeat" style="color:#e53935"></i> Monitor ECG
+            </a>
+          </li>
+          <li class="nav-section">Aprendizaje</li>
+          <li class="nav-item">
+            <a href="autopercepcion.html" class="nav-link">
+              <i class="fas fa-brain" style="color:#a78bfa"></i> Autopercepción
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="main-content" id="mainContent">
+
+      <!-- HUD — Barra de estado completa -->
+      <div class="quiz-hud" id="quizHud" style="display:none">
+        <div class="hud-item">
+          <span class="hud-icon">⭐</span>
+          <div>
+            <div class="hud-val" id="hudPoints">0</div>
+            <div class="hud-label">Puntos</div>
+          </div>
+        </div>
+        <div class="hud-item">
+          <span class="hud-icon">⏱️</span>
+          <div>
+            <div class="hud-val timer-val" id="hudTimer">30</div>
+            <div class="hud-label">Segundos</div>
+          </div>
+        </div>
+        <div class="hud-item">
+          <span class="hud-icon">🔥</span>
+          <div>
+            <div class="hud-val streak-val" id="hudStreak">0</div>
+            <div class="hud-label">Racha</div>
+          </div>
+        </div>
+        <!-- Barra de Potencial de Acción -->
+        <div class="energy-hud">
+          <span class="energy-label">⚡ PA</span>
+          <div class="energy-track">
+            <div class="energy-fill" id="energyFill" style="width:100%"></div>
+          </div>
+          <span class="energy-pct" id="energyPct">100%</span>
+        </div>
+        <!-- Vidas -->
+        <div class="hud-item" id="hudLivesWrap">
+          <span class="hud-icon">❤️</span>
+          <div class="lives-display" id="hudLives"></div>
+        </div>
+
+        <div class="hud-progress">
+          <div class="hud-prog-track">
+            <div class="hud-prog-fill" id="hudProgFill" style="width:0%"></div>
+          </div>
+          <div class="hud-prog-label" id="hudProgLabel">Pregunta 1 de 10</div>
+        </div>
+      </div>
+
+      <div class="quiz-wrap">
+
+        <!-- ═══ PANTALLA INICIO ═══ -->
+        <div id="screen-start">
+          <div class="qs-icon">🧠</div>
+          <div class="qs-title">Quiz — Capítulo 1</div>
+          <div class="qs-sub">
+            Fundamentos Fisiológicos y Técnicos<br/>
+            Pon a prueba lo que aprendiste. Cada error tiene una reflexión que te ayuda a entender <em>por qué</em> te equivocaste.
+          </div>
+
+          <div class="qs-stats">
+            <div class="qs-stat">
+              <span class="qs-stat-num">10</span>
+              <span class="qs-stat-label">Por partida</span>
+            </div>
+            <div class="qs-stat">
+              <span class="qs-stat-num" style="color:#a78bfa">15</span>
+              <span class="qs-stat-label">Banco total</span>
+            </div>
+            <div class="qs-stat">
+              <span class="qs-stat-num" id="statTime">30s</span>
+              <span class="qs-stat-label">Por pregunta</span>
+            </div>
+            <div class="qs-stat">
+              <span class="qs-stat-num" id="statLives">3</span>
+              <span class="qs-stat-label">Vidas</span>
+            </div>
+          </div>
+
+          <div style="margin-bottom:12px; color:#8899aa; font-size:.88rem;">Selecciona la dificultad:</div>
+          <div class="diff-selector">
+            <button class="diff-btn suave"   onclick="setDiff('suave')">😌 Suave (60s · 3 vidas)</button>
+            <button class="diff-btn medio selected" onclick="setDiff('medio')">😤 Medio (30s · 3 vidas)</button>
+            <button class="diff-btn intenso" onclick="setDiff('intenso')">🔥 Intenso (15s · 2 vidas)</button>
+          </div>
+
+          <button class="btn-next" style="max-width:320px;margin:0 auto" onclick="startQuiz()">
+            <i class="fas fa-play"></i> Comenzar Quiz
+          </button>
+          <!-- Botón Ficha de Personaje -->
+          <div style="margin-top:16px">
+            <button onclick="showCharacterSheet()" style="
+              background:transparent;border:1px solid #1e3a5f;color:#60c8ff;
+              padding:8px 20px;border-radius:8px;font-family:inherit;
+              font-size:.85rem;cursor:pointer;transition:all .2s;
+            " onmouseover="this.style.borderColor='#1976d2'" onmouseout="this.style.borderColor='#1e3a5f'">
+              📜 Ver mi Ficha de Personaje
+            </button>
+          </div>
+        </div>
+
+        <!-- ═══ PANTALLA QUIZ ═══ -->
+        <div id="screen-quiz">
+          <div class="q-card" id="qCard">
+            <div class="q-type-badge" id="qTypeBadge"></div>
+            <div class="q-text" id="qText"></div>
+            <div id="qBody"></div>
+          </div>
+
+          <!-- Consecuencia clínica (aparece antes del feedback cuando hay error) -->
+          <div class="clinical-consequence" id="clinicalBox" style="display:none">
+            <span class="cc-icon">🏥</span>
+            <div id="clinicalText"></div>
+          </div>
+
+          <!-- Feedback (correcto o incorrecto) -->
+          <div class="feedback-panel" id="feedbackPanel">
+            <div class="fb-header">
+              <span class="fb-icon" id="fbIcon"></span>
+              <span class="fb-title" id="fbTitle"></span>
+              <span class="points-badge" id="fbPoints" style="margin-left:auto"></span>
+            </div>
+            <div class="fb-correct-answer" id="fbCorrectAnswer" style="display:none"></div>
+            <div class="fb-why" id="fbWhy" style="display:none">
+              <div class="fb-why-title">¿Por qué esta opción está mal?</div>
+              <div id="fbWhyText"></div>
+            </div>
+
+            <!-- NPC Duelo de Reflexión (reemplaza al panel de reflexión anterior) -->
+            <div class="npc-box" id="npcBox" style="display:none">
+              <div class="npc-avatar">🧑‍⚕️</div>
+              <div class="npc-bubble">
+                <div class="npc-name">Dr. ECG — Tu instructor</div>
+                <div class="npc-text" id="npcQuestion"></div>
+                <div class="npc-opts" id="npcOpts"></div>
+                <div class="reflection-response" id="reflectionResponse"></div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-next" id="btnNext" onclick="nextQuestion()" disabled>
+            Siguiente pregunta <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <!-- ═══ PANTALLA GAME OVER ═══ -->
+        <div id="screen-gameover">
+          <div style="font-size:3.5rem;margin-bottom:16px">💔</div>
+          <div class="qs-title" style="color:#ef4444">¡Sin vidas!</div>
+          <div class="qs-sub">Agotaste todas tus vidas. Repasa el capítulo y vuelve a intentarlo.</div>
+          <div style="font-size:2rem;font-weight:800;color:#60c8ff;margin-bottom:4px" id="goPoints">0 pts</div>
+          <div style="color:#607080;margin-bottom:28px">Puntos acumulados</div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <button class="btn-retry" onclick="restartQuiz()"><i class="fas fa-redo"></i> Reintentar</button>
+            <a href="chapter-1.html" class="btn-back"><i class="fas fa-book"></i> Repasar capítulo</a>
+          </div>
+        </div>
+
+        <!-- ═══ PANTALLA RESULTADO ═══ -->
+        <div id="screen-result">
+          <div class="result-icon" id="resultIcon"></div>
+          <div class="result-title" id="resultTitle"></div>
+          <div class="result-sub"  id="resultSub"></div>
+          <div class="result-score-big"  id="resultScore"></div>
+          <div class="result-score-label">puntos de conducción</div>
+
+          <!-- Barra de energía final -->
+          <div style="margin:0 auto 24px;max-width:400px">
+            <div style="font-size:.75rem;color:#60c8ff;text-transform:uppercase;
+                        letter-spacing:.06em;margin-bottom:8px;font-weight:700">
+              ⚡ Potencial de Acción Final
+            </div>
+            <div style="background:#1e2d40;border-radius:8px;height:14px;overflow:hidden">
+              <div id="resultEnergyBar" style="height:100%;border-radius:8px;
+                   background:linear-gradient(90deg,#22c55e,#84cc16);transition:width .8s ease"></div>
+            </div>
+            <div id="resultEnergyPct" style="font-size:.8rem;color:#607080;margin-top:4px"></div>
+          </div>
+
+          <!-- Insignias ganadas -->
+          <div class="badges-section" id="resultBadges">
+            <div class="badges-title"><i class="fas fa-star"></i> Insignias obtenidas esta partida</div>
+            <div class="badges-grid" id="resultBadgesGrid"></div>
+          </div>
+
+          <div class="result-grid">
+            <div class="result-stat">
+              <span class="result-stat-num" id="rCorrect">0</span>
+              <span class="result-stat-label">Correctas</span>
+            </div>
+            <div class="result-stat">
+              <span class="result-stat-num" id="rWrong">0</span>
+              <span class="result-stat-label">Intentos fallidos</span>
+            </div>
+            <div class="result-stat">
+              <span class="result-stat-num" id="rStreak">0</span>
+              <span class="result-stat-label">Mejor racha</span>
+            </div>
+            <div class="result-stat">
+              <span class="result-stat-num" id="rTime">0s</span>
+              <span class="result-stat-label">Tiempo total</span>
+            </div>
+          </div>
+          <div class="result-breakdown">
+            <h3>Desglose por pregunta</h3>
+            <div id="resultBreakdown"></div>
+          </div>
+          <div class="result-actions">
+            <button class="btn-retry" onclick="restartQuiz()"><i class="fas fa-redo"></i> Jugar de nuevo</button>
+            <button class="btn-retry" onclick="showCharacterSheet()" style="background:#1a0f40;border-color:#7c3aed"><i class="fas fa-scroll"></i> Mi Ficha de Personaje</button>
+            <button class="btn-retry" onclick="exportarCSV()" style="background:#10692a"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+            <a href="chapter-1.html" class="btn-back"><i class="fas fa-book"></i> Volver al capítulo</a>
+            <a href="chapter-2.html" class="btn-back" style="border-color:#22c55e;color:#22c55e"><i class="fas fa-arrow-right"></i> Capítulo 2</a>
+          </div>
+        </div>
+
+      </div><!-- /quiz-wrap -->
+    </main>
+  </div>
+
+<script src="js/session.js"></script>
+<script src="js/main.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════
+   BANCO DE PREGUNTAS — CAPÍTULO 1
+   Cada pregunta tiene:
+     type: 'mcq' (opción múltiple) | 'fitb' (fill in blank)
+     q: texto de la pregunta
+     opts: opciones (solo mcq)
+     answer: respuesta correcta (letra para mcq, texto para fitb)
+     why_wrong: objeto {A:'',B:'',C:'',D:''} explicación de por qué cada opción incorrecta está mal
+     reflection: pregunta de reflexión para el estudiante
+     reflection_yes / reflection_no / reflection_partial: respuestas según lo que elija
+     points: puntos base
+═══════════════════════════════════════════════════════ */
+const QUESTIONS = [
+  {
+    type: 'mcq',
+    q: '¿Cuál es el potencial de membrana en reposo de una célula ventricular normal?',
+    opts: { A: '+30 mV', B: '–90 mV', C: '0 mV', D: '–70 mV' },
+    answer: 'B',
+    why_wrong: {
+      A: '+30 mV es el potencial máximo que alcanza la célula durante la Fase 0 (despolarización rápida), no el potencial de reposo.',
+      C: '0 mV sería una célula sin diferencia de potencial entre el interior y exterior. En reposo, el interior de la célula es más negativo que el exterior.',
+      D: '–70 mV corresponde al potencial de reposo de una neurona, no de una célula ventricular cardíaca, que es más negativa (–90 mV).'
+    },
+    reflection: '¿Por qué crees que el interior de la célula cardíaca es negativo en reposo y no positivo o neutro?',
+    reflection_yes: 'Perfecto. La célula mantiene ese gradiente negativo gracias a la bomba Na⁺/K⁺-ATPasa que expulsa 3 Na⁺ por cada 2 K⁺ que entra, generando un exceso de cargas negativas dentro.',
+    reflection_partial: 'El truco está en la bomba Na⁺/K⁺-ATPasa: saca más cargas positivas (3 Na⁺) de las que mete (2 K⁺), dejando el interior con carga neta negativa de –90 mV.',
+    reflection_no: 'No te preocupes. Regresa a la sección "Potencial de Acción" y enfócate específicamente en el concepto de "potencial de membrana en reposo". La clave es la bomba Na⁺/K⁺.',
+    points: 100
+  },
+  {
+    type: 'mcq',
+    q: 'Durante la Fase 2 del potencial de acción cardíaco (meseta o plateau), ¿qué ión es el responsable principal?',
+    opts: { A: 'Na⁺ (entrada)', B: 'K⁺ (salida)', C: 'Ca²⁺ (entrada)', D: 'Cl⁻ (entrada)' },
+    answer: 'C',
+    why_wrong: {
+      A: 'El Na⁺ es el protagonista de la Fase 0 (despolarización rápida), no de la meseta. En la Fase 2 los canales rápidos de Na⁺ ya están inactivados.',
+      B: 'El K⁺ saliente es el responsable de las Fases 1 y 3 (repolarización). En la Fase 2 hay cierta salida de K⁺, pero es el Ca²⁺ entrante el que mantiene el plateau.',
+      D: 'El Cl⁻ no tiene un papel protagonista en el potencial de acción cardíaco en ninguna de sus fases.'
+    },
+    reflection: '¿Recuerdas por qué es tan importante que el Ca²⁺ entre durante la meseta? ¿Qué desencadena esa entrada de calcio?',
+    reflection_yes: '¡Exacto! El Ca²⁺ que entra en la Fase 2 desencadena la liberación de más Ca²⁺ desde el retículo sarcoplásmico, lo que provoca la contracción muscular cardíaca.',
+    reflection_partial: 'La clave es que el Ca²⁺ entrante en Fase 2 actúa como "disparador" para que el retículo sarcoplásmico libere Ca²⁺ adicional, causando la contracción. Sin meseta, no hay contracción sostenida.',
+    reflection_no: 'Revisa la tabla de fases del potencial de acción en el capítulo, específicamente la columna "Ión principal". La Fase 2 es la única con Ca²⁺ como protagonista.',
+    points: 100
+  },
+  {
+    type: 'mcq',
+    q: '¿Cuál es la función principal del Nodo AV en el sistema de conducción?',
+    opts: {
+      A: 'Iniciar el impulso eléctrico cardíaco',
+      B: 'Distribuir el impulso por los ventrículos',
+      C: 'Retrasar el impulso para que las aurículas terminen de contraerse',
+      D: 'Conectar la rama derecha con la izquierda del Haz de His'
+    },
+    answer: 'C',
+    why_wrong: {
+      A: 'Iniciar el impulso es la función del Nodo Sinusal (SA), el marcapasos natural del corazón. El Nodo AV recibe el impulso, no lo origina.',
+      B: 'Distribuir el impulso por los ventrículos es la función de las Fibras de Purkinje, que tienen la mayor velocidad de conducción del sistema.',
+      D: 'El Haz de His es el que se divide en rama derecha e izquierda. El Nodo AV está antes de ese punto y tiene una función diferente.'
+    },
+    reflection: '¿Entiendes por qué es necesario ese retraso de 120-200 ms? ¿Qué pasaría si el impulso llegara a los ventrículos al mismo tiempo que a las aurículas?',
+    reflection_yes: 'Correcto. Sin ese retraso, aurículas y ventrículos se contraerían simultáneamente, perdiendo la sincronía que permite un llenado ventricular eficiente.',
+    reflection_partial: 'Piénsalo así: las aurículas necesitan tiempo para vaciarse hacia los ventrículos. El retraso del Nodo AV es el "pause" que da tiempo al llenado ventricular antes de que se contraigan.',
+    reflection_no: 'Revisa la sección "Nodo Auriculoventricular (AV)" del capítulo. La palabra clave es "retraso fisiológico" y su relación con el intervalo PR en el ECG.',
+    points: 100
+  },
+  {
+    type: 'mcq',
+    topic: 'tiempo',
+    q: 'A la velocidad estándar de 25 mm/s, cada cuadro grande del papel de ECG (5 mm) equivale a:',
+    opts: { A: '0.04 segundos', B: '0.12 segundos', C: '0.20 segundos', D: '1.00 segundo' },
+    answer: 'C',
+    why_wrong: {
+      A: '0.04 s corresponde a 1 mm (cuadro pequeño), no a 5 mm. Recuerda: 1 mm = 1/25 s = 0.04 s.',
+      B: '0.12 s equivale a 3 cuadros pequeños (3 mm), no a un cuadro grande. Es el valor del intervalo PR mínimo normal, no de un cuadro grande.',
+      D: '1.00 segundo equivale a 25 mm (5 cuadros grandes), no a uno solo. A 25 mm/s, 25 mm de papel pasan en 1 segundo.'
+    },
+    reflection: '¿Cuántos cuadros grandes necesitas contar para estimar una frecuencia cardíaca de 75 lpm?',
+    reflection_yes: 'Correcto. A 75 lpm, el intervalo RR es ~0.80 s = 4 cuadros grandes. La regla rápida: 300 ÷ número de cuadros grandes entre R y R.',
+    reflection_partial: 'La fórmula es: FC = 300 ÷ cuadros grandes entre dos ondas R. Prueba: si hay 4 cuadros grandes entre R-R → 300/4 = 75 lpm.',
+    reflection_no: 'Vuelve a la sección "El Papel de Registro". La relación clave: 1 cuadro grande = 0.20 s. Para calcular FC: FC = 300 ÷ cuadros grandes R-R.',
+    points: 100
+  },
+  {
+    type: 'mcq',
+    q: 'En el ECG, la despolarización auricular genera:',
+    opts: { A: 'El complejo QRS', B: 'La onda T', C: 'La onda P', D: 'El segmento ST' },
+    answer: 'C',
+    why_wrong: {
+      A: 'El complejo QRS representa la despolarización ventricular, no auricular. Es la onda más pronunciada del trazado porque la masa ventricular es mucho mayor.',
+      B: 'La onda T representa la repolarización ventricular. Es el proceso opuesto a la despolarización y ocurre después del QRS.',
+      D: 'El segmento ST es la línea isoeléctrica entre el fin del QRS y el inicio de la onda T. Representa el período entre despolarización y repolarización ventricular.'
+    },
+    reflection: '¿Puedes completar la secuencia? Despolarización auricular → __ / Despolarización ventricular → __ / Repolarización ventricular → __',
+    reflection_yes: '¡Excelente! Onda P → QRS → Onda T. Esta secuencia es la base de toda la interpretación del ECG.',
+    reflection_partial: 'La regla nemotécnica del capítulo: D (Despolarización) → P y QRS / R (Repolarización) → T.',
+    reflection_no: 'Regresa a la sección "Despolarización y Repolarización" y memoriza la regla nemotécnica: D → P, QRS / R → T.',
+    points: 100
+  },
+  {
+    type: 'mcq',
+    q: '¿Qué estructura del sistema de conducción tiene la mayor velocidad de conducción?',
+    opts: { A: 'Nodo Sinusal (SA)', B: 'Nodo AV', C: 'Haz de His', D: 'Fibras de Purkinje' },
+    answer: 'D',
+    why_wrong: {
+      A: 'El Nodo SA tiene una velocidad de 1 m/s, que es moderada. Su importancia no es la velocidad sino su automatismo espontáneo a 60-100 lpm.',
+      B: 'El Nodo AV es, paradójicamente, el más LENTO del sistema (0.05 m/s). Su lentitud es intencional para crear el retraso fisiológico.',
+      C: 'El Haz de His conduce a 2-4 m/s, más rápido que el Nodo AV, pero más lento que las Fibras de Purkinje.'
+    },
+    reflection: '¿Por qué crees que las Fibras de Purkinje necesitan ser las más rápidas? ¿Qué problema causaría si condujeran lento?',
+    reflection_yes: 'Correcto. Si las Purkinje fueran lentas, distintas partes del ventrículo se contraerían en momentos diferentes, generando una contracción desincronizada e ineficiente.',
+    reflection_partial: 'La razón es la sincronía: los ventrículos deben contraerse casi simultáneamente para bombear eficientemente. Las Purkinje a 4 m/s logran activar todo el ventrículo en milisegundos.',
+    reflection_no: 'Revisa la tabla de velocidades de conducción en la sección "Sistema de Conducción". Ordena las 4 estructuras de más lenta a más rápida.',
+    points: 100
+  },
+  {
+    type: 'mcq',
+    q: 'Si un vector de despolarización se ALEJA de un electrodo, la deflexión registrada en ese electrodo será:',
+    opts: { A: 'Positiva (hacia arriba)', B: 'Negativa (hacia abajo)', C: 'Bifásica', D: 'No se registra nada' },
+    answer: 'B',
+    why_wrong: {
+      A: 'La deflexión positiva ocurre cuando el vector se ACERCA al electrodo. "Se acerca = sube" en el trazo.',
+      C: 'La deflexión bifásica ocurre cuando el vector es PERPENDICULAR al electrodo, pasando mitad hacia él y mitad alejándose.',
+      D: 'Siempre se registra algo. Un vector que se aleja genera una deflexión negativa, no silencio eléctrico.'
+    },
+    reflection: '¿Puedes recordar la regla completa? Acercamiento → ___ / Alejamiento → ___ / Perpendicular → ___',
+    reflection_yes: 'Excelente: Acercamiento → positiva / Alejamiento → negativa / Perpendicular → bifásica. Esta regla explica por qué cada derivación ve el mismo corazón de forma diferente.',
+    reflection_partial: 'La regla completa: vector que SE ACERCA = deflexión positiva ↑ / vector que SE ALEJA = deflexión negativa ↓ / vector PERPENDICULAR = bifásica ↕',
+    reflection_no: 'Busca en el capítulo la sección "Deflexión según el electrodo". La regla tiene solo 3 casos y es fundamental para entender las derivaciones.',
+    points: 100
+  },
+  {
+    type: 'mcq',
+    topic: 'ion',
+    q: 'La calibración estándar del ECG es 10 mm/mV. Una deflexión de 5 mm de altura equivale a:',
+    opts: { A: '0.1 mV', B: '0.5 mV', C: '1.0 mV', D: '2.0 mV' },
+    answer: 'B',
+    why_wrong: {
+      A: '0.1 mV equivale solo a 1 mm (un cuadro pequeño). Recuerda: 10 mm = 1 mV, por lo que cada mm = 0.1 mV.',
+      C: '1.0 mV equivale a 10 mm (dos cuadros grandes). Si la deflexión mide 5 mm, divide entre 10: 5/10 = 0.5 mV, no 1.0 mV.',
+      D: '2.0 mV equivale a 20 mm. Una deflexión de 5 mm está muy por debajo de ese valor. Recuerda siempre partir de la regla: 10 mm = 1 mV.'
+    },
+    reflection: '¿Qué error clínico podrías cometer si el ECG fue grabado a media calibración (5 mm/mV) y no lo notas?',
+    reflection_yes: 'Correcto. A media calibración las deflexiones miden la mitad, podrías interpretar voltajes normales como bajos y diagnosticar erróneamente "bajos voltajes" o subestimar una hipertrofia ventricular.',
+    reflection_partial: 'A media calibración (5 mm/mV), una onda R de 8 mm en realidad mide 1.6 mV, no 0.8 mV. Siempre verifica la señal de calibración al inicio del trazado.',
+    reflection_no: 'Revisa la sección "El Papel de Registro" y el recuadro de advertencia sobre calibración. La clave: busca siempre la señal cuadrada de 10 mm al inicio del ECG.',
+    points: 100
+  },
+  {
+    type: 'mcq',
+    q: '¿Cuál es la frecuencia de descarga normal del Nodo Sinusal (SA)?',
+    opts: { A: '20-40 lpm', B: '40-60 lpm', C: '60-100 lpm', D: '100-150 lpm' },
+    answer: 'C',
+    why_wrong: {
+      A: '20-40 lpm es la frecuencia de escape de las Fibras de Purkinje. Si el SA falla y las Purkinje toman el mando, el ritmo sería tan lento que causaría síntomas.',
+      B: '40-60 lpm es la frecuencia de escape del Nodo AV. Si el SA falla, el AV puede ser el marcapasos secundario a esta frecuencia.',
+      D: '100-150 lpm sería taquicardia. El SA puede acelerar hasta esas frecuencias, pero no es su rango normal en reposo.'
+    },
+    reflection: '¿Por qué es importante que el SA tenga la frecuencia más alta de todo el sistema de conducción?',
+    reflection_yes: 'Correcto. Al tener la frecuencia más alta, el SA "suprime" el automatismo de las estructuras inferiores, dominando el ritmo. Si el SA falla, el siguiente más rápido toma el control.',
+    reflection_partial: 'El principio es: en el corazón, manda quien más rápido dispara. El SA a 60-100 lpm es más rápido que el AV (40-60) y las Purkinje (20-40), por eso siempre domina.',
+    reflection_no: 'Revisa la tabla de velocidades y frecuencias de escape del capítulo. El concepto clave es "supresión por sobreestimulación" — el SA al ser el más rápido, suprime a los demás.',
+    points: 100
+  },
+  {
+    type: 'mcq',
+    q: 'En el contexto del ECG, ¿qué representa la Fase 4 del potencial de acción en las células del Nodo Sinusal (a diferencia de las células ventriculares)?',
+    opts: {
+      A: 'Reposo absoluto sin actividad eléctrica',
+      B: 'Despolarización diastólica espontánea (automatismo)',
+      C: 'Repolarización rápida por salida de K⁺',
+      D: 'Entrada masiva de Na⁺ para iniciar el siguiente potencial'
+    },
+    answer: 'B',
+    why_wrong: {
+      A: 'En células ventriculares sí hay reposo en Fase 4, pero en el Nodo SA no. Las células marcapasos tienen una corriente de despolarización lenta y espontánea que las hace disparar automáticamente.',
+      C: 'La repolarización rápida por salida de K⁺ corresponde a la Fase 3, no a la Fase 4.',
+      D: 'La entrada masiva de Na⁺ es la Fase 0. La Fase 4 del SA involucra corrientes más lentas (If, o "corriente funny") que generan la despolarización gradual.'
+    },
+    reflection: '¿Qué consecuencia clínica tendría si las células del Nodo SA perdieran su capacidad de despolarización espontánea?',
+    reflection_yes: 'Exacto: se produciría un paro sinusal. El siguiente marcapasos de rescate sería el Nodo AV a 40-60 lpm. Si este también falla, las Purkinje a 20-40 lpm. Si todo falla, paro cardíaco.',
+    reflection_partial: 'Sin automatismo del SA, el corazón dependería del próximo marcapasos: el Nodo AV (40-60 lpm). Esto se llama "ritmo nodal de escape" y es una emergencia clínica.',
+    reflection_no: 'Vuelve a leer la descripción de Fase 4 en la tabla del capítulo: "Estable (trabajo) o despolarización espontánea (marcapasos)". La diferencia entre células de trabajo y células marcapasos está ahí.',
+    points: 120
+  },
+
+  // ── PREGUNTAS NUEVAS (set 2) ──────────────────────────────────
+  {
+    type: 'mcq',
+    q: '¿Cuál es el ión responsable de la Fase 0 (despolarización rápida) del potencial de acción en las células ventriculares?',
+    opts: { A: 'Potasio (K⁺)', B: 'Calcio (Ca²⁺)', C: 'Sodio (Na⁺)', D: 'Magnesio (Mg²⁺)' },
+    answer: 'C',
+    why_wrong: {
+      A: 'El K⁺ tiene el papel opuesto: su SALIDA genera la repolarización en las Fases 1 y 3. En Fase 0 los canales de K⁺ están cerrados.',
+      B: 'El Ca²⁺ es el protagonista de la Fase 2 (meseta/plateau), no de la Fase 0. Su entrada es más lenta y sostenida, no rápida como la del Na⁺.',
+      D: 'El Mg²⁺ no tiene un papel directo en las fases del potencial de acción cardíaco. Funciona principalmente como cofactor enzimático.'
+    },
+    reflection: '¿Puedes relacionar la entrada masiva y rápida de Na⁺ en Fase 0 con lo que se ve en el ECG? ¿Qué onda representa ese momento?',
+    reflection_yes: 'Perfecto. La despolarización rápida ventricular (Fase 0 masiva de Na⁺) genera el complejo QRS en el ECG — la onda más prominente del trazado.',
+    reflection_partial: 'La Fase 0 de todas las células ventriculares activándose casi simultáneamente produce la deflexión rápida y pronunciada que llamamos complejo QRS.',
+    reflection_no: 'Regresa a la tabla de fases del potencial de acción. Fase 0 = Na⁺ entrada = despolarización rápida = origen del QRS. Esa cadena es clave.',
+    points: 100
+  },
+  {
+    type: 'mcq',
+    q: '¿Qué estructura del sistema de conducción es conocida como el "marcapasos natural" del corazón?',
+    opts: {
+      A: 'Nodo Auriculoventricular (AV)',
+      B: 'Fibras de Purkinje',
+      C: 'Haz de His',
+      D: 'Nodo Sinusal (SA)'
+    },
+    answer: 'D',
+    why_wrong: {
+      A: 'El Nodo AV es el marcapasos SECUNDARIO — si el SA falla, el AV toma el control a 40-60 lpm. Pero en condiciones normales el SA lo suprime.',
+      B: 'Las Fibras de Purkinje son el marcapasos TERCIARIO de escape (20-40 lpm). Su papel principal es la conducción rápida, no el inicio del impulso.',
+      C: 'El Haz de His es un conductor, no un marcapasos. Su función es transmitir el impulso desde el Nodo AV hacia las ramas y las Purkinje.'
+    },
+    reflection: '¿Por qué el Nodo SA domina como marcapasos y no el AV o las Purkinje, si todos tienen automatismo?',
+    reflection_yes: 'Correcto. El SA tiene la frecuencia espontánea más alta (60-100 lpm), así que siempre llega primero. Los demás no alcanzan a disparar solos porque el SA los "reinicia" antes.',
+    reflection_partial: 'Es una competencia de velocidad: el que dispara más rápido domina. SA gana con 60-100 lpm vs AV con 40-60 y Purkinje con 20-40. El ganador suprime a los demás.',
+    reflection_no: 'Lee la sección "Nodo Sinusal (SA)" y presta atención a la frase "Su automatismo es el más rápido del sistema, por lo que domina el ritmo cardíaco".',
+    points: 100
+  },
+  {
+    type: 'mcq',
+    q: 'En un ECG estándar registrado a 25 mm/s, ¿cuánto tiempo representan 3 cuadros grandes consecutivos?',
+    opts: { A: '0.12 segundos', B: '0.60 segundos', C: '0.20 segundos', D: '1.00 segundo' },
+    answer: 'B',
+    why_wrong: {
+      A: '0.12 segundos sería 3 cuadros PEQUEÑOS (3 × 0.04 s = 0.12 s), no 3 cuadros grandes. Es un valor que coincide con la duración normal del QRS.',
+      C: '0.20 segundos es lo que representa UN solo cuadro grande (5 mm × 0.04 s/mm = 0.20 s). La pregunta pide TRES cuadros grandes.',
+      D: '1.00 segundo equivale a 5 cuadros grandes (5 × 0.20 s). Tres cuadros grandes son solo el 60% de ese segundo.'
+    },
+    reflection: '¿Puedes calcular rápidamente cuántos cuadros grandes hay en un trazado de 6 segundos? ¿Para qué sirve saber eso en la práctica?',
+    reflection_yes: 'Excelente: 6 s ÷ 0.20 s = 30 cuadros grandes. Contar los complejos QRS en 6 segundos y multiplicar por 10 es uno de los métodos para calcular la frecuencia cardíaca.',
+    reflection_partial: 'En 6 segundos hay 30 cuadros grandes. Si cuentas los QRS en esa franja y multiplicas × 10, obtienes la frecuencia en lpm. Muy útil en ritmos irregulares.',
+    reflection_no: 'La clave es: 1 cuadro grande = 0.20 s. Para 3 cuadros grandes: 3 × 0.20 = 0.60 s. Practica con la tabla de escala del capítulo haciendo conversiones.',
+    points: 100
+  },
+  {
+    type: 'mcq',
+    q: 'Si un vector eléctrico de despolarización se aleja directamente de un electrodo de registro, ¿cómo será la deflexión en el ECG?',
+    opts: {
+      A: 'Positiva (hacia arriba)',
+      B: 'Negativa (hacia abajo)',
+      C: 'Isodifásica (bifásica igual hacia arriba y hacia abajo)',
+      D: 'Línea isoeléctrica plana, sin deflexión'
+    },
+    answer: 'B',
+    topic: 'vector',
+    clinical_consequence: '<strong>⚠️ Error de vector:</strong> Tu electrodo está "mirando" hacia el lado opuesto del vector. Es como intentar ver una película de espaldas a la pantalla. Confundir esto te haría reportar una onda negativa como patológica cuando es solo perspectiva del electrodo.',
+    reflection_yes_short: '✅ Entiendo — alejamiento = negativa, como mirar hacia atrás',
+    reflection_partial_short: '🤔 Entiendo la regla pero se me complica aplicarla a derivaciones',
+    reflection_no_short: '❌ Aún confundo cuándo es positiva o negativa una deflexión',
+    why_wrong: {
+      A: 'La deflexión positiva ocurre cuando el vector SE ACERCA al electrodo. "Acercamiento = positiva, alejamiento = negativa" es la regla fundamental.',
+      C: 'La deflexión bifásica (isodifásica) ocurre cuando el vector es PERPENDICULAR al electrodo, pasando la mitad de su recorrido acercándose y la mitad alejándose.',
+      D: 'Siempre habrá alguna deflexión si hay actividad eléctrica. La línea isoeléctrica real ocurre durante períodos de silencio eléctrico (segmentos PR y ST en condiciones normales).'
+    },
+    reflection: 'Aplicando esta regla: si en la derivación DII el vector cardíaco principal se acerca al electrodo, ¿la onda P será positiva o negativa en DII?',
+    reflection_yes: 'Correcto. En DII el vector auricular se aproxima al electrodo positivo, generando una onda P positiva — lo que vemos en ritmo sinusal normal.',
+    reflection_partial: 'En DII con ritmo sinusal, el vector auricular viaja hacia el electrodo positivo (se acerca), generando onda P positiva. Por eso DII es la derivación clásica para evaluar el ritmo.',
+    reflection_no: 'Revisa la sección "Deflexión según el electrodo" del capítulo. La regla es: ACERCAMIENTO → positiva ↑ / ALEJAMIENTO → negativa ↓ / PERPENDICULAR → bifásica ↕',
+    points: 100
+  },
+  {
+    type: 'mcq',
+    q: '¿Qué proceso fisiológico está representado por la aparición de la onda T en el trazado del ECG?',
+    opts: {
+      A: 'Despolarización auricular',
+      B: 'Repolarización ventricular',
+      C: 'Retraso de la conducción en el Nodo AV',
+      D: 'Despolarización ventricular'
+    },
+    answer: 'B',
+    why_wrong: {
+      A: 'La despolarización auricular genera la onda P, la primera onda del ciclo cardíaco. La repolarización auricular existe pero queda oculta dentro del QRS.',
+      C: 'El retraso en el Nodo AV se refleja en la duración del intervalo PR (de inicio de P al inicio del QRS). No genera una onda visible por sí mismo.',
+      D: 'La despolarización ventricular genera el complejo QRS. La onda T viene DESPUÉS y representa el proceso opuesto: la recuperación (repolarización).'
+    },
+    reflection: '¿Por qué crees que la repolarización auricular no genera una onda visible en el ECG como sí lo hace la repolarización ventricular (onda T)?',
+    reflection_yes: 'Exacto: la repolarización auricular es de baja amplitud y ocurre durante el QRS, siendo "tapada" por la gran señal ventricular. Solo se ve en condiciones especiales.',
+    reflection_partial: 'La masa auricular es mucho menor que la ventricular, genera menos voltaje. Además, su repolarización ocurre justo cuando el QRS está en curso, enmascarándola completamente.',
+    reflection_no: 'Vuelve a la sección "Despolarización y Repolarización" y la regla nemotécnica: R (Repolarización) → T. La onda T siempre es repolarización ventricular.',
+    points: 100
+  }
+];
+
+/* ═══════════════════════════════════
+   CONFIGURACIÓN Y ESTADO DEL QUIZ
+═══════════════════════════════════ */
+const DIFF_CONFIG = {
+  suave:   { time: 60, lives: 3, bonus_mult: 1.0 },
+  medio:   { time: 30, lives: 3, bonus_mult: 1.5 },
+  intenso: { time: 15, lives: 2, bonus_mult: 2.0 }
+};
+
+/* ── BARRA DE ENERGÍA (Potencial de Acción) ──
+   Empieza en 100. Cada error baja según la dificultad.
+   Si el alumno responde 'yes' en el NPC, recupera 50% de lo perdido (Potion). */
+const ENERGY_CONFIG = {
+  suave:   { loss: 15, recover: 7  },
+  medio:   { loss: 20, recover: 10 },
+  intenso: { loss: 30, recover: 12 }
+};
+
+/* ── INSIGNIAS DE ESPECIALISTA ── */
+const ALL_BADGES = [
+  {
+    id: 'maestro_iones',
+    icon: '⚡',
+    name: 'Maestro de Iones',
+    desc: 'Respondiste todas las preguntas sobre fases del potencial de acción correctamente a la primera.',
+    check: (s) => s.log.filter(l => l.topic === 'ion').every(l => l.intentos === 1)
+  },
+  {
+    id: 'reloj_precision',
+    icon: '⏱️',
+    name: 'Reloj de Precisión',
+    desc: 'Respondiste preguntas de tiempo/intervalos en menos de 10 segundos.',
+    check: (s) => s.log.filter(l => l.topic === 'tiempo').some(l => l.tiempoUsado <= 10 && l.intentos === 1)
+  },
+  {
+    id: 'brujula_cardiaca',
+    icon: '🧭',
+    name: 'Brújula Cardíaca',
+    desc: 'No fallaste ninguna pregunta de vectores y deflexiones.',
+    check: (s) => s.log.filter(l => l.topic === 'vector').every(l => l.intentos === 1)
+  },
+  {
+    id: 'primer_intento',
+    icon: '🌟',
+    name: 'Primer Intento',
+    desc: 'Respondiste 5 preguntas seguidas correctas a la primera.',
+    check: (s) => { let max=0,cur=0; s.log.forEach(l=>{if(l.intentos===1){cur++;max=Math.max(max,cur);}else cur=0;}); return max>=5; }
+  },
+  {
+    id: 'energia_plena',
+    icon: '💪',
+    name: 'Energía Plena',
+    desc: 'Terminaste el quiz con más del 80% de energía.',
+    check: (s) => s.energyFinal >= 80
+  },
+  {
+    id: 'reflexivo',
+    icon: '🧠',
+    name: 'Reflexivo',
+    desc: 'Usaste el Duelo de Reflexión y respondiste "Sí entendí" al menos 3 veces.',
+    check: (s) => (s.npcYesCount || 0) >= 3
+  }
+];
+
+/* ── INSIGNIAS GUARDADAS (localStorage) ── */
+function loadEarnedBadges() {
+  try { return JSON.parse(localStorage.getItem('ecg_badges_cap1') || '[]'); } catch { return []; }
+}
+function saveEarnedBadges(ids) {
+  localStorage.setItem('ecg_badges_cap1', JSON.stringify(ids));
+}
+
+let state = {
+  diff: 'medio',
+  questions: [],
+  currentIdx: 0,
+  points: 0,
+  lives: 3,
+  streak: 0,
+  bestStreak: 0,
+  correctCount: 0,
+  wrongCount: 0,
+  timeLeft: 30,
+  timerInterval: null,
+  answered: false,
+  startTime: null,
+  totalTime: 0,
+  log: [],
+  intentosPorPregunta: {},
+  energy: 100,           // Potencial de Acción (0-100)
+  energyFinal: 100,
+  npcYesCount: 0,        // cuantas veces eligió 'Sí entendí' en el NPC
+  earnedBadges: []       // insignias ganadas en esta partida
+};
+
+/* ── Seleccionar dificultad ── */
+function setDiff(d) {
+  state.diff = d;
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelector(`.diff-btn.${d}`).classList.add('selected');
+  document.getElementById('statTime').textContent  = DIFF_CONFIG[d].time + 's';
+  document.getElementById('statLives').textContent = DIFF_CONFIG[d].lives;
+}
+
+/* ── Iniciar quiz ── */
+function startQuiz() {
+  const cfg = DIFF_CONFIG[state.diff];
+  state.questions           = shuffle([...QUESTIONS]).slice(0, 10);
+  state.currentIdx          = 0;
+  state.points              = 0;
+  state.lives               = cfg.lives;
+  state.streak              = 0;
+  state.bestStreak          = 0;
+  state.correctCount        = 0;
+  state.wrongCount          = 0;
+  state.answered            = false;
+  state.startTime           = Date.now();
+  state.log                 = [];
+  state.intentosPorPregunta = {};
+  state.energy              = 100;
+  state.energyFinal         = 100;
+  state.npcYesCount         = 0;
+  state.earnedBadges        = [];
+  updateEnergyBar();
+
+  document.getElementById('screen-start').style.display = 'none';
+  document.getElementById('screen-quiz').style.display  = 'block';
+  document.getElementById('quizHud').style.display      = 'flex';
+
+  renderLives();
+  renderQuestion();
+}
+
+/* ── Barajar preguntas ── */
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/* ── Renderizar pregunta ── */
+function renderQuestion() {
+  const q   = state.questions[state.currentIdx];
+  const cfg = DIFF_CONFIG[state.diff];
+
+  // Limpiar feedback y paneles auxiliares
+  const fp = document.getElementById('feedbackPanel');
+  fp.className = 'feedback-panel';
+  fp.style.display = 'none';
+  document.getElementById('fbCorrectAnswer').style.display = 'none';
+  document.getElementById('fbWhy').style.display           = 'none';
+  document.getElementById('npcBox').style.display          = 'none';
+  document.getElementById('reflectionResponse').style.display = 'none';
+  document.getElementById('clinicalBox').style.display     = 'none';
+
+  // Limpiar hint de reintentar
+  const retryHint = document.getElementById('fbRetryHint');
+  if (retryHint) retryHint.style.display = 'none';
+
+  // Resetear NPC opciones
+  document.querySelectorAll('.npc-opt').forEach(b => {
+    b.classList.remove('chosen-correct','chosen-wrong');
+    b.disabled = false;
+  });
+
+  // Tipo
+  const badge = document.getElementById('qTypeBadge');
+  if (q.type === 'mcq') {
+    badge.innerHTML = '<i class="fas fa-list"></i> Opción múltiple';
+  } else {
+    badge.innerHTML = '<i class="fas fa-pencil-alt"></i> Completar espacio';
+  }
+
+  // Texto
+  document.getElementById('qText').innerHTML = q.q;
+
+  // Cuerpo de la pregunta
+  const body = document.getElementById('qBody');
+  if (q.type === 'mcq') {
+    body.innerHTML = `<div class="q-options">${
+      Object.entries(q.opts).map(([k,v]) =>
+        `<button class="q-opt" onclick="answerMCQ('${k}',this)" data-key="${k}">
+           <span class="opt-letter">${k}</span><span>${v}</span>
+         </button>`
+      ).join('')
+    }</div>`;
+  } else {
+    body.innerHTML = `
+      <div class="fitb-wrap">
+        <input class="fitb-input" id="fitbInput" placeholder="Escribe tu respuesta..."
+               onkeydown="if(event.key==='Enter') answerFITB()"/>
+        <button class="fitb-btn" onclick="answerFITB()">
+          <i class="fas fa-check"></i> Responder
+        </button>
+      </div>`;
+    setTimeout(() => document.getElementById('fitbInput')?.focus(), 100);
+  }
+
+  // HUD
+  updateHUD();
+
+  // Botón siguiente deshabilitado
+  const btnNext = document.getElementById('btnNext');
+  btnNext.disabled = true;
+  btnNext.innerHTML = 'Siguiente pregunta <i class="fas fa-arrow-right"></i>';
+
+  state.answered = false;
+
+  // Iniciar temporizador
+  startTimer(cfg.time);
+}
+
+/* ── Temporizador ── */
+function startTimer(seconds) {
+  clearInterval(state.timerInterval);
+  state.timeLeft = seconds;
+  updateTimerUI();
+
+  state.timerInterval = setInterval(() => {
+    state.timeLeft--;
+    updateTimerUI();
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timerInterval);
+      if (!state.answered) timeOut();
+    }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  const el = document.getElementById('hudTimer');
+  el.textContent = state.timeLeft;
+  el.className   = 'hud-val timer-val';
+  if (state.timeLeft <= 5)  el.classList.add('danger');
+  else if (state.timeLeft <= 10) el.classList.add('warning');
+}
+
+function timeOut() {
+  const q = state.questions[state.currentIdx];
+
+  // Cuando se acaba el tiempo: bloquear todas las opciones y revelar la correcta
+  state.answered = true;
+  document.querySelectorAll('.q-opt').forEach(b => {
+    b.disabled = true;
+    if (b.dataset.key === q.answer) b.classList.add('correct');
+  });
+  const fitbInput = document.getElementById('fitbInput');
+  if (fitbInput) { fitbInput.disabled = true; fitbInput.classList.add('wrong'); }
+  const fitbBtn = document.querySelector('.fitb-btn');
+  if (fitbBtn) fitbBtn.disabled = true;
+
+  // Mostrar feedback de timeout con respuesta revelada
+  processAnswer(false, null, q);
+
+  // Timeout revela la respuesta correcta (no hay opción de reintentar)
+  const ca = document.getElementById('fbCorrectAnswer');
+  ca.style.display = 'block';
+  ca.innerHTML = `<strong>⏱️ Tiempo agotado.</strong> La respuesta correcta era: <strong>${
+    q.type === 'mcq' ? `${q.answer}. ${q.opts[q.answer]}` : q.answer
+  }</strong>`;
+
+  // Ocultar el hint de reintentar si apareció
+  const retryHint = document.getElementById('fbRetryHint');
+  if (retryHint) retryHint.style.display = 'none';
+
+  // Habilitar siguiente directamente
+  const btnNext = document.getElementById('btnNext');
+  btnNext.disabled = false;
+  if (state.currentIdx >= state.questions.length - 1) {
+    btnNext.innerHTML = '🏁 Ver resultados <i class="fas fa-flag-checkered"></i>';
+  }
+}
+
+/* ── Responder MCQ ── */
+function answerMCQ(key, btn) {
+  if (state.answered) return;
+
+  const q       = state.questions[state.currentIdx];
+  const correct = key === q.answer;
+
+  if (correct) {
+    // Acertó — detener timer y bloquear todo
+    clearInterval(state.timerInterval);
+    state.answered = true;
+    document.querySelectorAll('.q-opt').forEach(b => {
+      b.disabled = true;
+      if (b.dataset.key === q.answer) b.classList.add('correct');
+    });
+    processAnswer(true, key, q);
+  } else {
+    // Erró — NO detener el timer (sigue corriendo mientras lee la explicación)
+    btn.classList.add('wrong');
+    btn.disabled = true;  // bloquear solo la opción elegida, las demás siguen activas
+    processAnswer(false, key, q);
+    // state.answered sigue false → puede seguir intentando
+  }
+}
+
+/* ── Responder Fill in the blank ── */
+function answerFITB() {
+  if (state.answered) return;
+
+  const q     = state.questions[state.currentIdx];
+  const input = document.getElementById('fitbInput');
+  const val   = input.value.trim().toLowerCase();
+  const alts  = (q.alt_answers || []).map(a => a.toLowerCase());
+  const correct = val === q.answer.toLowerCase() || alts.includes(val);
+
+  if (correct) {
+    clearInterval(state.timerInterval);  // detener timer solo al acertar
+    state.answered = true;
+    input.disabled = true;
+    input.classList.add('correct');
+    document.querySelector('.fitb-btn').disabled = true;
+    processAnswer(true, val, q);
+  } else {
+    // Error: marcar en rojo brevemente, limpiar y dejar reintentar sin detener el timer
+    input.classList.add('wrong');
+    setTimeout(() => {
+      input.classList.remove('wrong');
+      input.value = '';
+      input.focus();
+    }, 900);
+    processAnswer(false, val, q);
+    // state.answered sigue false → puede seguir intentando
+  }
+}
+
+/* ── Procesar respuesta (correcta o incorrecta) ── */
+function processAnswer(correct, given, q) {
+  const cfg      = DIFF_CONFIG[state.diff];
+  const ecfg     = ENERGY_CONFIG[state.diff];
+  const timeBonus= Math.floor(state.timeLeft * cfg.bonus_mult);
+  let   pts      = 0;
+
+  if (correct) {
+    pts = q.points + timeBonus;
+    state.points += pts;
+    state.correctCount++;
+    state.streak++;
+    if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+    showFeedbackCorrect(pts, q);
+
+    // Log local al acertar
+    const intentosPrevios = state.intentosPorPregunta[state.currentIdx] || 0;
+    state.log.push({
+      qText:      q.q.substring(0, 60) + '…',
+      correct:    true,
+      pts,
+      answer:     q.type === 'mcq' ? `${q.answer}. ${q.opts[q.answer]}` : q.answer,
+      intentos:   intentosPrevios + 1,
+      topic:      q.topic || 'general',
+      tiempoUsado: cfg.time - state.timeLeft
+    });
+
+    // Sesión global
+    if (window.ECGSession) {
+      window.ECGSession.logQuizAnswer({
+        capitulo: 'Capítulo 1 – Fundamentos Fisiológicos',
+        pregunta_num: state.currentIdx + 1,
+        pregunta_texto: q.q,
+        respuesta_dada: q.type === 'mcq' ? `${given}. ${q.opts[given] || given}` : given,
+        fue_correcta: true,
+        respuesta_correcta: q.type === 'mcq' ? `${q.answer}. ${q.opts[q.answer]}` : q.answer,
+        tiempo_seg: cfg.time - state.timeLeft,
+        reflexion_elegida: '',
+        puntos: pts, racha: state.streak
+      });
+    }
+
+    // Habilitar "Siguiente"
+    const btnNext = document.getElementById('btnNext');
+    btnNext.disabled = false;
+    if (state.currentIdx >= state.questions.length - 1) {
+      btnNext.innerHTML = '🏁 Ver resultados <i class="fas fa-flag-checkered"></i>';
+    }
+
+  } else {
+    // — Respuesta incorrecta —
+    pts = -Math.floor(q.points * 0.3);
+    state.points  = Math.max(0, state.points + pts);
+    state.wrongCount++;
+    state.streak  = 0;
+
+    // Contar intento fallido
+    state.intentosPorPregunta[state.currentIdx] =
+      (state.intentosPorPregunta[state.currentIdx] || 0) + 1;
+
+    // Bajar barra de energía
+    state.energy = Math.max(0, state.energy - ecfg.loss);
+    updateEnergyBar();
+
+    // Mostrar consecuencia clínica si la pregunta la tiene
+    if (q.clinical_consequence) showClinicalConsequence(q.clinical_consequence);
+
+    // Mostrar feedback PRIMERO para que el alumno vea la explicación
+    showFeedbackWrong(pts, given, q);
+
+    // Después quitar vida
+    loseLife();
+
+    // Si aún tiene vidas (no game over), reiniciar timer con tiempo reducido para el reintento
+    if (!state.answered) {   // state.answered lo pone loseLife() en true si vidas=0
+      const retryTime = Math.max(15, Math.floor(cfg.time * 0.6)); // 60% del tiempo original, mín 15s
+      startTimer(retryTime);
+    }
+
+    // Sesión global
+    if (window.ECGSession) {
+      window.ECGSession.logQuizAnswer({
+        capitulo: 'Capítulo 1 – Fundamentos Fisiológicos',
+        pregunta_num: state.currentIdx + 1,
+        pregunta_texto: q.q,
+        respuesta_dada: q.type === 'mcq' ? `${given}. ${q.opts[given] || given}` : given,
+        fue_correcta: false,
+        respuesta_correcta: q.type === 'mcq' ? `${q.answer}. ${q.opts[q.answer]}` : q.answer,
+        tiempo_seg: cfg.time - state.timeLeft,
+        reflexion_elegida: '',
+        puntos: pts, racha: 0
+      });
+    }
+  }
+
+  updateHUD();
+  floatPoints(correct ? `+${pts}` : `${pts}`, correct);
+}
+
+/* ── Feedback CORRECTO ── */
+function showFeedbackCorrect(pts, q) {
+  const fp = document.getElementById('feedbackPanel');
+  fp.className = 'feedback-panel correct';
+  fp.style.display = '';
+
+  const intentos = state.intentosPorPregunta[state.currentIdx] || 0;
+  const racha    = state.streak;
+
+  let titulo;
+  if      (intentos === 0 && racha >= 3) titulo = `¡Correcto! 🔥 Racha x${racha} — ¡Imparable!`;
+  else if (intentos === 0 && racha > 1)  titulo = `¡Correcto! 🔥 Racha de ${racha}`;
+  else if (intentos === 0)               titulo = '¡Correcto! Perfecto a la primera ⭐';
+  else if (intentos === 1)               titulo = '¡Correcto! Lo lograste en el 2º intento 💪';
+  else                                   titulo = `¡Correcto! Después de ${intentos + 1} intentos 📚`;
+
+  document.getElementById('fbIcon').textContent  = '✅';
+  document.getElementById('fbTitle').textContent = titulo;
+
+  const pb = document.getElementById('fbPoints');
+  pb.className   = 'points-badge gained';
+  pb.textContent = `+${pts} pts de conducción`;
+
+  // Si hubo intentos, mostrar nota de consolidación
+  const ca = document.getElementById('fbCorrectAnswer');
+  if (intentos > 0) {
+    ca.style.display = 'block';
+    ca.innerHTML = `<i class="fas fa-check-circle" style="color:#22c55e"></i> 
+      <strong>Respuesta consolidada.</strong> Recuerda el razonamiento que te llevó a la respuesta correcta — eso es lo que importa.`;
+  } else {
+    ca.style.display = 'none';
+  }
+
+  document.getElementById('fbWhy').style.display   = 'none';
+  document.getElementById('npcBox').style.display   = 'none';
+  document.getElementById('clinicalBox').style.display = 'none';
+}
+
+/* ── Feedback INCORRECTO ── */
+function showFeedbackWrong(pts, given, q) {
+  const fp = document.getElementById('feedbackPanel');
+  fp.className = 'feedback-panel wrong';
+  fp.style.display = '';
+
+  const intentos = state.intentosPorPregunta[state.currentIdx] || 0;
+
+  document.getElementById('fbIcon').textContent  = '❌';
+  document.getElementById('fbTitle').textContent =
+    intentos === 1 ? '⚡ Energía baja — vuelve a intentarlo'
+    : `⚡ Intento ${intentos} — cada error cuesta energía`;
+
+  const pb = document.getElementById('fbPoints');
+  pb.className   = 'points-badge lost';
+  pb.textContent = `${pts} pts`;
+
+  document.getElementById('fbCorrectAnswer').style.display = 'none';
+
+  // Por qué ESTA opción está mal
+  const why = document.getElementById('fbWhy');
+  why.style.display = 'block';
+  const whyText = q.type === 'mcq' && given && q.why_wrong && q.why_wrong[given]
+    ? q.why_wrong[given]
+    : (typeof q.why_wrong === 'string' ? q.why_wrong : 'Esa opción no es correcta. Revisa el razonamiento e intenta de nuevo.');
+  document.getElementById('fbWhyText').textContent = whyText;
+
+  // NPC Duelo de Reflexión (reemplaza al panel de reflexión anterior)
+  showNPCDuel(q);
+
+  // Hint de reintentar
+  let retryHint = document.getElementById('fbRetryHint');
+  if (!retryHint) {
+    retryHint = document.createElement('div');
+    retryHint.id = 'fbRetryHint';
+    retryHint.style.cssText = `
+      margin-top:12px; padding:10px 14px;
+      background:#0d1f12; border:1px dashed #22c55e;
+      border-radius:8px; font-size:.84rem;
+      color:#86efac; text-align:center;
+    `;
+    fp.appendChild(retryHint);
+  }
+  retryHint.innerHTML = `
+    <i class="fas fa-redo" style="margin-right:6px"></i>
+    Lee la explicación del Dr. ECG, luego elige otra opción.
+    <span style="color:#607080;font-size:.76rem;display:block;margin-top:3px">
+      Intento ${intentos} &bull; ${pts} pts &bull; ⚡ Energía: ${state.energy}%
+    </span>
+  `;
+  retryHint.style.display = 'block';
+}
+
+/* ── Consecuencia clínica ── */
+function showClinicalConsequence(text) {
+  const box = document.getElementById('clinicalBox');
+  document.getElementById('clinicalText').innerHTML = text;
+  box.style.display = 'flex';
+}
+
+/* ── Barra de Potencial de Acción ── */
+function updateEnergyBar() {
+  const pct  = Math.max(0, Math.min(100, state.energy));
+  const fill = document.getElementById('energyFill');
+  const pctEl= document.getElementById('energyPct');
+  if (!fill) return;
+  fill.style.width = pct + '%';
+  fill.className = 'energy-fill' +
+    (pct <= 20 ? ' crit' : pct <= 50 ? ' low' : '');
+  if (pctEl) pctEl.textContent = pct + '%';
+}
+
+/* ── NPC Duelo de Reflexión ── */
+function showNPCDuel(q) {
+  const box = document.getElementById('npcBox');
+  document.getElementById('npcQuestion').textContent = q.reflection;
+  document.getElementById('reflectionResponse').style.display = 'none';
+
+  // Generar opciones NPC a partir de las respuestas de reflexión de la pregunta
+  const optsEl = document.getElementById('npcOpts');
+  const npcOptions = [
+    { type: 'yes',     text: q.reflection_yes_short     || '✅ Entiendo — el error tiene sentido ahora' },
+    { type: 'partial', text: q.reflection_partial_short  || '🤔 Entendí algo, pero necesito repasar' },
+    { type: 'no',      text: q.reflection_no_short       || '❌ No lo veo aún, necesito más contexto' }
+  ];
+
+  optsEl.innerHTML = npcOptions.map((o, i) =>
+    `<button class="npc-opt" onclick="answerNPC('${o.type}',this,${i})">${o.text}</button>`
+  ).join('');
+
+  box.style.display = 'flex';
+}
+
+/* ── Responder NPC (Duelo de Reflexión) ── */
+function answerNPC(type, btn, idx) {
+  // Deshabilitar todos los botones NPC
+  document.querySelectorAll('.npc-opt').forEach(b => b.disabled = true);
+  btn.classList.add(type === 'yes' ? 'chosen-correct' : 'chosen-wrong');
+
+  const q   = state.questions[state.currentIdx];
+  const res = document.getElementById('reflectionResponse');
+
+  const msgs = {
+    yes:     { text: q.reflection_yes,     bg: '#0d2e1a', border: '#22c55e', recover: true  },
+    partial: { text: q.reflection_partial, bg: '#1a1200', border: '#f97316', recover: false },
+    no:      { text: q.reflection_no,      bg: '#1a0a0a', border: '#ef4444', recover: false }
+  };
+  const m = msgs[type];
+
+  res.style.cssText = `display:block;background:${m.bg};border-left:3px solid ${m.border};
+    border-radius:0 8px 8px 0;padding:10px 14px;margin-top:10px;
+    font-size:.85rem;color:#c8d8e8;line-height:1.6`;
+  res.textContent = m.text;
+
+  // Si entiende (´yes´), recupera energía (Potion)
+  if (type === 'yes') {
+    const ecfg    = ENERGY_CONFIG[state.diff];
+    const recover = ecfg.recover;
+    const prev    = state.energy;
+    state.energy  = Math.min(100, state.energy + recover);
+    state.npcYesCount++;
+    updateEnergyBar();
+    if (state.energy > prev) showPotionToast(recover);
+  }
+
+  // Guardar reflexión en sesión global
+  if (window.ECGSession) {
+    const s = JSON.parse(sessionStorage.getItem('ecg_session') || '{}');
+    if (s.quizEvents && s.quizEvents.length > 0) {
+      const labels = { yes: 'Sí entendí', partial: 'Más o menos', no: 'No lo veo' };
+      for (let i = s.quizEvents.length - 1; i >= 0; i--) {
+        if (s.quizEvents[i].pregunta_num === state.currentIdx + 1) {
+          s.quizEvents[i].reflexion_elegida = labels[type] || type;
+          break;
+        }
+      }
+      sessionStorage.setItem('ecg_session', JSON.stringify(s));
+    }
+  }
+}
+
+/* ── Toast de Potion (recuperación de energía) ── */
+function showPotionToast(amount) {
+  const t = document.createElement('div');
+  t.className = 'potion-toast';
+  t.innerHTML = `🦪 <span>+${amount}% Energía recuperada — ¡La reflexión te cura!</span>`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+/* answerReflection — compatibilidad (ya no se usa en el NPC, pero se conserva) */
+function answerReflection(type, btn) { answerNPC(type, btn, 0); }
+
+/* ── Siguiente pregunta ── */
+function nextQuestion() {
+  state.currentIdx++;
+  if (state.currentIdx >= state.questions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+/* ── Perder vida ── */
+function loseLife() {
+  state.lives--;
+  renderLives();
+  if (state.lives <= 0) {
+    clearInterval(state.timerInterval);
+    state.answered = true;  // bloquear nuevos intentos mientras aparece game over
+    // Deshabilitar todas las opciones para que no sigan respondiendo
+    document.querySelectorAll('.q-opt').forEach(b => b.disabled = true);
+    const fitbBtn = document.querySelector('.fitb-btn');
+    if (fitbBtn) fitbBtn.disabled = true;
+    setTimeout(showGameOver, 1800);  // dar tiempo a ver el último feedback
+  }
+}
+
+function renderLives() {
+  const total = DIFF_CONFIG[state.diff].lives;
+  const el    = document.getElementById('hudLives');
+  if (!el) return;
+  let html = '';
+  for (let i = 0; i < total; i++) {
+    html += `<span class="life${i >= state.lives ? ' lost' : ''}">❤️</span>`;
+  }
+  el.innerHTML = html;
+}
+
+/* ── Actualizar HUD ── */
+function updateHUD() {
+  document.getElementById('hudPoints').textContent = state.points;
+
+  const streakEl = document.getElementById('hudStreak');
+  streakEl.textContent = state.streak;
+  if (state.streak > 0) {
+    streakEl.classList.add('active');
+    setTimeout(() => streakEl.classList.remove('active'), 600);
+  }
+
+  const total = state.questions.length;
+  const done  = state.currentIdx;
+  document.getElementById('hudProgFill').style.width = `${(done/total)*100}%`;
+  document.getElementById('hudProgLabel').textContent = `Pregunta ${done+1} de ${total}`;
+}
+
+/* ── Puntos flotantes ── */
+function floatPoints(text, isGood) {
+  const el  = document.createElement('div');
+  el.className   = 'float-points';
+  el.textContent = text;
+  el.style.color = isGood ? '#22c55e' : '#ef4444';
+  el.style.left  = `${40 + Math.random() * 20}%`;
+  el.style.top   = '80px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1300);
+}
+
+/* ── Game Over ── */
+function showGameOver() {
+  document.getElementById('screen-quiz').style.display    = 'none';
+  document.getElementById('quizHud').style.display        = 'none';
+  document.getElementById('screen-gameover').style.display= 'block';
+  document.getElementById('goPoints').textContent = state.points + ' pts';
+  state.totalTime = Math.floor((Date.now() - state.startTime) / 1000);
+}
+
+/* ── Calcular y mostrar insignias ganadas ── */
+function checkBadges() {
+  state.energyFinal = state.energy;
+  const earned = ALL_BADGES.filter(b => {
+    try { return b.check(state); } catch { return false; }
+  });
+  state.earnedBadges = earned.map(b => b.id);
+
+  // Persistir en localStorage junto con las ya ganadas anteriormente
+  const prev = loadEarnedBadges();
+  const merged = [...new Set([...prev, ...state.earnedBadges])];
+  saveEarnedBadges(merged);
+  return earned;
+}
+
+/* ── Resultado final ── */
+function showResult() {
+  clearInterval(state.timerInterval);
+  state.totalTime = Math.floor((Date.now() - state.startTime) / 1000);
+  state.energyFinal = state.energy;
+  const pct = Math.round(state.correctCount / state.questions.length * 100);
+
+  document.getElementById('screen-quiz').style.display   = 'none';
+  document.getElementById('quizHud').style.display       = 'none';
+  document.getElementById('screen-result').style.display = 'block';
+
+  // Mensaje según energía final + acierto
+  let icon, title, sub;
+  const eng = state.energyFinal;
+  if      (pct >= 90 && eng >= 80) { icon='🏆'; title='¡Maestro de Conducción!'; sub='Dominaste el capítulo con alta energía y precisión.'; }
+  else if (pct >= 90)              { icon='🎯'; title='¡Gran dominio!'; sub='Acertaste casi todo, aunque el potencial de acción quedó bajo.'; }
+  else if (pct >= 70 && eng >= 60) { icon='📚'; title='¡Buen ritmo!'; sub='Buen manejo, con espacio para mejorar la eficiencia.'; }
+  else if (pct >= 70)              { icon='💪'; title='¡Resististe!'; sub='Acertaste la mayoría, pero los errores te costaron energía.'; }
+  else if (pct >= 50)              { icon='📡'; title='Señal débil'; sub='Necesitas repasar los conceptos clave del capítulo.'; }
+  else                             { icon='🔋'; title='Potencial bajo'; sub='El capítulo necesita otro repaso completo antes del siguiente quiz.'; }
+
+  document.getElementById('resultIcon').textContent  = icon;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultSub').textContent   = sub;
+  document.getElementById('resultScore').textContent = state.points;
+
+  // Barra de energía final
+  const engPct = Math.round(state.energyFinal);
+  document.getElementById('resultEnergyBar').style.width = engPct + '%';
+  document.getElementById('resultEnergyBar').style.background =
+    engPct > 60 ? 'linear-gradient(90deg,#22c55e,#84cc16)'
+    : engPct > 30 ? 'linear-gradient(90deg,#f97316,#fbbf24)'
+    : 'linear-gradient(90deg,#ef4444,#f97316)';
+  document.getElementById('resultEnergyPct').textContent =
+    `Potencial de Acción restante: ${engPct}%`;
+
+  // Insignias
+  const earned = checkBadges();
+  const grid   = document.getElementById('resultBadgesGrid');
+  if (earned.length === 0) {
+    grid.innerHTML = `<p style="color:#607080;font-size:.85rem">No ganaste insignias esta partida. ¡Sigue practicando!</p>`;
+  } else {
+    grid.innerHTML = earned.map(b =>
+      `<div class="badge-chip earned">
+        <span class="badge-icon">${b.icon}</span>
+        <div><div class="badge-name">${b.name}</div>
+        <div style="font-size:.7rem;color:#a78bfa;margin-top:1px">${b.desc}</div></div>
+      </div>`
+    ).join('');
+  }
+
+  // Stats
+  const totalIntentosFallidos = Object.values(state.intentosPorPregunta)
+    .reduce((acc, v) => acc + v, 0);
+  document.getElementById('rCorrect').textContent = state.correctCount;
+  document.getElementById('rWrong').textContent   = totalIntentosFallidos;
+  document.getElementById('rStreak').textContent  = state.bestStreak;
+  document.getElementById('rTime').textContent    = state.totalTime + 's';
+
+  // Desglose
+  const bd = document.getElementById('resultBreakdown');
+  bd.innerHTML = state.log.map(l => {
+    const intentos = l.intentos || 1;
+    const badge = intentos === 1
+      ? `<span style="font-size:.72rem;color:#22c55e;margin-left:6px">✨ 1er intento</span>`
+      : `<span style="font-size:.72rem;color:#f97316;margin-left:6px">⚠️ ${intentos} intentos</span>`;
+    return `
+    <div class="rb-row">
+      <span class="rb-icon">✅</span>
+      <span class="rb-text"><strong>${l.qText}</strong>${badge}<br/>
+        <span style="color:#607080;font-size:.8rem">Respuesta correcta: ${l.answer}</span>
+      </span>
+      <span class="rb-pts pos">+${l.pts}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ── Ficha de Personaje ── */
+function showCharacterSheet() {
+  if (document.getElementById('char-modal-overlay')) return;
+
+  const allEarned  = loadEarnedBadges();
+  const id         = window.ECGSession ? window.ECGSession.getIdentity() : { nombre: 'Estudiante', matricula: '' };
+  const nivel       = allEarned.length >= 5 ? 'Especialista ECG' :
+                      allEarned.length >= 3 ? 'Residente Cardíaco' :
+                      allEarned.length >= 1 ? 'Interno Aprendiz' : 'Novato';
+  const engColor    = state.energyFinal >= 80 ? 'linear-gradient(90deg,#22c55e,#84cc16)'
+                    : state.energyFinal >= 40 ? 'linear-gradient(90deg,#f97316,#fbbf24)'
+                    : 'linear-gradient(90deg,#ef4444,#f97316)';
+
+  const overlay = document.createElement('div');
+  overlay.id    = 'char-modal-overlay';
+  overlay.className = 'char-modal-overlay';
+  overlay.innerHTML = `
+    <div class="char-modal">
+      <div class="char-header">
+        <div class="char-avatar">🧑‍⚕️</div>
+        <div class="char-name">${id.nombre || 'Estudiante'}</div>
+        ${id.matricula ? `<div style="color:#607080;font-size:.82rem;margin-bottom:6px">${id.matricula}</div>` : ''}
+        <span class="char-level">🎮 ${nivel}</span>
+      </div>
+
+      <div class="char-energy-section">
+        <div class="char-energy-label">⚡ Potencial de Acción (esta partida)</div>
+        <div class="char-energy-bar">
+          <div class="char-energy-fill" style="width:${state.energyFinal}%;background:${engColor}"></div>
+        </div>
+        <div style="font-size:.78rem;color:#607080;margin-top:4px">${Math.round(state.energyFinal)}% restante</div>
+      </div>
+
+      <div class="char-stats-grid">
+        <div class="char-stat">
+          <span class="char-stat-num">${state.correctCount || 0}</span>
+          <span class="char-stat-label">Respuestas correctas</span>
+        </div>
+        <div class="char-stat">
+          <span class="char-stat-num">${state.bestStreak || 0}</span>
+          <span class="char-stat-label">Mejor racha</span>
+        </div>
+        <div class="char-stat">
+          <span class="char-stat-num">${state.points || 0}</span>
+          <span class="char-stat-label">Puntos de conducción</span>
+        </div>
+        <div class="char-stat">
+          <span class="char-stat-num">${state.npcYesCount || 0}</span>
+          <span class="char-stat-label">Reflexiones superadas</span>
+        </div>
+      </div>
+
+      <div class="char-badges-title">🏅 Insignias desbloqueadas (acumuladas)</div>
+      <div class="badges-grid">
+        ${ALL_BADGES.map(b => {
+          const ok = allEarned.includes(b.id);
+          return `<div class="badge-chip ${ok ? 'earned' : ''}">
+            <span class="badge-icon">${b.icon}</span>
+            <div>
+              <div class="badge-name">${b.name}</div>
+              ${ok
+                ? `<div style="font-size:.68rem;color:#86efac">✅ Desbloqueada</div>`
+                : `<div class="badge-locked">${b.desc.substring(0,45)}…</div>`
+              }
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <button class="char-close-btn" onclick="document.getElementById('char-modal-overlay').remove()">
+        <i class="fas fa-times"></i> Cerrar Ficha
+      </button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+}
+
+/* ── Reiniciar ── */
+function restartQuiz() {
+  document.getElementById('screen-gameover').style.display = 'none';
+  document.getElementById('screen-result').style.display   = 'none';
+  document.getElementById('screen-start').style.display    = 'block';
+  document.getElementById('quizHud').style.display         = 'none';
+}
+
+/* ── Exportar CSV de la sesión ── */
+function exportarCSV() {
+  if (window.ECGSession) {
+    window.ECGSession.exportCSV();
+  } else {
+    alert('No hay datos de sesión guardados. Asegúrate de identificarte en la portada primero.');
+  }
+}
+</script>
+</body>
+</html>
