@@ -286,5 +286,16 @@
 <script src="js/main.js"></script>
 <script src="js/quiz-config-1.js"></script>
 <script src="js/quiz-engine.js"></script>
+<script>
+  if (typeof QuizEngine === 'undefined') {
+    console.error('quiz-engine.js no se cargó correctamente');
+    const wrap = document.querySelector('.quiz-wrap');
+    if (wrap) {
+      wrap.innerHTML = '<div style="padding:24px;border:1px solid #fecaca;background:#fff1f2;border-radius:12px;color:#9f1239;font-weight:600;">Error: No se pudo cargar el quiz. Recarga la página.</div>';
+    } else {
+      alert('Error: No se pudo cargar el quiz. Recarga la página.');
+    }
+  }
+</script>
 </body>
 </html>

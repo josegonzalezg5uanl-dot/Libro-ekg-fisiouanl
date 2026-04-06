@@ -14,13 +14,8 @@
   <!-- HEADER -->
   <header class="site-header">
     <div class="header-left">
-      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
-        <i class="fas fa-bars"></i>
-      </button>
-      <a href="index.html" class="site-logo">
-        <i class="fas fa-heartbeat"></i>
-        <span>Guía de ECG</span>
-      </a>
+      <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+      <a href="index.html" class="site-logo"><i class="fas fa-heartbeat"></i><span>Guía de ECG</span></a>
     </div>
     <div class="header-center">
       <div class="search-box">
@@ -33,72 +28,35 @@
       <button class="btn-send-session" id="btnSendSession" onclick="openSendModal()" title="Enviar registro de sesión al profesor">
         <i class="fas fa-paper-plane"></i><span class="btn-send-label">Enviar</span>
       </button>
-      <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
-        <i class="fas fa-moon"></i>
-      </button>
-      <a href="https://github.com/dmccreary/i-book-v1" target="_blank" class="gh-link" title="Ver en GitHub">
-        <i class="fab fa-github"></i>
-      </a>
+      <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
     </div>
   </header>
 
-  <!-- OVERLAY para móvil -->
   <div class="overlay" id="overlay"></div>
 
-  <!-- LAYOUT PRINCIPAL -->
   <div class="layout">
-
     <!-- SIDEBAR -->
     <nav class="sidebar" id="sidebar">
       <div class="sidebar-inner">
         <div class="sidebar-title">Contenido</div>
         <ul class="nav-list">
-          <li class="nav-item">
-            <a href="index.html" class="nav-link" data-page="home">
-              <i class="fas fa-home"></i> Inicio
-            </a>
-          </li>
+          <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Inicio</a></li>
           <li class="nav-section">Capítulos</li>
-
-          <li class="nav-item">
-            <a href="chapter-1.html" class="nav-link" data-page="ch1">
-              <span class="ch-num">1</span> Fundamentos Fisiológicos y Técnicos
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="chapter-2.html" class="nav-link active" data-page="ch2">
-              <span class="ch-num">2</span> Anatomía de las Derivaciones
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="chapter-3.html" class="nav-link" data-page="ch3">
-              <span class="ch-num">3</span> Componentes del Trazado Normal
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="chapter-4.html" class="nav-link" data-page="ch4">
-              <span class="ch-num">4</span> Metodología de Interpretación
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="chapter-5.html" class="nav-link" data-page="ch5">
-              <span class="ch-num">5</span> Patologías Básicas y Patrones
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="chapter-6.html" class="nav-link" data-page="ch6">
-              <span class="ch-num">6</span> Talleres de Práctica
-            </a>
-          </li>
+          <li class="nav-item"><a href="chapter-1.html" class="nav-link"><span class="ch-num">1</span> Fundamentos Fisiológicos</a></li>
+          <li class="nav-item"><a href="chapter-2.html" class="nav-link active"><span class="ch-num">2</span> Anatomía de las Derivaciones</a></li>
+          <li class="nav-item"><a href="chapter-3.html" class="nav-link"><span class="ch-num">3</span> Componentes del Trazado</a></li>
+          <li class="nav-item"><a href="chapter-4.html" class="nav-link"><span class="ch-num">4</span> Metodología de Interpretación</a></li>
+          <li class="nav-item"><a href="chapter-5.html" class="nav-link"><span class="ch-num">5</span> Patologías Básicas</a></li>
+          <li class="nav-item"><a href="chapter-6.html" class="nav-link"><span class="ch-num">6</span> Talleres de Práctica</a></li>
           <li class="nav-section">Simuladores</li>
           <li class="nav-item">
-            <a href="ecg-monitor.html" class="nav-link" data-page="monitor">
+            <a href="ecg-monitor.html" class="nav-link">
               <i class="fas fa-heartbeat" style="color:#e53935"></i> Monitor ECG
             </a>
           </li>
           <li class="nav-section">Aprendizaje</li>
           <li class="nav-item">
-            <a href="autopercepcion.html" class="nav-link" data-page="autopercepcion">
+            <a href="autopercepcion.html" class="nav-link">
               <i class="fas fa-brain" style="color:#a78bfa"></i> Autopercepción
             </a>
           </li>
@@ -106,228 +64,222 @@
       </div>
     </nav>
 
-    <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content" id="mainContent">
 
-      <!-- HUD SUPERIOR DEL QUIZ -->
-      <div class="quiz-hud" id="quizHud" style="display:none;">
-        <div class="hud-item hud-progress">
-          <div class="hud-prog-track">
-            <div class="hud-prog-fill" id="hudProgFill" style="width:0%"></div>
+      <!-- HUD — Barra de estado completa -->
+      <div class="quiz-hud" id="quizHud" style="display:none">
+        <div class="hud-item">
+          <span class="hud-icon">⭐</span>
+          <div>
+            <div class="hud-val" id="hudPoints">0</div>
+            <div class="hud-label">Puntos</div>
           </div>
-          <div class="hud-prog-label">
-            <span id="hudProgLabel">Pregunta 0 de 0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-icon">⏱️</span>
+          <div>
+            <div class="hud-val timer-val" id="hudTimer">30</div>
+            <div class="hud-label">Segundos</div>
           </div>
         </div>
-
         <div class="hud-item">
-          <span class="hud-icon"><i class="fas fa-clock"></i></span>
-          <span class="hud-val timer-val" id="hudTimer">30</span>
-          <span class="hud-label">Tiempo</span>
+          <span class="hud-icon">🔥</span>
+          <div>
+            <div class="hud-val streak-val" id="hudStreak">0</div>
+            <div class="hud-label">Racha</div>
+          </div>
         </div>
-
-        <div class="hud-item">
-          <span class="hud-label">Vidas</span>
-          <span class="hud-val lives-display" id="hudLives">
-            <span class="life">❤️</span>
-            <span class="life">❤️</span>
-            <span class="life">❤️</span>
-          </span>
-        </div>
-
-        <div class="hud-item">
-          <span class="hud-label">Puntos</span>
-          <span class="hud-val" id="hudPoints">0</span>
-        </div>
-
-        <div class="hud-item">
-          <span class="hud-label">Racha</span>
-          <span class="hud-val streak-val" id="hudStreak">0</span>
-        </div>
-
-        <div class="hud-item energy-hud">
-          <span class="energy-label">Energía</span>
+        <div class="energy-hud">
+          <span class="energy-label">⚡ PA</span>
           <div class="energy-track">
             <div class="energy-fill" id="energyFill" style="width:100%"></div>
           </div>
           <span class="energy-pct" id="energyPct">100%</span>
         </div>
+        <div class="hud-item" id="hudLivesWrap">
+          <span class="hud-icon">❤️</span>
+          <div class="lives-display" id="hudLives"></div>
+        </div>
+
+        <div class="hud-progress">
+          <div class="hud-prog-track">
+            <div class="hud-prog-fill" id="hudProgFill" style="width:0%"></div>
+          </div>
+          <div class="hud-prog-label" id="hudProgLabel">Pregunta 1 de 10</div>
+        </div>
       </div>
 
       <div class="quiz-wrap">
 
-        <!-- PANTALLA DE INICIO -->
+        <!-- ═══ PANTALLA INICIO ═══ -->
         <div id="screen-start">
-          <div class="qs-icon">🧠</div>
-          <div class="qs-title">Quiz Capítulo 2</div>
+          <div class="qs-icon">📡</div>
+          <div class="qs-title">Quiz — Capítulo 2</div>
           <div class="qs-sub">
             Anatomía de las Derivaciones ECG<br/>
-            Demuestra tu dominio del sistema de electrodos y planos de proyección
+            10 preguntas sobre derivaciones, electrodos y sistema hexaxial. Cada error incluye reflexión clínica.
           </div>
 
           <div class="qs-stats">
             <div class="qs-stat">
               <span class="qs-stat-num">10</span>
-              <span class="qs-stat-label">Preguntas</span>
+              <span class="qs-stat-label">Por partida</span>
             </div>
             <div class="qs-stat">
-              <span class="qs-stat-num" id="statTime">60s</span>
-              <span class="qs-stat-label">Tiempo/pregunta</span>
+              <span class="qs-stat-num" style="color:#a78bfa">15</span>
+              <span class="qs-stat-label">Banco total</span>
+            </div>
+            <div class="qs-stat">
+              <span class="qs-stat-num" id="statTime">30s</span>
+              <span class="qs-stat-label">Por pregunta</span>
             </div>
             <div class="qs-stat">
               <span class="qs-stat-num" id="statLives">3</span>
               <span class="qs-stat-label">Vidas</span>
             </div>
-            <div class="qs-stat">
-              <span class="qs-stat-num">15</span>
-              <span class="qs-stat-label">Segundos bonus</span>
-            </div>
           </div>
 
-          <div class="diff-selector" id="diffSelector">
+          <div style="margin-bottom:12px; color:#8899aa; font-size:.88rem;">Selecciona la dificultad:</div>
+          <div class="diff-selector">
             <button class="diff-btn suave" onclick="QuizEngine.setDiff('suave')">😌 Suave (60s · 3 vidas)</button>
             <button class="diff-btn medio selected" onclick="QuizEngine.setDiff('medio')">😤 Medio (30s · 3 vidas)</button>
             <button class="diff-btn intenso" onclick="QuizEngine.setDiff('intenso')">🔥 Intenso (15s · 2 vidas)</button>
           </div>
 
-          <button class="start-btn" onclick="QuizEngine.startQuiz()">
+          <button class="btn-next" style="max-width:320px;margin:0 auto" onclick="QuizEngine.startQuiz()">
             <i class="fas fa-play"></i> Comenzar Quiz
           </button>
+          <div style="margin-top:16px">
+            <button onclick="QuizEngine.showCharacterSheet()" style="
+              background:transparent;border:1px solid #1e3a5f;color:#60c8ff;
+              padding:8px 20px;border-radius:8px;font-family:inherit;
+              font-size:.85rem;cursor:pointer;transition:all .2s;
+            " onmouseover="this.style.borderColor='#1976d2'" onmouseout="this.style.borderColor='#1e3a5f'">
+              📜 Ver mi Ficha de Personaje
+            </button>
+          </div>
         </div>
 
-        <!-- PANTALLA DE JUEGO -->
+        <!-- ═══ PANTALLA QUIZ ═══ -->
         <div id="screen-quiz">
-          <div class="q-card">
-            <div class="q-type-badge" id="qTypeBadge">
-              <i class="fas fa-list"></i> Opción múltiple
-            </div>
+          <div class="q-card" id="qCard">
+            <div class="q-type-badge" id="qTypeBadge"></div>
             <div class="q-text" id="qText"></div>
             <div id="qBody"></div>
           </div>
 
-          <!-- Panel de feedback (oculto inicialmente) -->
+          <div class="clinical-consequence" id="clinicalBox" style="display:none">
+            <span class="cc-icon">🏥</span>
+            <div id="clinicalText"></div>
+          </div>
+
           <div class="feedback-panel" id="feedbackPanel">
             <div class="fb-header">
               <span class="fb-icon" id="fbIcon"></span>
               <span class="fb-title" id="fbTitle"></span>
+              <span class="points-badge" id="fbPoints" style="margin-left:auto"></span>
             </div>
-            <div class="fb-pts" id="fbPts"></div>
-            <div class="fb-correct-answer" id="fbCorrectAnswer" style="display:none;"></div>
-            <div class="fb-why" id="fbWhy" style="display:none;">
-              <div class="fb-why-title">¿Por qué está mal esta opción?</div>
+            <div class="fb-correct-answer" id="fbCorrectAnswer" style="display:none"></div>
+            <div class="fb-why" id="fbWhy" style="display:none">
+              <div class="fb-why-title">¿Por qué esta opción está mal?</div>
               <div id="fbWhyText"></div>
             </div>
 
-            <!-- NPC Dr. ECG -->
-            <div class="fb-reflection" id="fbReflection" style="display:none;">
-              <div class="fb-reflection-title">
-                <i class="fas fa-robot"></i> Dr. ECG pregunta:
+            <div class="npc-box" id="npcBox" style="display:none">
+              <div class="npc-avatar">🧑‍⚕️</div>
+              <div class="npc-bubble">
+                <div class="npc-name">Dr. ECG — Tu instructor</div>
+                <div class="npc-text" id="npcQuestion"></div>
+                <div class="npc-opts" id="npcOpts"></div>
+                <div class="reflection-response" id="reflectionResponse"></div>
               </div>
-              <div class="fb-reflection-q" id="fbReflectionQ"></div>
-              <div class="npc-opts" id="npcOpts"></div>
-              <div class="npc-dialog" id="npcDialog"></div>
             </div>
+          </div>
 
-            <button id="btnNext" onclick="QuizEngine.nextQuestion()" disabled>
-              Siguiente pregunta <i class="fas fa-arrow-right"></i>
-            </button>
+          <button class="btn-next" id="btnNext" onclick="QuizEngine.nextQuestion()" disabled>
+            Siguiente pregunta <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <!-- ═══ PANTALLA GAME OVER ═══ -->
+        <div id="screen-gameover">
+          <div style="font-size:3.5rem;margin-bottom:16px">💔</div>
+          <div class="qs-title" style="color:#ef4444">¡Sin vidas!</div>
+          <div class="qs-sub">Agotaste todas tus vidas. Repasa el capítulo y vuelve a intentarlo.</div>
+          <div style="font-size:2rem;font-weight:800;color:#60c8ff;margin-bottom:4px" id="goPoints">0 pts</div>
+          <div style="color:#607080;margin-bottom:28px">Puntos acumulados</div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <button class="btn-retry" onclick="QuizEngine.restartQuiz()"><i class="fas fa-redo"></i> Reintentar</button>
+            <a href="chapter-2.html" class="btn-back"><i class="fas fa-book"></i> Repasar capítulo</a>
           </div>
         </div>
 
-        <!-- PANTALLA DE GAME OVER -->
-        <div id="screen-gameover" style="display:none;">
-          <div class="result-hero">
-            <div class="go-icon">💔</div>
-            <div class="go-title">¡Se acabaron las vidas!</div>
-            <div class="go-sub">No te desanimes, practica más y vuelve a intentarlo</div>
-            <div class="result-score-big" id="gameOverScore">0</div>
-            <div class="result-score-label">Puntos obtenidos</div>
-            
-            <div class="result-energy-bar">
-              <div class="result-energy-fill" id="gameOverEnergy" style="width:0%; background:linear-gradient(90deg,#ef4444,#f87171)"></div>
-            </div>
-            <div class="result-energy-label" id="gameOverEnergyLabel">Energía final: 0%</div>
-          </div>
-
-          <div class="result-actions">
-            <button class="result-btn primary" onclick="QuizEngine.restartQuiz()">
-              <i class="fas fa-redo"></i> Intentar de nuevo
-            </button>
-            <button class="result-btn secondary" onclick="location.href='chapter-2.html'">
-              <i class="fas fa-book"></i> Volver al capítulo
-            </button>
-            <button class="result-btn secondary" onclick="location.href='index.html'">
-              <i class="fas fa-home"></i> Inicio
-            </button>
-          </div>
-        </div>
-
-        <!-- PANTALLA DE RESULTADOS -->
+        <!-- ═══ PANTALLA RESULTADO ═══ -->
         <div id="screen-result">
           <div class="result-hero">
-            <div class="result-icon" id="resultIcon">🏆</div>
-            <div class="result-title" id="resultTitle">¡Excelente trabajo!</div>
-            <div class="result-sub" id="resultSub">Has completado el quiz del Capítulo 2</div>
-            <div class="result-score-big" id="resultScoreBig">0</div>
-            <div class="result-score-label">Puntos totales</div>
-            
-            <div class="result-energy-bar">
-              <div class="result-energy-fill" id="resultEnergyFill" style="width:0%; background:linear-gradient(90deg,#22c55e,#84cc16)"></div>
-            </div>
-            <div class="result-energy-label" id="resultEnergyLabel">Energía final: 0%</div>
+            <div class="result-icon" id="resultIcon">🎯</div>
+            <div class="result-title" id="resultTitle">¡Bien hecho!</div>
+            <div class="result-sub" id="resultSub">Completaste el quiz del Capítulo 2.</div>
+            <div class="result-score-big" id="resultScore">0</div>
+            <div class="result-score-label">puntos totales</div>
+            <div class="result-energy-bar"><div class="result-energy-fill" id="resultEnergyBar" style="width:100%"></div></div>
+            <div class="result-energy-label" id="resultEnergyPct"></div>
           </div>
 
-          <div class="result-stats" id="resultStats">
-            <div class="rs-item">
-              <span class="rs-num" id="statCorrectas">0</span>
-              <span class="rs-label">Correctas</span>
-            </div>
-            <div class="rs-item">
-              <span class="rs-num" id="statErroneas">0</span>
-              <span class="rs-label">Erróneas</span>
-            </div>
-            <div class="rs-item">
-              <span class="rs-num" id="statRacha">0</span>
-              <span class="rs-label">Mejor racha</span>
-            </div>
-            <div class="rs-item">
-              <span class="rs-num" id="statTiempo">0s</span>
-              <span class="rs-label">Tiempo total</span>
-            </div>
+          <div class="badges-section" id="resultBadges">
+            <div class="badges-title"><i class="fas fa-star"></i> Insignias obtenidas esta partida</div>
+            <div class="badges-grid" id="resultBadgesGrid"></div>
           </div>
 
-          <div class="result-badges" id="resultBadges" style="display:none;">
-            <div class="rb-title">Insignias ganadas</div>
-            <div class="badges-grid" id="badgesGrid"></div>
+          <div class="result-grid">
+            <div class="result-stat">
+              <span class="result-stat-num" id="rCorrect">0</span>
+              <span class="result-stat-label">Correctas</span>
+            </div>
+            <div class="result-stat">
+              <span class="result-stat-num" id="rWrong">0</span>
+              <span class="result-stat-label">Intentos fallidos</span>
+            </div>
+            <div class="result-stat">
+              <span class="result-stat-num" id="rStreak">0</span>
+              <span class="result-stat-label">Mejor racha</span>
+            </div>
+            <div class="result-stat">
+              <span class="result-stat-num" id="rTime">0s</span>
+              <span class="result-stat-label">Tiempo total</span>
+            </div>
           </div>
-
-          <div class="result-breakdown" id="resultBreakdown">
-            <div class="breakdown-title">Desglose por pregunta</div>
-            <div id="breakdownList"></div>
+          <div class="result-breakdown">
+            <h3>Desglose por pregunta</h3>
+            <div id="resultBreakdown"></div>
           </div>
-
           <div class="result-actions">
-            <button class="result-btn primary" onclick="QuizEngine.restartQuiz()">
-              <i class="fas fa-redo"></i> Intentar de nuevo
-            </button>
-            <button class="result-btn secondary" onclick="location.href='chapter-2.html'">
-              <i class="fas fa-book"></i> Volver al capítulo
-            </button>
-            <button class="result-btn secondary" onclick="location.href='index.html'">
-              <i class="fas fa-home"></i> Inicio
-            </button>
+            <button class="btn-retry" onclick="QuizEngine.restartQuiz()"><i class="fas fa-redo"></i> Jugar de nuevo</button>
+            <button class="btn-retry" onclick="QuizEngine.showCharacterSheet()" style="background:#1a0f40;border-color:#7c3aed"><i class="fas fa-scroll"></i> Mi Ficha de Personaje</button>
+            <button class="btn-retry" onclick="QuizEngine.exportarCSV()" style="background:#10692a"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+            <a href="chapter-2.html" class="btn-back"><i class="fas fa-book"></i> Volver al capítulo</a>
+            <a href="chapter-3.html" class="btn-back" style="border-color:#22c55e;color:#22c55e"><i class="fas fa-arrow-right"></i> Capítulo 3</a>
           </div>
         </div>
 
-      </div>
+      </div><!-- /quiz-wrap -->
     </main>
-
   </div>
 
-<script src="js/session.js"></script>
-<script src="js/main.js"></script>
-<script src="js/quiz-config-2.js"></script>
-<script src="js/quiz-engine.js"></script>
-
+  <script src="js/session.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/quiz-config-2.js"></script>
+  <script src="js/quiz-engine.js"></script>
+  <script>
+    if (typeof QuizEngine === 'undefined') {
+      console.error('quiz-engine.js no se cargó correctamente');
+      const wrap = document.querySelector('.quiz-wrap');
+      if (wrap) {
+        wrap.innerHTML = '<div style="padding:24px;border:1px solid #fecaca;background:#fff1f2;border-radius:12px;color:#9f1239;font-weight:600;">Error: No se pudo cargar el quiz. Recarga la página.</div>';
+      } else {
+        alert('Error: No se pudo cargar el quiz. Recarga la página.');
+      }
+    }
+  </script>
 </body>
 </html>

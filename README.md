@@ -72,6 +72,21 @@ Libro digital interactivo sobre Electrocardiografía, construido con **HTML5 + C
 - ✅ Estilos compartidos del quiz en `css/quiz.css`
 - ✅ Motor compartido `QuizEngine` (`js/quiz-engine.js`)
 
+### Quiz Gamificado (Cap. 4 — `quiz-4.html`)
+- ✅ Interfaz unificada con el template del Capítulo 1 (HUD, feedback, NPC y resultados)
+- ✅ Banco de preguntas embebido (`QUESTIONS`) con `DIFF_CONFIG` y `ENERGY_CONFIG`
+- ✅ Integración con `QuizEngine` + registro en `session.js`
+
+### Quiz Gamificado (Cap. 5 — `quiz-5.html`)
+- ✅ Interfaz unificada con el template del Capítulo 1
+- ✅ Banco de preguntas embebido (`QUESTIONS`) con ajustes de dificultad
+- ✅ Integración con `QuizEngine` + envío de datos de sesión
+
+### Quiz Gamificado (Cap. 6 — `quiz-6.html`)
+- ✅ Interfaz unificada con el template del Capítulo 1
+- ✅ Banco de preguntas embebido (`QUESTIONS`) con ajustes de dificultad
+- ✅ Integración con `QuizEngine` y pantalla de resultados completa
+
 ### Autopercepción en capítulos (`chapter-1.html` … `chapter-6.html`)
 - ✅ Contenedor vacío `<div id="likert-container">` renderizado por `js/likert-engine.js`
 - ✅ Configuración por capítulo en `js/likert-config-1.js` … `js/likert-config-6.js`
@@ -101,7 +116,7 @@ Libro digital interactivo sobre Electrocardiografía, construido con **HTML5 + C
 - Añadir gráficas de progreso en `autopercepcion.html` (Chart.js/ECharts)
 - Mover estilos inline restantes a archivos CSS compartidos
 - Normalizar textos de capítulos y validar consistencia de claves de storage
-- Revisar la integración de quizzes 4–6 con `QuizEngine` para unificar lógica
+- Mover los bancos de preguntas de `quiz-4.html` a `quiz-6.html` a archivos `js/quiz-config-4.js` … `js/quiz-config-6.js`
 
 ### 🌐 URLs públicas
 - Producción: **Pendiente de publicación** (usa la pestaña **Publish**)
@@ -113,7 +128,7 @@ Libro digital interactivo sobre Electrocardiografía, construido con **HTML5 + C
 
 ```
 index.html              → Portada del libro (modal de identificación)
-chapter-1.html          → Fundamentos Fisiológicos y Técnicos + 2 autopercep. inline
+chapter-1.html          → Fundamentos Fisiológicos y Técnicos + contenedor Likert
 chapter-2.html          → Anatomía de las Derivaciones
 chapter-3.html          → Componentes del Trazado Normal
 chapter-4.html          → Metodología de Interpretación
