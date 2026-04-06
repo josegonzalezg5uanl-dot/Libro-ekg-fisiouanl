@@ -417,7 +417,7 @@ window.calcResumenEnvio = function(s) {
   (s.quizEvents || []).forEach(e => {
     if (!caps[e.capitulo]) caps[e.capitulo] = { correctas: 0, total: 0, puntos: 0 };
     caps[e.capitulo].total++;
-    if (e.fue_correcta) caps[e.capitulo].correctas++;
+    if (e.fue_correcta === 'SI') caps[e.capitulo].correctas++;
     caps[e.capitulo].puntos += (e.puntos || 0);
   });
   return Object.entries(caps).map(([cap, d]) => ({

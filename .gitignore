@@ -1,0 +1,4 @@
+*.backup
+original/
+temp/
+diagnostico-*.html

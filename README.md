@@ -25,6 +25,7 @@ Libro digital interactivo sobre Electrocardiografía, construido con **HTML5 + C
 - ✅ **Badge de identidad** en el header de todas las páginas
 - ✅ Identidad persistente via `localStorage` (se mantiene entre sesiones)
 - ✅ Datos de sesión en `sessionStorage` (quiz + Likert durante la sesión)
+- ✅ Registro de autopercepción desde `likert-engine.js` cuando existe contenedor Likert
 - ✅ Resumen de aprovechamiento por capítulo calculado en cliente
 
 ### Sistema de Envío al Profesor (`js/main.js` — `submitSession`)
@@ -45,7 +46,12 @@ Libro digital interactivo sobre Electrocardiografía, construido con **HTML5 + C
 - ✅ Feedback por opción incorrecta (por qué esa opción está mal) — campo `why_wrong` por opción
 - ✅ NPC Dr. ECG con pregunta de reflexión metacognitiva tras cada error
 - ✅ No se avanza hasta acertar — reintentos ilimitados con penalización de puntos y energía
+- ✅ Prevención de selección múltiple (solo una opción marcada por intento)
+- ✅ Limpieza de estados en reintento (botones re-habilitados)
+- ✅ Clase visual `selected` para resaltar la opción elegida
 - ✅ Pantalla de resultado con insignias, desglose por pregunta e intentos
+- ✅ Motor compartido `QuizEngine` (`js/quiz-engine.js`) + configuración en `js/quiz-config-1.js`
+- ✅ Estilos compartidos del quiz en `css/quiz.css`
 - ✅ Integrado con `session.js` (guarda cada respuesta automáticamente)
 
 ### Quiz Gamificado (Cap. 2 — `quiz-2.html`)
@@ -55,27 +61,51 @@ Libro digital interactivo sobre Electrocardiografía, construido con **HTML5 + C
 - ✅ Sistema de dificultad adaptativo (Suave/Medio/Intenso)
 - ✅ Configuración restaurada de dificultad/energía/insignias (DIFF_CONFIG, ENERGY_CONFIG, ALL_BADGES)
 - ✅ Corrección del cálculo de energía al fallar preguntas
+- ✅ Motor compartido `QuizEngine` (`js/quiz-engine.js`) + configuración en `js/quiz-config-2.js`
+- ✅ Estilos compartidos del quiz en `css/quiz.css`
 - ✅ Integración completa con el sistema de sesión y envío de datos
 
-### Autopercepción en Capítulos (`chapter-1.html`)
-- ✅ **2 marcas de autopercepción inline** en el Capítulo 1 en posiciones estratégicas:
-  - Marca 1: tras la tabla de fases del potencial de acción
-  - Marca 2: tras la regla de vectores y deflexiones
-- ✅ Botón disparador con animación de pulso, badge "✅ Respondido" persistente (via `localStorage`)
-- ✅ Modal emergente con escala Likert de 5 niveles + texto de respuesta personalizado por nivel
-- ✅ 10 textos de retroalimentación únicos (2 conceptos × 5 niveles)
-- ✅ Registra en `session.js` vía `logLikert()` → aparece en el envío al profesor
+### Quiz Gamificado (Cap. 3 — `quiz-3.html`)
+- ✅ Banco de preguntas sobre componentes del ECG (ondas, segmentos e intervalos)
+- ✅ Configuración en `js/quiz-config-3.js` con 13 preguntas y mini-casos
+- ✅ Soporte en `QuizEngine` para tipo `mini_case` y `why_wrong` por opción
+- ✅ Estilos compartidos del quiz en `css/quiz.css`
+- ✅ Motor compartido `QuizEngine` (`js/quiz-engine.js`)
+
+### Autopercepción en capítulos (`chapter-1.html` … `chapter-6.html`)
+- ✅ Contenedor vacío `<div id="likert-container">` renderizado por `js/likert-engine.js`
+- ✅ Configuración por capítulo en `js/likert-config-1.js` … `js/likert-config-6.js`
+- ✅ Escala Likert de 5 puntos definida por config (labels estándar 1–5)
+- ✅ Guardado/restauración en `localStorage` con claves `cap{N}_likert_badges`
+- ✅ Registro en sesión mediante `ECGSession.logLikert()` para envío al profesor
 
 ### Página de Autopercepción (`autopercepcion.html`)
 - ✅ Explicación de la función y objetivos de la autopercepción
-- ✅ Escala Likert interactiva visual (5 emojis + slider)
-- ✅ Panel "Ver mi progreso" con historial acumulado (vía `likert.js`)
+- ✅ Cuestionario completo renderizado por `js/likert-engine.js` + `js/likert-config-full.js`
+- ✅ Panel de resultados dinámico (promedio, respondidas, % completitud)
+- ✅ Botones de acción: ver progreso (`LikertEngine.mostrarResultados`) y exportar CSV
+- ✅ Registro en sesión mediante `ECGSession.logLikert()` para envío/CSV
 - ✅ Panel de identidad del estudiante visible con opción de editar
 - ✅ Aviso si no hay sesión iniciada con botón para identificarse
 
 ### Simulador
 - ✅ Monitor ECG interactivo animado (`ecg-monitor.html`) con 6 ritmos
 - ✅ Integrado con `session.js` y sección Aprendizaje en sidebar
+
+### ❌ Funcionalidades no implementadas aún
+- ⛔ Panel analítico avanzado de progreso (gráficas por capítulo/tiempo)
+- ⛔ Consolidación de resultados de autopercepción en un dashboard global
+- ⛔ Publicación automática del sitio (requiere acción en la pestaña Publish)
+
+### 🧭 Próximos pasos recomendados
+- Añadir gráficas de progreso en `autopercepcion.html` (Chart.js/ECharts)
+- Mover estilos inline restantes a archivos CSS compartidos
+- Normalizar textos de capítulos y validar consistencia de claves de storage
+- Revisar la integración de quizzes 4–6 con `QuizEngine` para unificar lógica
+
+### 🌐 URLs públicas
+- Producción: **Pendiente de publicación** (usa la pestaña **Publish**)
+- Endpoint Google Apps Script: **Definir en `js/main.js` → ENDPOINT**
 
 ---
 
@@ -90,13 +120,31 @@ chapter-4.html          → Metodología de Interpretación
 chapter-5.html          → Patologías Básicas y Patrones
 chapter-6.html          → Talleres de Práctica
 quiz-1.html             → Quiz gamificado Capítulo 1 (15 preguntas, banco)
+quiz-2.html             → Quiz gamificado Capítulo 2 (derivaciones)
+quiz-3.html             → Quiz gamificado Capítulo 3 (componentes del ECG)
 ecg-monitor.html        → Monitor ECG Interactivo (Canvas)
 autopercepcion.html     → Página de Autopercepción del Aprendizaje
 descargar.html          → Descarga del proyecto ZIP (oculta del menú)
 css/style.css           → Estilos globales (tema claro/oscuro + modal Enviar)
+css/quiz.css            → Estilos compartidos de los quizzes
+css/likert.css          → Estilos compartidos del sistema Likert
 js/main.js              → Navegación, búsqueda, tema, TOC + modal Enviar + submitSession()
 js/session.js           → Módulo de sesión: identidad (clave: 'identity'), quiz log, Likert
-js/likert.js            → Componente de autopercepción Likert interactivo
+js/likert-engine.js     → Motor compartido para cuestionarios Likert por ítems
+js/likert-config-1.js   → Preguntas de autopercepción Cap. 1
+js/likert-config-2.js   → Preguntas de autopercepción Cap. 2
+js/likert-config-3.js   → Preguntas de autopercepción Cap. 3
+js/likert-config-4.js   → Preguntas de autopercepción Cap. 4
+js/likert-config-5.js   → Preguntas de autopercepción Cap. 5
+js/likert-config-6.js   → Preguntas de autopercepción Cap. 6
+js/likert-config-full.js→ Preguntas de autopercepción (todos los capítulos)
+js/likert.js            → (Legacy) motor previo de autopercepción, sin uso en capítulos actuales
+js/quiz-engine.js       → Motor unificado `QuizEngine` para quizzes
+js/quiz-config-1.js     → Banco de preguntas y config del Quiz Cap. 1
+js/quiz-config-2.js     → Banco de preguntas y config del Quiz Cap. 2
+js/quiz-config-3.js     → Banco de preguntas y config del Quiz Cap. 3
+diagnostico-quiz-seleccion.html → Prueba automática de selección única (quiz 1–3)
+diagnostico-likert-engine.html  → Diagnóstico del motor Likert
 README.md               → Documentación funcional del proyecto
 ARQUITECTURA-TECNICA.md → Arquitectura interna, flujos, bugs, IDs del DOM
 MANUAL-GOOGLE-SHEETS.md → Guía paso a paso para configurar Apps Script
@@ -119,15 +167,18 @@ MANUAL-GOOGLE-SHEETS.md → Guía paso a paso para configurar Apps Script
 | `/chapter-6.html` | Cap. 6 – Talleres de Práctica |
 | `/quiz-1.html` | Quiz Gamificado Capítulo 1 |
 | `/quiz-2.html` | Quiz Gamificado Capítulo 2 – Anatomía de Derivaciones |
+| `/quiz-3.html` | Quiz Gamificado Capítulo 3 – Componentes del ECG |
+| `/diagnostico-quiz-seleccion.html` | Diagnóstico automático de selección única (quiz 1–3) |
 | `/ecg-monitor.html` | Monitor ECG Interactivo |
 | `/autopercepcion.html` | Autopercepción del Aprendizaje |
+| `/diagnostico-likert-engine.html` | Diagnóstico del motor Likert |
 | `/descargar.html` | Descarga ZIP (no enlazada en menú) |
 
 ---
 
 ## 🧩 Modelos de datos, estructuras y almacenamiento
 
-- **localStorage**: `ecg_identity`, `ecg_badges_cap1`, tema (`ecg-theme`).
+- **localStorage**: `ecg_identity`, `ecg-theme`, `cap1_likert_badges` … `cap6_likert_badges`, `likert_full_badges` (autopercepción).
 - **sessionStorage**: `ecg_session` con respuestas de quiz y autopercepción en la sesión actual.
 - **Google Sheets (Apps Script)**: persistencia de respuestas al profesor vía POST.
 
