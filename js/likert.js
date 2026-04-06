@@ -141,15 +141,22 @@
     slider.style.background =
       `linear-gradient(to right, ${color} ${pct}%, #1e2d40 ${pct}%)`;
 
+    // Limpiar selección previa
+    overlay.querySelectorAll('.lk-emoji, .lk-tick').forEach(el => {
+      el.classList.remove('selected', 'active', 'checked', 'highlighted');
+    });
+
     // Resaltar emoji activo
     overlay.querySelectorAll('.lk-emoji').forEach((em, i) => {
       em.classList.toggle('lk-emoji-active', i === val);
+      if (i === val) em.classList.add('selected');
     });
 
     // Resaltar etiqueta activa
     overlay.querySelectorAll('.lk-tick').forEach((t, i) => {
       t.classList.toggle('lk-tick-active', i === val);
       t.style.color = i === val ? color : '';
+      if (i === val) t.classList.add('selected');
     });
 
     // Texto de feedback
@@ -220,6 +227,16 @@
     const saveBtn  = overlay.querySelector('#lk-save-btn');
 
     saveResponse(concept, val);
+
+    // Registrar en sesión si está disponible
+    if (window.ECGSession && typeof window.ECGSession.logLikert === 'function') {
+      window.ECGSession.logLikert({
+        capitulo: document.title || 'Autopercepción',
+        concepto: concept,
+        nivel_num: val + 1,
+        nivel_texto: LABELS[val]
+      });
+    }
 
     // Animación de confirmación
     saveBtn.innerHTML = '<i class="fas fa-check-circle"></i> ¡Guardado!';
